@@ -9,6 +9,10 @@ export const HeaderWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px 40px;
+
+  @media screen and (max-width: 425px) {
+    padding: 10px 20px;
+  }
 `;
 
 export const LogoImage = styled.img`
@@ -24,7 +28,7 @@ export const HeaderMenu = styled.div`
   justify-content: center;
 `;
 
-export const HeaderMenuText = styled.a`
+export const HeaderMenuText = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,4 +42,22 @@ export const HeaderMenuText = styled.a`
   line-height: normal;
   cursor: pointer;
   text-decoration: none;
+`;
+
+export const MobileMenuIconDiv = styled.div`
+  display: grid;
+  place-items: center;
+`;
+
+export const MobileMenuText = styled.div``;
+
+export const MobileMenuWrapper = styled.div`
+  background: linear-gradient(90deg, #f9f1e7 70%, #fcf8f3 30%);
+  padding: 0px 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  color: #542e00;
+  text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  font-family: "Outfit";
 `;

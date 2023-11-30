@@ -7,7 +7,7 @@ export const DiscountWrapper = styled.div`
   justify-content: space-between;
   gap: 40px;
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 767px) {
     display: grid;
     place-items: center;
     padding: 20px;
@@ -88,6 +88,10 @@ export const DiscountInput = styled.input`
   @media screen and (max-width: 768px) {
     padding: 12px;
     font-size: 14px;
+  }
+
+  @media screen and (max-width: 425px) {
+    width: 50%;
   }
 
   @media screen and (max-width: 320px) {
