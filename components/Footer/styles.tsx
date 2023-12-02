@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styled from "styled-components";
 
 export const FooterWrapper = styled.div`
@@ -20,7 +21,7 @@ export const FooterLogoDiv = styled.div`
   }
 `;
 
-export const FooterLogo = styled.img`
+export const FooterLogo = styled(Image)`
   width: 206.14px;
   height: 44.22px;
   cursor: pointer;

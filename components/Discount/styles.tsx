@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { TextFontSize, TitleFontSize } from "../../constants";
+import Image from "next/image";
 
 export const DiscountWrapper = styled.div`
   display: flex;

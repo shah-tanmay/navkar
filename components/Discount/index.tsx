@@ -15,7 +15,7 @@ const Discount = () => {
   return (
     <DiscountWrapper id="contact">
       <DiscountImageDiv>
-        <DiscountImage src="/images/discount-image.png" />
+        <DiscountImage src="/images/discount-image.png" alt="BedRoom" />
       </DiscountImageDiv>
       <DiscountInfoWrapper>
         <DiscountInfo>

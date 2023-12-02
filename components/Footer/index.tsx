@@ -16,7 +16,12 @@ const Footer = () => {
     <FooterWrapper>
       <FooterMain>
         <FooterLogoDiv>
-          <FooterLogo src={logoPath} />
+          <FooterLogo
+            src={logoPath}
+            alt="Navkar Logo"
+            width={206.14}
+            height={44.22}
+          />
         </FooterLogoDiv>
         <FooterSocials>
           <FooterSocialIconWrapper>

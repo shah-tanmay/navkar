@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { TextFontSize, TitleFontSize } from "../../constants";
+import Image from "next/image";
 
 export const AboutContainer = styled.div`
   display: flex;
@@ -24,7 +25,7 @@ export const AboutImageDiv = styled.div`
   }
 `;
 
-export const AboutImage = styled.img`
+export const AboutImage = styled(Image)`
   border-radius: 10px;
   max-width: 100%;
 `;
