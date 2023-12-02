@@ -15,9 +15,6 @@ export const ReviewsDetails = styled.div<{ isSlideIn?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: transform 0.5s ease-in-out;
-  animation: ${({ isSlideIn }) => (isSlideIn ? slideIn : slideOut)} 0.5s
-    ease-in-out;
 
   @media screen and (max-width: 768px) {
     gap: 10px;

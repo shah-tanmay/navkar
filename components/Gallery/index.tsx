@@ -1,3 +1,4 @@
+import { useWindowWidth } from "@react-hook/window-size";
 import GalleryCarousel from "./GalleryCarousel";
 import {
   GalleryImageDiv,
@@ -10,6 +11,7 @@ import {
 } from "./styles";
 
 const Gallery = () => {
+  const width = useWindowWidth();
   return (
     <GalleryWrapper id="gallery">
       <GalleryInfoWrapper>
@@ -22,7 +24,7 @@ const Gallery = () => {
         </GalleryInfoDiv>
       </GalleryInfoWrapper>
       <GalleryImageDiv>
-        <GalleryStaticImage src="/images/gallery-main.png" />
+        {width > 425 && <GalleryStaticImage src="/images/gallery-main.png" />}
         <GalleryCarousel />
       </GalleryImageDiv>
     </GalleryWrapper>

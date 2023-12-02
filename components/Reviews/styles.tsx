@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { TitleFontSize } from "../../constants";
 
 export const ReviewsWrapper = styled.div`
@@ -31,7 +31,7 @@ export const ReviewImageDiv = styled.div`
   display: grid;
   place-items: center;
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
     display: none;
   }
 `;
@@ -57,6 +57,7 @@ export const ReviewTitle = styled.div`
 
   @media screen and (max-width: 768px) {
     font-size: ${TitleFontSize["768"]};
+    text-align: center;
   }
 `;
 
@@ -66,8 +67,33 @@ export const ReviewInfoDiv = styled.div`
   min-width: 50%;
 `;
 
-export const ReviewControl = styled.div``;
+export const ReviewControls = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
 
-export const ReviewNext = styled.div``;
+  @media screen and (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+  }
+`;
 
-export const ReviewPrevious = styled.div``;
+export const ReviewImageRightDiv = styled.div`
+  display: grid;
+  place-items: center;
+  background: #794328;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+export const ReviewImageLeftDiv = styled.div`
+  display: grid;
+  place-items: center;
+  background-color: rgba(121, 67, 40, 0.3);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+`;

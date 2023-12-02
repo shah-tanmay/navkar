@@ -10,12 +10,12 @@ export const GalleryWrapper = styled.div`
   @media screen and (max-width: 768px) {
     padding: 0px 0px;
     gap: 50px;
-  }
-
-  @media screen and (max-width: 425px) {
     flex-direction: column;
     text-align: center;
     gap: 40px;
+  }
+
+  @media screen and (max-width: 425px) {
   }
 `;
 

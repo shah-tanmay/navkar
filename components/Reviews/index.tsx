@@ -1,16 +1,17 @@
-import { Children, useEffect, useState } from "react";
+import { Children, useState } from "react";
 import ReviewerCard from "./ReviewerCard";
 import {
-  ReviewControl,
+  ReviewControls,
   ReviewImage,
   ReviewImageDiv,
+  ReviewImageLeftDiv,
+  ReviewImageRightDiv,
   ReviewInfoDiv,
-  ReviewNext,
-  ReviewPrevious,
   ReviewTitle,
   ReviewsInfo,
   ReviewsWrapper,
 } from "./styles";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export const Reviews = () => {
   const reviewInfo = [
@@ -29,14 +30,45 @@ export const Reviews = () => {
         "“They are have a perfect touch for make something so professional, interest and useful for a lot of people .”",
     },
   ];
-  const [reviewIndex, setReviewIndex] = useState(0);
+  const [currentReview, setCurrentReview] = useState(0);
+
   return (
     <ReviewsWrapper>
       <ReviewInfoDiv>
         <ReviewTitle>What people are saying about us</ReviewTitle>
-        <ReviewsInfo>
-          <ReviewerCard {...reviewInfo[reviewIndex]} />
-        </ReviewsInfo>
+        {Children.toArray(
+          reviewInfo.map((info, idx) => {
+            return (
+              idx === currentReview && (
+                <ReviewsInfo>
+                  <ReviewerCard {...info} />
+                </ReviewsInfo>
+              )
+            );
+          })
+        )}
+        <ReviewControls>
+          <ReviewImageLeftDiv
+            onClick={() =>
+              setCurrentReview((currentReview) =>
+                currentReview - 1 < 0
+                  ? reviewInfo.length - 1
+                  : currentReview - 1
+              )
+            }
+          >
+            <FaChevronLeft size={20} color="#794328" />
+          </ReviewImageLeftDiv>
+          <ReviewImageRightDiv
+            onClick={() =>
+              setCurrentReview((currentReview) =>
+                currentReview + 1 >= reviewInfo.length ? 0 : currentReview + 1
+              )
+            }
+          >
+            <FaChevronRight size={20} color="white" />
+          </ReviewImageRightDiv>
+        </ReviewControls>
       </ReviewInfoDiv>
       <ReviewImageDiv>
         <ReviewImage src="/images/review-image.png" />

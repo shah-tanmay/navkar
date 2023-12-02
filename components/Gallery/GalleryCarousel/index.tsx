@@ -1,10 +1,9 @@
-import { Children, useEffect, useState } from "react";
+import { Carousel } from "react-responsive-carousel";
 import {
   GalleryCarouselWrapper,
-  GalleryImageOne,
+  GalleryImageDiv,
+  GalleryCarouselImage,
   GallerySlideShowWrapper,
-  NextImage,
-  SlideShowButton,
 } from "./styles";
 
 const GalleryCarousel = () => {
@@ -13,23 +12,25 @@ const GalleryCarousel = () => {
     "/images/gallery-slide-show-2.png",
     "/images/gallery-slide-show-0.png",
   ];
-  const carouselLength = galleryImages.length;
-  const [imageNumber, setImageNumber] = useState(0);
-  const slideShowButtonHandler = () =>
-    setImageNumber((imageNumber) =>
-      imageNumber + 1 >= carouselLength ? 0 : imageNumber + 1
-    );
   return (
     <GalleryCarouselWrapper>
       <GallerySlideShowWrapper>
-        {Children.toArray(
-          galleryImages.map((image, idx) => {
-            return <GalleryImageOne src={image} />;
-          })
-        )}
-        <SlideShowButton onClick={slideShowButtonHandler}>
-          <NextImage src="/images/right-icon.png" />
-        </SlideShowButton>
+        <Carousel
+          infiniteLoop
+          centerMode
+          centerSlidePercentage={70}
+          showThumbs={false}
+          showStatus={false}
+          autoPlay
+        >
+          {galleryImages.map((image, idx) => {
+            return (
+              <GalleryImageDiv key={idx}>
+                <GalleryCarouselImage src={image} />
+              </GalleryImageDiv>
+            );
+          })}
+        </Carousel>
       </GallerySlideShowWrapper>
     </GalleryCarouselWrapper>
   );

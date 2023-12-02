@@ -7,7 +7,7 @@ export const AboutContainer = styled.div`
   gap: 70px;
   align-items: stretch;
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
     display: grid;
     place-items: center;
     text-align: center;
@@ -19,7 +19,7 @@ export const AboutImageDiv = styled.div`
   min-width: 45%;
   max-width: 45%;
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
     min-width: 80%;
   }
 `;

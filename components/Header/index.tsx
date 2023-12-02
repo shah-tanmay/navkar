@@ -24,7 +24,7 @@ const Header = () => {
     <Fragment>
       <HeaderWrapper>
         <LogoImage src={logoPath} alt="logo" />
-        {width > 426 && (
+        {width > 768 && (
           <HeaderMenu>
             {Children.toArray(
               menuItems.map((menuItem) => (
@@ -37,7 +37,7 @@ const Header = () => {
             )}
           </HeaderMenu>
         )}
-        {width <= 425 && (
+        {width <= 768 && (
           <MobileMenuIconDiv onClick={() => setIsOpen((isOpen) => !isOpen)}>
             <FaBars color="70441b" size={25} />
           </MobileMenuIconDiv>

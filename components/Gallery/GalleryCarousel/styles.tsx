@@ -12,7 +12,7 @@ const slideOut = keyframes`
     100% { transform: translateX(100%); }
 `;
 
-export const GalleryImageOne = styled.img`
+export const GalleryCarouselImage = styled.img`
   width: 372px;
   height: 486px;
   flex-shrink: 0;
@@ -45,4 +45,6 @@ export const SlideShowButton = styled.div`
   cursor: pointer;
 `;
 
-export const NextImage = styled.img``;
+export const GalleryImageDiv = styled.div`
+  margin: 0px 10px;
+`;

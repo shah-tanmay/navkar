@@ -14,16 +14,14 @@ const ReviewerCard = ({
   designation,
   image,
   review,
-  isSlideIn,
 }: {
   name: string;
   designation: string;
   image: string;
   review: string;
-  isSlideIn?: boolean;
 }) => {
   return (
-    <ReviewsDetails isSlideIn={isSlideIn}>
+    <ReviewsDetails>
       <ReviwerDetails>
         <ReviewerImage src={image} />
         <ReviewrInfoWrapper>
