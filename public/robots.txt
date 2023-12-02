@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://navkar-test.netlify.app/sitemap.xml
