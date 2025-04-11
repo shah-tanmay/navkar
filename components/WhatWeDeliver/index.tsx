@@ -18,7 +18,7 @@ const WhatWeDeliver = () => {
     {
       icon: "/images/shipping.png",
       title: "Free Shiping",
-      description: "Order over 150 $",
+      description: "Order over ₹4000",
     },
     {
       icon: "/images/customer-support.png",

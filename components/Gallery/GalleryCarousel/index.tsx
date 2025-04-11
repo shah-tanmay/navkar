@@ -8,9 +8,10 @@ import {
 
 const GalleryCarousel = () => {
   const galleryImages = [
-    "/images/gallery-slide-show-1.png",
-    "/images/gallery-slide-show-2.png",
-    "/images/gallery-slide-show-0.png",
+    "/images/gallery-1.jpg",
+    "/images/gallery-2.jpg",
+    "/images/gallery-3.jpg",
+    "/images/gallery-5.jpg",
   ];
   return (
     <GalleryCarouselWrapper>

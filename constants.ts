@@ -9,3 +9,5 @@ export const TextFontSize = {
   "1024": "18px",
   "768": "15px",
 };
+
+export const excludeLayouts = ["/login"];

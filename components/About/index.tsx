@@ -22,11 +22,10 @@ const About = () => {
     <AboutContainer id="about">
       <AboutImageDiv>
         <AboutImage
-          src="/images/about-image.png"
+          src="/images/shop.jpg"
           alt="About the shop"
-          layout="responsive"
-          width={459}
-          height={689}
+          width={518}
+          height={540}
         />
       </AboutImageDiv>
       <AboutInfoDiv>

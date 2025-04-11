@@ -31,6 +31,8 @@ export const DiscountImageDiv = styled.div`
 `;
 
 export const DiscountImage = styled.img`
+  border-radius: 30px;
+
   @media screen and (max-width: 1024px) {
     max-width: 100%;
   }

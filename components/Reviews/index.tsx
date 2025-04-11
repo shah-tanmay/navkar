@@ -17,17 +17,24 @@ export const Reviews = () => {
   const reviewInfo = [
     {
       image: "/images/josh.png",
-      name: "Josh Smith",
-      designation: "Manager of New York Times",
+      name: "Anoop Sahu",
+      designation: "Proud Customer of Navkar Mattresses",
       review:
-        "“They are have a perfect touch for make something so professional, interest and useful for a lot of people .”",
+        "“Good quality mattress. We bought a mattress with 3 layers of foam and breathable fabric cover. We are happy with quality of mattress, speed of delivery and service. A proper bill was given as well. Thanks to Mr.Brijesh.”",
     },
     {
       image: "/images/josh.png",
-      name: "Hey Josh Smith",
-      designation: "Manager of New York Times",
+      name: "Aamena Hirani",
+      designation: "Proud Customer of Navkar Mattresses",
       review:
-        "“They are have a perfect touch for make something so professional, interest and useful for a lot of people .”",
+        "“Made a customize sofa set with great fabric and quality stitching work with timly delivered at our door step.”",
+    },
+    {
+      image: "/images/josh.png",
+      name: "Tina Mistry",
+      designation: "Proud Customer of Navkar Mattresses",
+      review:
+        "“Very good service and all products are very reasonably priced.”",
     },
   ];
   const [currentReview, setCurrentReview] = useState(0);
@@ -71,7 +78,7 @@ export const Reviews = () => {
         </ReviewControls>
       </ReviewInfoDiv>
       <ReviewImageDiv>
-        <ReviewImage src="/images/review-image.png" />
+        <ReviewImage src="/images/carousel-5.jpg" />
       </ReviewImageDiv>
     </ReviewsWrapper>
   );

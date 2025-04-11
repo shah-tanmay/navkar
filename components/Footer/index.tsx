@@ -9,6 +9,7 @@ import {
   FooterSocialIconWrapper,
   FooterSocials,
   FooterWrapper,
+  SocialAnchor,
 } from "./styles";
 
 const Footer = () => {
@@ -25,10 +26,22 @@ const Footer = () => {
         </FooterLogoDiv>
         <FooterSocials>
           <FooterSocialIconWrapper>
-            <FaInstagram size={20} color="#794328" />
+            <SocialAnchor
+              href="https://www.instagram.com/navkarmattresses/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagram size={20} color="#794328" />
+            </SocialAnchor>
           </FooterSocialIconWrapper>
           <FooterSocialIconWrapper>
-            <FaFacebook size={20} color="#794328" />
+            <SocialAnchor
+              href="https://www.facebook.com/navkarmattresses/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaFacebook size={20} color="#794328" />
+            </SocialAnchor>
           </FooterSocialIconWrapper>
         </FooterSocials>
       </FooterMain>

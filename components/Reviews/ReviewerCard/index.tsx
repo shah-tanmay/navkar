@@ -2,6 +2,7 @@ import {
   Review,
   ReviewerDesignation,
   ReviewerImage,
+  ReviewerImageGenerater,
   ReviewerInfo,
   ReviewerName,
   ReviewrInfoWrapper,
@@ -23,7 +24,9 @@ const ReviewerCard = ({
   return (
     <ReviewsDetails>
       <ReviwerDetails>
-        <ReviewerImage src={image} />
+        <ReviewerImageGenerater>
+          {name.charAt(0).toUpperCase()}
+        </ReviewerImageGenerater>
         <ReviewrInfoWrapper>
           <ReviewerInfo>
             <ReviewerName>{name}</ReviewerName>

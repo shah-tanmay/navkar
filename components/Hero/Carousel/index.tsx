@@ -4,9 +4,10 @@ import { CarouselImage, CarouselImageDiv, CarouselWrapper } from "./styles";
 
 const CarouselComponent = () => {
   const CarouselImages = [
-    "/images/carousel-1.png",
-    "/images/carousel-2.png",
-    "/images/carousel-3.png",
+    "/images/carousel-4.jpg",
+    // "/images/carousel-5.jpg",
+    "/images/carousel-6.jpg",
+    "/images/sofa-2.png",
   ];
   return (
     <CarouselWrapper>

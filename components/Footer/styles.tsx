@@ -71,3 +71,5 @@ export const FooterRights = styled.div`
   font-weight: 400;
   line-height: 20px; /* 142.857% */
 `;
+
+export const SocialAnchor = styled.a``;

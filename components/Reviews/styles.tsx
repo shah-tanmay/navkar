@@ -40,6 +40,7 @@ export const ReviewImage = styled.img`
   width: 100%;
   object-fit: contain;
   height: auto;
+  border-radius: 30px;
 `;
 
 export const ReviewTitle = styled.div`

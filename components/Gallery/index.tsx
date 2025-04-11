@@ -24,7 +24,13 @@ const Gallery = () => {
         </GalleryInfoDiv>
       </GalleryInfoWrapper>
       <GalleryImageDiv>
-        {width > 425 && <GalleryStaticImage src="/images/gallery-main.png" />}
+        {width > 425 && (
+          <GalleryStaticImage
+            src="/images/gallery-4.jpg"
+            width={404}
+            height={582}
+          />
+        )}
         <GalleryCarousel />
       </GalleryImageDiv>
     </GalleryWrapper>

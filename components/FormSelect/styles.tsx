@@ -1,0 +1,50 @@
+import { StylesConfig } from "react-select";
+import { StateOption } from "../../types/api";
+import styled from "styled-components";
+
+export const selectStyles: StylesConfig<StateOption, false> = {
+  control: (provided, state) => ({
+    ...provided,
+    border: "1px solid #542e00",
+    borderRadius: "4px",
+    padding: "0.3rem",
+    "&:hover": { borderColor: "#b89f72" },
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? "#542e00" : "white",
+    color: state.isSelected ? "white" : "#542e00",
+    "&:hover": { backgroundColor: "#b89f72", color: "white" },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    border: "1px solid #542e00",
+    borderRadius: "4px",
+  }),
+};
+
+const primary = "#542e00";
+
+export const SelectComponentStyles = styled.div`
+  width: 100%;
+
+  label {
+    display: block;
+    color: ${primary};
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  span {
+    color: #ff4444;
+    margin-left: 2px;
+  }
+`;
+
+export const ErrorMessage = styled.span`
+  font-family: "Outfit";
+  color: #ff4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+`;

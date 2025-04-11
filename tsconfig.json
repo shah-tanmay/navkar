@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "public/robots.tst"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "public/robots.tst", "pages/products/[slug]"],
   "exclude": ["node_modules"]
 }

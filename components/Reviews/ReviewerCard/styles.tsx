@@ -21,6 +21,20 @@ export const ReviewsDetails = styled.div<{ isSlideIn?: boolean }>`
   }
 `;
 
+export const ReviewerImageGenerater = styled.div`
+  width: 60px;
+  height: 60px;
+  background-color: #794328;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Outfit";
+  font-size: 30px;
+  color: #ffffff;
+  border-radius: 100%;
+  border-width: 2px;
+`;
+
 export const ReviwerDetails = styled.div`
   display: flex;
   gap: 20px;
