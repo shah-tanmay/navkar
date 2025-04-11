@@ -1,36 +1,3 @@
-// import { FaCartPlus } from "react-icons/fa";
-// import { AddToCartButton } from "./styles";
-// import { isUserloggedIn } from "../../utils/login";
-// import { useCart } from "../../context/CartContext";
-// import { ProductVariantType } from "../../types/api";
-// import React from "react";
-
-// export const AddToCart = ({
-//   variantId,
-//   quantity,
-//   type,
-// }: {
-//   variantId?: string;
-//   quantity?: number;
-//   type: ProductVariantType;
-// }) => {
-//   const { addToCart } = useCart();
-//   const handleAddToCart = async (e: React.MouseEvent) => {
-//     e.stopPropagation;
-//     const userLoggedIn = await isUserloggedIn();
-//     if (userLoggedIn) {
-//       if (variantId) {
-//         await addToCart(variantId, (quantity || 1).toString(), type);
-//       }
-//     }
-//   };
-//   return (
-//     <AddToCartButton size="small" onClick={handleAddToCart}>
-//       <FaCartPlus />
-//       Add to Cart
-//     </AddToCartButton>
-//   );
-// };
 import _ from "lodash";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";

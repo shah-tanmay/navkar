@@ -20,6 +20,7 @@ import { OrderItem } from "../../../types/api";
 import { CheckoutFormType } from "../../../types/type";
 import { FormData, schema } from "../../../types/zodSchema";
 import * as S from "./styles";
+import InvalidCheckout from "../../../components/InvalidCheckout";
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -34,6 +35,7 @@ const CheckoutPage = () => {
   const [isAddressSaved, setIsAddressSaved] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [invalidOrder, setInvalidOrder] = useState(false);
 
   const [formData, setFormData] = useState<CheckoutFormType>({
     contact: {
@@ -95,6 +97,11 @@ const CheckoutPage = () => {
       setLoading(true);
       if (orderToken) {
         const orderDetails = await getOrderByOrderToken(orderToken);
+        if (!orderDetails) {
+          setInvalidOrder(true);
+          setLoading(false);
+          return;
+        }
         setOrderItems(orderDetails.order_items);
       }
       setLoading(false);
@@ -113,130 +120,134 @@ const CheckoutPage = () => {
   });
   return (
     <LoaderWrapper loading={loading}>
-      <ProtectedRoute>
-        <S.CheckoutContainer>
-          <S.MainContainer>
-            <FormProvider {...methods}>
-              <StepContainer
-                steps={[
-                  {
-                    title: "Contact Details",
-                    Component: <ContactDetailsStepComponent />,
-                    validate: () => methods.trigger("contact"),
-                    header: "Information",
-                  },
-                  {
-                    title: "Shipping Information",
-                    Component: (
-                      <AddressDetailsStepComponent
-                        setSelectedAddress={setSelectedAddress}
-                        orderToken={orderToken}
-                        phone={methods.getValues().contact.phoneNumber}
-                      />
-                    ),
-                    validate: async () => {
-                      if (selectedAddress) return true;
-                      const result = formSchema.shape.shipping.safeParse(
-                        formData.shipping
-                      );
-                      if (!result.success) {
-                        return false;
-                      }
-                      return true;
+      {invalidOrder ? (
+        <InvalidCheckout />
+      ) : (
+        <ProtectedRoute>
+          <S.CheckoutContainer>
+            <S.MainContainer>
+              <FormProvider {...methods}>
+                <StepContainer
+                  steps={[
+                    {
+                      title: "Contact Details",
+                      Component: <ContactDetailsStepComponent />,
+                      validate: () => methods.trigger("contact"),
+                      header: "Information",
                     },
-                    beforeNextStep: async () => {
-                      if (selectedAddress) {
-                        await updateOrderShippingAddress(
-                          orderToken,
-                          selectedAddress
+                    {
+                      title: "Shipping Information",
+                      Component: (
+                        <AddressDetailsStepComponent
+                          setSelectedAddress={setSelectedAddress}
+                          orderToken={orderToken}
+                          phone={methods.getValues().contact.phoneNumber}
+                        />
+                      ),
+                      validate: async () => {
+                        if (selectedAddress) return true;
+                        const result = formSchema.shape.shipping.safeParse(
+                          formData.shipping
                         );
-                      }
-                      if (!isAddressSaved && !selectedAddress) {
-                        const response = await postAddress({
-                          ...formData.shipping,
-                          phone: formData.contact.phoneNumber,
-                        });
-                        if (response) {
-                          setIsAddressSaved(true);
-                          const shippingAddressId = response.id;
+                        if (!result.success) {
+                          return false;
+                        }
+                        return true;
+                      },
+                      beforeNextStep: async () => {
+                        if (selectedAddress) {
                           await updateOrderShippingAddress(
                             orderToken,
-                            shippingAddressId
+                            selectedAddress
                           );
                         }
-                      }
+                        if (!isAddressSaved && !selectedAddress) {
+                          const response = await postAddress({
+                            ...formData.shipping,
+                            phone: formData.contact.phoneNumber,
+                          });
+                          if (response) {
+                            setIsAddressSaved(true);
+                            const shippingAddressId = response.id;
+                            await updateOrderShippingAddress(
+                              orderToken,
+                              shippingAddressId
+                            );
+                          }
+                        }
+                      },
+                      header: "Shipping",
                     },
-                    header: "Shipping",
-                  },
-                  {
-                    title: "Secure Payment",
-                    Component: <Payment total={calculateTotal()} />,
-                    validate: async () => {
-                      const result = formSchema.shape.shipping.safeParse(
-                        formData.shipping
-                      );
-                      if (!result.success) {
-                        return false;
-                      }
-                      return true;
+                    {
+                      title: "Secure Payment",
+                      Component: <Payment total={calculateTotal()} />,
+                      validate: async () => {
+                        const result = formSchema.shape.shipping.safeParse(
+                          formData.shipping
+                        );
+                        if (!result.success) {
+                          return false;
+                        }
+                        return true;
+                      },
+                      header: "Payment",
                     },
-                    header: "Payment",
-                  },
-                ]}
-              />
-            </FormProvider>
+                  ]}
+                />
+              </FormProvider>
 
-            <S.OrderSummary>
-              <S.SummaryHeader>
-                <h3>Order Summary</h3>
-                <S.EditCartLink
-                  onClick={() => {
-                    const pathname = itemSlug
-                      ? `/products/${itemSlug}`
-                      : "/cart";
-                    router.push(pathname);
-                  }}
-                >
-                  {itemSlug ? "Back to Product" : "Edit Cart"}
-                </S.EditCartLink>
-              </S.SummaryHeader>
-
-              <S.ProductItem>
-                {orderItems.map((item) => (
-                  <S.ProductItemsWrapper
-                    key={item.product_variant_id}
-                    onClick={() => router.push(`/products/${item.slug}`)}
+              <S.OrderSummary>
+                <S.SummaryHeader>
+                  <h3>Order Summary</h3>
+                  <S.EditCartLink
+                    onClick={() => {
+                      const pathname = itemSlug
+                        ? `/products/${itemSlug}`
+                        : "/cart";
+                      router.push(pathname);
+                    }}
                   >
-                    <S.ProductImage src={item.image_url} alt={item.name} />
-                    <S.ProductDetails>
-                      <h4>{item.product_name}</h4>
-                      <p>Color: {item.name}</p>
-                      <p>Size: {item.type}</p>
-                      <p>Quantity: {item.quantity}</p>
-                    </S.ProductDetails>
-                    <S.Price>₹{item.price * item.quantity}</S.Price>
-                  </S.ProductItemsWrapper>
-                ))}
-              </S.ProductItem>
+                    {itemSlug ? "Back to Product" : "Edit Cart"}
+                  </S.EditCartLink>
+                </S.SummaryHeader>
 
-              <S.PriceBreakdown>
-                <S.PriceRow>
-                  <span>Subtotal</span>
-                  <span>₹{calculateTotal()}</span>
-                </S.PriceRow>
-                <S.PriceRow>
-                  <span>Shipping</span>
-                  <span>FREE</span>
-                </S.PriceRow>
-                <S.TotalPrice>
-                  <span>Total</span>
-                  <span>₹{calculateTotal()}</span>
-                </S.TotalPrice>
-              </S.PriceBreakdown>
-            </S.OrderSummary>
-          </S.MainContainer>
-        </S.CheckoutContainer>
-      </ProtectedRoute>
+                <S.ProductItem>
+                  {orderItems.map((item) => (
+                    <S.ProductItemsWrapper
+                      key={item.product_variant_id}
+                      onClick={() => router.push(`/products/${item.slug}`)}
+                    >
+                      <S.ProductImage src={item.image_url} alt={item.name} />
+                      <S.ProductDetails>
+                        <h4>{item.product_name}</h4>
+                        <p>Color: {item.name}</p>
+                        <p>Size: {item.type}</p>
+                        <p>Quantity: {item.quantity}</p>
+                      </S.ProductDetails>
+                      <S.Price>₹{item.price * item.quantity}</S.Price>
+                    </S.ProductItemsWrapper>
+                  ))}
+                </S.ProductItem>
+
+                <S.PriceBreakdown>
+                  <S.PriceRow>
+                    <span>Subtotal</span>
+                    <span>₹{calculateTotal()}</span>
+                  </S.PriceRow>
+                  <S.PriceRow>
+                    <span>Shipping</span>
+                    <span>FREE</span>
+                  </S.PriceRow>
+                  <S.TotalPrice>
+                    <span>Total</span>
+                    <span>₹{calculateTotal()}</span>
+                  </S.TotalPrice>
+                </S.PriceBreakdown>
+              </S.OrderSummary>
+            </S.MainContainer>
+          </S.CheckoutContainer>
+        </ProtectedRoute>
+      )}
     </LoaderWrapper>
   );
 };

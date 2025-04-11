@@ -8,6 +8,7 @@ import _ from "lodash";
 import { useSession } from "next-auth/react";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
+import OrderNotFoundPage from "../../../components/OrderNotFound";
 
 const STATUS_FLOW = [
   "received",
@@ -23,12 +24,18 @@ const OrderTracking: FC<OrderResponse> = () => {
   const router = useRouter();
   const { orderToken } = router.query as { orderToken: string };
   const { data: session } = useSession();
+  const [invalidOrder, setInvalidOrder] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
       setLoading(true);
       if (!orderToken) return;
       let order = await getOrderByOrderToken(orderToken);
+      if (!order) {
+        setInvalidOrder(true);
+        setLoading(false);
+        return;
+      }
       if (order) {
         order.order_tracking_statuses = _.orderBy(
           order?.order_tracking_statuses,
@@ -113,74 +120,80 @@ const OrderTracking: FC<OrderResponse> = () => {
 
   return (
     <LoaderWrapper loading={loading}>
-      <ProtectedRoute>
-        <S.Container>
-          {orderDetails && (
-            <S.OrderCard>
-              <S.OrderHeader>
-                <S.OrderNumber>
-                  Order #{orderDetails?.order_token}
-                </S.OrderNumber>
-                <S.CustomerName>{session?.user?.name}</S.CustomerName>
-                <S.DeliveryAddress>{"Address"}</S.DeliveryAddress>
-              </S.OrderHeader>
+      {invalidOrder ? (
+        <OrderNotFoundPage />
+      ) : (
+        <ProtectedRoute>
+          <S.Container>
+            {orderDetails && (
+              <S.OrderCard>
+                <S.OrderHeader>
+                  <S.OrderNumber>
+                    Order #{orderDetails?.order_token}
+                  </S.OrderNumber>
+                  <S.CustomerName>{session?.user?.name}</S.CustomerName>
+                  <S.DeliveryAddress>{"Address"}</S.DeliveryAddress>
+                </S.OrderHeader>
 
-              <S.OrderSection>
-                <S.SectionTitle>Tracking Status</S.SectionTitle>
-                <S.HorizontalTimeline>
-                  {fullStatus.map((status, index) => (
-                    <S.TimelineStep
-                      key={status.status}
-                      $isCompleted={status.isCompleted || false}
-                      $isCurrent={index === currentStatusIndex}
-                    >
-                      <S.StepConnector
-                        $isCompleted={index <= currentStatusIndex}
-                        $isFirst={index === 0}
-                      />
-                      <S.StepIndicator>
-                        <S.StepDot
-                          $isCompleted={status.isCompleted || false}
-                          $isCurrent={index === currentStatusIndex}
+                <S.OrderSection>
+                  <S.SectionTitle>Tracking Status</S.SectionTitle>
+                  <S.HorizontalTimeline>
+                    {fullStatus.map((status, index) => (
+                      <S.TimelineStep
+                        key={status.status}
+                        $isCompleted={status.isCompleted || false}
+                        $isCurrent={index === currentStatusIndex}
+                      >
+                        <S.StepConnector
+                          $isCompleted={index <= currentStatusIndex}
+                          $isFirst={index === 0}
                         />
-                        {index === currentStatusIndex && <S.CurrentPulse />}
-                      </S.StepIndicator>
-                      <S.StepInfo>
-                        <S.StepTitle>{_.capitalize(status.status)}</S.StepTitle>
-                        <S.StepDate>{formatToIST(status.date)}</S.StepDate>
-                      </S.StepInfo>
-                    </S.TimelineStep>
-                  ))}
-                </S.HorizontalTimeline>
-              </S.OrderSection>
+                        <S.StepIndicator>
+                          <S.StepDot
+                            $isCompleted={status.isCompleted || false}
+                            $isCurrent={index === currentStatusIndex}
+                          />
+                          {index === currentStatusIndex && <S.CurrentPulse />}
+                        </S.StepIndicator>
+                        <S.StepInfo>
+                          <S.StepTitle>
+                            {_.capitalize(status.status)}
+                          </S.StepTitle>
+                          <S.StepDate>{formatToIST(status.date)}</S.StepDate>
+                        </S.StepInfo>
+                      </S.TimelineStep>
+                    ))}
+                  </S.HorizontalTimeline>
+                </S.OrderSection>
 
-              <S.OrderSection>
-                <S.SectionTitle>Ordered Products</S.SectionTitle>
-                <S.ItemsGrid>
-                  {orderDetails?.order_items.map((item) => (
-                    <S.ProductCard
-                      key={item.id}
-                      onClick={() => router.push(`/products/${item.slug}`)}
-                    >
-                      <S.ProductImage src={item.image_url} alt={item.name} />
-                      <S.ProductDetails>
-                        <S.ProductName>
-                          {item.product_name}- {item.name}
-                        </S.ProductName>
-                        <S.ProductMeta>
-                          <span>Qty: {item.quantity}</span>
-                          <span>Type: {_.capitalize(item.type)}</span>
-                          <span>₹{item.price}</span>
-                        </S.ProductMeta>
-                      </S.ProductDetails>
-                    </S.ProductCard>
-                  ))}
-                </S.ItemsGrid>
-              </S.OrderSection>
-            </S.OrderCard>
-          )}
-        </S.Container>
-      </ProtectedRoute>
+                <S.OrderSection>
+                  <S.SectionTitle>Ordered Products</S.SectionTitle>
+                  <S.ItemsGrid>
+                    {orderDetails?.order_items.map((item) => (
+                      <S.ProductCard
+                        key={item.id}
+                        onClick={() => router.push(`/products/${item.slug}`)}
+                      >
+                        <S.ProductImage src={item.image_url} alt={item.name} />
+                        <S.ProductDetails>
+                          <S.ProductName>
+                            {item.product_name}- {item.name}
+                          </S.ProductName>
+                          <S.ProductMeta>
+                            <span>Qty: {item.quantity}</span>
+                            <span>Type: {_.capitalize(item.type)}</span>
+                            <span>₹{item.price}</span>
+                          </S.ProductMeta>
+                        </S.ProductDetails>
+                      </S.ProductCard>
+                    ))}
+                  </S.ItemsGrid>
+                </S.OrderSection>
+              </S.OrderCard>
+            )}
+          </S.Container>
+        </ProtectedRoute>
+      )}
     </LoaderWrapper>
   );
 };
