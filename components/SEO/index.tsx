@@ -21,6 +21,7 @@ const SEO: React.FC<SEOProps> = ({
   const defaultDescription =
     "Elevate your living space with Navkar's handcrafted curtains and bespoke drapes. Premium fabrics, master tailoring, and timeless elegance for every window.";
   const siteUrl = "https://navkar.shop";
+  const backendUrl = process.env.NEXT_PUBLIC_CUSTOM_BACKEND_URL || "https://api.navkar.shop";
   const defaultImage = `${siteUrl}/logo.png`;
 
   // Fallback logic
@@ -33,8 +34,16 @@ const SEO: React.FC<SEOProps> = ({
     if (image.startsWith("http")) {
       seoImage = image;
     } else {
+      // Determine if it's a backend path or a frontend public path
+      const isPublicAsset = image.startsWith("/images/") || image.startsWith("/favicon") || image === "/logo.png";
       const path = image.startsWith("/") ? image : `/${image}`;
-      seoImage = `${siteUrl}${path}`;
+      
+      if (isPublicAsset) {
+        seoImage = `${siteUrl}${path}`;
+      } else {
+        // Assume it's a backend upload if not in public folder
+        seoImage = `${backendUrl.replace(/\/$/, "")}${path}`;
+      }
     }
   }
 
