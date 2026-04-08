@@ -18,23 +18,23 @@ export const Reviews = () => {
     {
       image: "/images/josh.png",
       name: "Anoop Sahu",
-      designation: "Proud Customer of Navkar Mattresses",
+      designation: "Navkar Home Decor Enthusiast",
       review:
-        "“Good quality mattress. We bought a mattress with 3 layers of foam and breathable fabric cover. We are happy with quality of mattress, speed of delivery and service. A proper bill was given as well. Thanks to Mr.Brijesh.”",
+        "“Incredible quality curtains. We ordered custom drapes for our living room and the fabric texture is truly premium. The artisanal finish and perfect pleats have transformed our space. Thanks to the Navkar team for such elegance.”",
     },
     {
       image: "/images/josh.png",
       name: "Aamena Hirani",
-      designation: "Proud Customer of Navkar Mattresses",
+      designation: "Verified Premium Customer",
       review:
-        "“Made a customize sofa set with great fabric and quality stitching work with timly delivered at our door step.”",
+        "“Bespoke drapes with great fabric and quality stitching work. Delivered exactly as promised and fits our windows perfectly. The attention to detail is outstanding.”",
     },
     {
       image: "/images/josh.png",
       name: "Tina Mistry",
-      designation: "Proud Customer of Navkar Mattresses",
+      designation: "Interior Decor Connoisseur",
       review:
-        "“Very good service and all products are very reasonably priced.”",
+        "“Exceptional service and the curtain collections are very reasonably priced for the artisanal quality provided. Highly recommended for premium home tailoring.”",
     },
   ];
   const [currentReview, setCurrentReview] = useState(0);
