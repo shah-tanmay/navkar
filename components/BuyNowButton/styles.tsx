@@ -5,27 +5,26 @@ export const BuyNowButton = styled.button`
   width: 100%;
   font-family: "Outfit";
   margin-top: 1rem;
-  padding: 14px 24px;
-  height: 56px;
+  padding: 0 20px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   background: ${COLORS.gold};
   color: ${COLORS.secondary};
-  border: 2px solid ${COLORS.gold};
+  border: 1px solid ${COLORS.gold};
   border-radius: 12px;
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  box-shadow: 0 4px 16px rgba(84, 46, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(84, 46, 0, 0.1);
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    /* background: ${COLORS.bronze}; */
-    box-shadow: 0 6px 24px rgba(84, 46, 0, 0.15);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 16px rgba(84, 46, 0, 0.15);
 
     svg {
       transform: translateX(2px);
@@ -37,14 +36,14 @@ export const BuyNowButton = styled.button`
   }
 
   svg {
-    font-size: 20px;
+    font-size: 18px;
     color: ${COLORS.secondary};
     transition: transform 0.2s ease;
   }
 
   @media (max-width: 768px) {
-    height: 48px;
-    font-size: 1rem;
-    padding: 12px 20px;
+    height: 42px;
+    font-size: 0.9rem;
+    padding: 0 16px;
   }
 `;

@@ -27,10 +27,6 @@ const FormSelect: React.FC<FormSelectProps> = ({
 }) => {
   const { control } = useFormContext();
 
-
-  console.log(`FormSelect ${name} rendered with options:`, options);
-  console.log(`FormContext for ${name}:`, useFormContext().getValues(name));
-
   return (
     <SelectComponentStyles>
       <label>

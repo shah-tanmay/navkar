@@ -2,8 +2,19 @@ import _, { uniqueId } from "lodash";
 import NextAuth, { AuthOptions, RequestInternal, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { googleAuthLogin, registerUser } from "../../../services/authService";
+import {
+  googleAuthLogin,
+  refreshAccessToken,
+  registerUser,
+} from "../../../services/authService";
 import { ServerToken, UserObject } from "../../../types/api";
+import { jwtDecode } from "jwt-decode";
+
+const getJwtExpiry = (jwt: string) => {
+  const decodedToken = jwtDecode(jwt) as { exp: number };
+  if (!decodedToken.exp) throw new Error("Invalid token");
+  return decodedToken.exp * 1000; // Convert to milliseconds
+};
 
 const authOptions: AuthOptions = {
   secret: process.env.AUTH_SECRET,
@@ -74,24 +85,44 @@ const authOptions: AuthOptions = {
         );
         token.user = response.user;
         token.token = response.tokens;
+        token.accessTokenExpires = getJwtExpiry(response.tokens.accessToken);
         token.id_token = account.id_token;
       }
-      if (user) {
-        // token.user = _.get(user, "user");
-        // token.token = _.get(user, "token");
-      }
       //user already logged in but some issues with logout/login
-      if (token && !token.token?.accessToken) {
+      if (token && token.token?.accessToken) {
         if (!token.id_token || !token.name || !token.email) {
           throw new Error("Login Failed");
         }
-        const response = await googleAuthLogin(
-          token.email,
-          token.name,
-          token.id_token as string
+        const now = Date.now();
+        if (now < (token.accessTokenExpires as number)) {
+          return token;
+        }
+
+        try {
+          const refreshExpires = getJwtExpiry(
+            token.token?.refreshToken as string
+          );
+          if (now >= refreshExpires) {
+            token.error = "RefreshTokenError";
+            return token;
+          }
+        } catch {
+          token.error = "RefreshTokenError";
+          return token;
+        }
+
+        const refreshedAuthToken = await refreshAccessToken(
+          token.token?.refreshToken as string
         );
-        token.user = response.user;
-        token.token = response.tokens;
+        token.token!.accessToken = refreshedAuthToken;
+        token.acccessTokenExpires = getJwtExpiry(refreshedAuthToken);
+        // const response = await googleAuthLogin(
+        //   token.email,
+        //   token.name,
+        //   token.id_token as string
+        // );
+        // token.user = response.user;
+        // token.token = response.tokens;
       }
       return token;
     },
@@ -99,6 +130,15 @@ const authOptions: AuthOptions = {
       if (token) {
         session.user = token.user as UserObject;
         session.token = token.token as ServerToken;
+        session.error = token.error as string;
+        try {
+          if (session.token?.accessToken) {
+            const decodedToken: any = jwtDecode(session.token.accessToken);
+            if (decodedToken.role) {
+              session.user.role = decodedToken.role;
+            }
+          }
+        } catch (e) {}
       }
       return session;
     },

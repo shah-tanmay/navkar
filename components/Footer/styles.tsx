@@ -60,6 +60,32 @@ export const FooterDivider = styled.div`
   background-color: #70441b;
 `;
 
+export const FooterLinksRow = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  
+  @media screen and (max-width: 425px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+`;
+
+export const FooterLinkItem = styled.span`
+  color: #794328;
+  font-family: "Outfit", sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const FooterRights = styled.div`
   display: flex;
   justify-content: center;

@@ -4,9 +4,9 @@ import COLORS from "../../../constants/color";
 import { motion } from "framer-motion";
 
 // Color scheme
-const primary = "#542e00";
-const accent = "#b89f72";
-const background = "#f9f1e7";
+const primary = "#111111";
+const accent = "#D4AF37";
+const background = "#f9f9f9";
 
 export const CheckoutContainer = styled.div`
   background: ${background};
@@ -15,6 +15,13 @@ export const CheckoutContainer = styled.div`
   font-family: "Outfit", sans-serif;
   display: flex;
   flex-direction: column;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0.75rem;
+  }
 `;
 
 export const BrandLogo = styled.div`
@@ -22,6 +29,10 @@ export const BrandLogo = styled.div`
   font-weight: 600;
   color: ${primary};
   letter-spacing: -1px;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 export const MainContainer = styled.div`
@@ -33,6 +44,7 @@ export const MainContainer = styled.div`
 
   @media (max-width: 1200px) {
     flex-direction: column;
+    gap: 2rem;
   }
 `;
 
@@ -58,6 +70,10 @@ export const OrderSummary = styled.div`
   @media (max-width: 1200px) {
     max-width: 100%;
     position: static;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    width: 100%;
+    overflow: hidden; /* Prevent any internal content from pushing the card width */
   }
 `;
 
@@ -178,6 +194,10 @@ export const ProductItem = styled.div`
   margin: 1.5rem 0;
   padding: 1rem 0;
   border-bottom: 1px solid #eee;
+
+  @media (max-width: 768px) {
+    margin: 1rem 0;
+  }
 `;
 
 export const ProductImage = styled.img`
@@ -185,23 +205,30 @@ export const ProductImage = styled.img`
   height: 80px;
   border-radius: 8px;
   object-fit: cover;
+  flex-shrink: 0;
 `;
 
 export const ProductDetails = styled.div`
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-left: 10px;
+  gap: 0.25rem;
+  margin-left: 15px;
+
+  @media (max-width: 768px) {
+    margin-left: 10px;
+  }
 
   h4 {
     color: ${primary};
     margin: 0;
+    font-size: 1rem;
   }
 
   p {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin: 0;
   }
 `;
@@ -211,6 +238,12 @@ export const Price = styled.span`
   color: ${primary};
   font-weight: 600;
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+  }
 `;
 
 export const PriceBreakdown = styled.div`
@@ -224,6 +257,13 @@ export const PriceRow = styled.div`
   display: flex;
   justify-content: space-between;
   color: ${primary};
+  width: 100%;
+  gap: 0.5rem;
+  min-width: 0;
+
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+  }
 `;
 
 export const TotalPrice = styled(PriceRow)`
@@ -231,6 +271,10 @@ export const TotalPrice = styled(PriceRow)`
   font-weight: 600;
   padding-top: 1rem;
   border-top: 2px solid ${accent};
+
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+  }
 `;
 
 export const BackToCartLink = styled.a`
@@ -311,6 +355,12 @@ export const SummaryHeader = styled.div`
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #eee;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 `;
 
 export const ProductItemsWrapper = styled.div`
@@ -320,6 +370,13 @@ export const ProductItemsWrapper = styled.div`
   padding-bottom: 1rem;
   border-bottom: 2px solid #eee;
   cursor: pointer;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+
+  @media (max-width: 480px) {
+    align-items: flex-start;
+  }
 `;
 
 export const AddressSection = styled.div`

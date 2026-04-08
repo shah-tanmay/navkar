@@ -1,4 +1,5 @@
 import { FaFacebook, FaInstagram } from "react-icons/fa";
+import Link from "next/link";
 import { logoPath } from "../../constants";
 import {
   FooterDivider,
@@ -10,6 +11,8 @@ import {
   FooterSocials,
   FooterWrapper,
   SocialAnchor,
+  FooterLinksRow,
+  FooterLinkItem,
 } from "./styles";
 
 const Footer = () => {
@@ -45,8 +48,17 @@ const Footer = () => {
           </FooterSocialIconWrapper>
         </FooterSocials>
       </FooterMain>
-      <FooterDivider></FooterDivider>
-      <FooterRights>© Navkar - All Rights Reserved</FooterRights>
+      <FooterDivider />
+      <FooterLinksRow>
+        <Link href="/returns" style={{ textDecoration: "none" }}><FooterLinkItem>Returns Policy</FooterLinkItem></Link>
+        <Link href="/shipping" style={{ textDecoration: "none" }}><FooterLinkItem>Shipping Info</FooterLinkItem></Link>
+        <Link href="/faq" style={{ textDecoration: "none" }}><FooterLinkItem>FAQs</FooterLinkItem></Link>
+      </FooterLinksRow>
+      <FooterRights>
+        © {new Date().getFullYear()} Navkar - All Rights Reserved. 
+        <br />
+        <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>🛡️ SSL Certified & Secure Payments</span>
+      </FooterRights>
     </FooterWrapper>
   );
 };

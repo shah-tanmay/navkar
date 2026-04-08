@@ -1,69 +1,125 @@
-import COLORS from "../../constants/color";
-import { PayButton, PaymentContainer, SecurityNotice } from "./styles";
-import { FaLock } from "react-icons/fa";
-import Script from "next/script";
 import { useState } from "react";
+import { FaLock, FaChevronLeft } from "react-icons/fa";
+import { PayButton, PaymentContainer, SecurityNotice } from "./styles";
+//@ts-ignore
+import { load } from "@cashfreepayments/cashfree-js";
+import {
+  getPaymentSessionId,
+  verifyPayment,
+} from "../../services/paymentService";
+import { LoaderWrapper } from "../LoaderWrapper";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
+import { event as gaEvent } from "nextjs-google-analytics";
 
-export const Payment = ({ total }: { total: number }) => {
+
+const initializeSDK = async () => {
+  const cashfree = await load({ mode: "sandbox" });
+  return cashfree;
+};
+
+export const Payment = ({
+  total,
+  orderToken,
+  onBack,
+}: {
+  total: number;
+  orderToken: string;
+  onBack?: () => void;
+}) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  //   const handlePayment = () => {
-  //     try {
-  //       setErrorMessage(null);
-  //       const orderId = "order_QCaIk5eDuzdPNI"; // Your static order ID
-
-  //       const options = {
-  //         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-  //         amount: 100 * 100,
-  //         currency: "INR",
-  //         name: "Navkar",
-  //         order_id: orderId,
-  //         handler: (response: any) => {
-  //           console.log(response);
-  //         },
-  //         prefill: {
-  //           name: "Tanmay Shah",
-  //           email: "shahtanmay13@gmail.com",
-  //           contact: "+919156834423",
-  //         },
-  //         theme: {
-  //           color: COLORS.primary,
-  //         },
-  //         modal: {
-  //           error: (error: any) => {
-  //             if (error.error.code === "ORDER_PAID") {
-  //               setErrorMessage("This order was already completed successfully!");
-  //             } else {
-  //               setErrorMessage("Payment system error. Please try again.");
-  //             }
-  //           },
-  //         },
-  //       };
-
-  //       const rzp = new (window as any).Razorpay(options);
-  //       rzp.open();
-  //     } catch (error) {
-  //       setErrorMessage("Payment gateway failed to initialize. Refresh page.");
-  //       console.error("Payment crash:", error);
-  //     }
-  //   };
+  const handlePayment = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const cashfree = await initializeSDK();
+    const paymentDetails = await getPaymentSessionId(orderToken);
+    if (!paymentDetails) {
+      setErrorMessage("Failed to fetch payment details2");
+      setIsLoading(false);
+      return;
+    }
+    if (paymentDetails.paid) {
+      setIsLoading(false);
+      router.push(`/orders/${orderToken}`);
+      toast.success("Order already paid!");
+      return;
+    }
+    setIsLoading(false);
+    const checkoutOptions = {
+      paymentSessionId: paymentDetails.paymentSessionId,
+      redirectTarget: "_modal",
+    };
+    cashfree.checkout(checkoutOptions).then(async (result: any) => {
+      if (result.error) {
+        // This will be true whenever user clicks on close icon inside the modal or any error happens during the payment
+        console.log(
+          "User has closed the popup or there is some payment error, Check for Payment Status"
+        );
+        console.log(result.error);
+      }
+      if (result.redirect) {
+        // This will be true when the payment redirection page couldnt be opened in the same window
+        // This is an exceptional case only when the page is opened inside an inAppBrowser
+        // In this case the customer will be redirected to return url once payment is completed
+        console.log("Payment will be redirected");
+      }
+      if (result.paymentDetails) {
+        // This will be called whenever the payment is completed irrespective of transaction status
+        console.log("Payment has been completed, Check for Payment Status");
+        console.log(result.paymentDetails.paymentMessage);
+        setIsLoading(true);
+        const isPaymentVerified = await verifyPayment(orderToken);
+        setIsLoading(false);
+        if (isPaymentVerified) {
+          gaEvent("purchase", {
+            currency: "INR",
+            value: total,
+            transaction_id: orderToken
+          });
+          import("react-facebook-pixel").then((x) => x.default.track("Purchase", {
+            currency: "INR",
+            value: total
+          }));
+          toast.success("Payment successful!");
+          router.push(`/orders/${orderToken}?success=true`);
+        } else {
+          toast.error("Payment failed. Please try again.");
+        }
+      }
+    });
+  };
 
   return (
-    <PaymentContainer>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive"
-        id="razorpay-checkout-js"
-      />
-
-      <SecurityNotice>
-        <FaLock /> 256-bit SSL Encrypted Transaction
-      </SecurityNotice>
-      <PayButton onClick={() => toast.warn("Implement payment")}>
-        Pay ₹{total}
-      </PayButton>
-      <img src="/images/razorpay-icon.svg" alt="Razorpay" width={200} />
-    </PaymentContainer>
+    <LoaderWrapper loading={isLoading}>
+      <PaymentContainer>
+        {onBack && (
+          <div style={{ alignSelf: 'flex-start', marginBottom: '1rem' }}>
+            <button 
+              onClick={onBack}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: '#64748b', 
+                cursor: 'pointer', 
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <FaChevronLeft size={12} /> Back to Shipping
+            </button>
+          </div>
+        )}
+        <SecurityNotice>
+          <FaLock /> 256-bit SSL Encrypted Transaction
+        </SecurityNotice>
+        {errorMessage && <div className="error">{errorMessage}</div>}
+        <PayButton onClick={handlePayment}>Pay ₹{total}</PayButton>
+      </PaymentContainer>
+    </LoaderWrapper>
   );
 };

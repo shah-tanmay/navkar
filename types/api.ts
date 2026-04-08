@@ -42,6 +42,7 @@ export interface ProductVariant {
   color_hex_code: string;
   slug: string;
   ui_cart_quantity?: number;
+  metadata?: Record<string, any>;
 }
 
 export interface ProductResponse {
@@ -49,6 +50,8 @@ export interface ProductResponse {
   product_name: string;
   image_url: string;
   variants: ProductVariant[];
+  is_discontinued?: boolean;
+  tag?: string;
 }
 
 export interface Product {
@@ -62,6 +65,9 @@ export interface Product {
   metadata: Record<string, any>;
   color?: string;
   variant_id: string;
+  is_discontinued?: boolean;
+  product_id?: string;
+  tag?: string;
 }
 
 export interface Variant {
@@ -138,6 +144,7 @@ export interface OrderResponse {
   order_token: string;
   order_items: OrderItem[];
   order_tracking_statuses: TrackingStatus[];
+  shipping_address?: Address;
 }
 
 export type StateOption = { value: string; label: string };
@@ -151,4 +158,10 @@ export type Address = {
   postal_code: string;
   landmark?: string;
   type?: string;
+};
+
+export type PaymentDetails = {
+  paymentSessionId: string;
+  orderExpiryTime: string;
+  paid?: boolean;
 };

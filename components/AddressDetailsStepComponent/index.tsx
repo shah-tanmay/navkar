@@ -1,6 +1,6 @@
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import { getAddresses } from "../../services/addressService";
-import { updateOrderShippingAddress } from "../../services/orderService";
+import { updateOrder } from "../../services/orderService";
 import { Address } from "../../types/api";
 import { AddressForm } from "../AddressForm";
 import { AddressSelector } from "../AddressSelector";
@@ -19,7 +19,7 @@ export const AddressDetailsStepComponent = ({
 
   const handleAddressSelect = async (address: Address | null) => {
     if (address) {
-      await updateOrderShippingAddress(orderToken, address.id);
+      await updateOrder(orderToken, { shipping_address_id: address.id });
       setSelectedAddress(address.id);
       setShowAddressForm(false);
     } else {

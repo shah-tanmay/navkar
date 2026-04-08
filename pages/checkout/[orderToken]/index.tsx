@@ -14,13 +14,16 @@ import { StepContainer } from "../../../components/StepContainer";
 import { postAddress } from "../../../services/addressService";
 import {
   getOrderByOrderToken,
-  updateOrderShippingAddress,
+  updateOrder,
 } from "../../../services/orderService";
 import { OrderItem } from "../../../types/api";
 import { CheckoutFormType } from "../../../types/type";
 import { FormData, schema } from "../../../types/zodSchema";
 import * as S from "./styles";
 import InvalidCheckout from "../../../components/InvalidCheckout";
+import { useReservations } from "../../../lib/useReservations";
+import { event as gaEvent } from "nextjs-google-analytics";
+
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -36,6 +39,8 @@ const CheckoutPage = () => {
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [invalidOrder, setInvalidOrder] = useState(false);
+  const [isCheckoutComplete, setIsCheckoutComplete] = useState(false);
+  const [startStep, setStartStep] = useState(0);
 
   const [formData, setFormData] = useState<CheckoutFormType>({
     contact: {
@@ -52,6 +57,11 @@ const CheckoutPage = () => {
       zip: "",
       type: "home",
     },
+  });
+
+  const { isActive, releaseReservations } = useReservations({
+    orderToken,
+    isCheckoutComplete,
   });
 
   const phoneRegex = /^\+91[6-9]\d{9}$/;
@@ -103,8 +113,49 @@ const CheckoutPage = () => {
           return;
         }
         setOrderItems(orderDetails.order_items);
+        
+        let initialAddressId = orderDetails.shipping_address_id;
+
+        // Restore saved contact and shipping data
+        if (orderDetails.metadata?.contact) {
+          methods.reset({
+            contact: orderDetails.metadata.contact
+          });
+          setFormData(prev => ({
+            ...prev,
+            contact: orderDetails.metadata.contact
+          }));
+        }
+        
+        if (initialAddressId) {
+          setSelectedAddress(initialAddressId);
+        }
+
+        const orderTotal = _.reduce(orderDetails.order_items, (sum: any, item: any) => sum + item.price * item.quantity, 0);
+        gaEvent("begin_checkout", {
+          currency: "INR",
+          value: orderTotal
+        });
+        import("react-facebook-pixel").then((x) => x.default.track("InitiateCheckout", {
+          currency: "INR",
+          value: orderTotal
+        }));
+
+        // Calculate Smart Skip
+        setTimeout(async () => {
+          const isContactValid = await methods.trigger("contact");
+          if (isContactValid) {
+            if (initialAddressId) {
+              setStartStep(2); // Skip both to Payment
+            } else {
+              setStartStep(1); // Skip to Shipping
+            }
+          }
+          setLoading(false);
+        }, 100);
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchOrderDetails();
   }, [orderToken]);
@@ -128,11 +179,18 @@ const CheckoutPage = () => {
             <S.MainContainer>
               <FormProvider {...methods}>
                 <StepContainer
+                  initialStep={startStep}
                   steps={[
                     {
                       title: "Contact Details",
                       Component: <ContactDetailsStepComponent />,
                       validate: () => methods.trigger("contact"),
+                      beforeNextStep: async () => {
+                        const contactInfo = methods.getValues().contact;
+                        await updateOrder(orderToken, {
+                          metadata: { ...formData, contact: contactInfo }
+                        });
+                      },
                       header: "Information",
                     },
                     {
@@ -156,9 +214,9 @@ const CheckoutPage = () => {
                       },
                       beforeNextStep: async () => {
                         if (selectedAddress) {
-                          await updateOrderShippingAddress(
+                          await updateOrder(
                             orderToken,
-                            selectedAddress
+                            { shipping_address_id: selectedAddress }
                           );
                         }
                         if (!isAddressSaved && !selectedAddress) {
@@ -169,9 +227,9 @@ const CheckoutPage = () => {
                           if (response) {
                             setIsAddressSaved(true);
                             const shippingAddressId = response.id;
-                            await updateOrderShippingAddress(
+                            await updateOrder(
                               orderToken,
-                              shippingAddressId
+                              { shipping_address_id: shippingAddressId }
                             );
                           }
                         }
@@ -180,7 +238,13 @@ const CheckoutPage = () => {
                     },
                     {
                       title: "Secure Payment",
-                      Component: <Payment total={calculateTotal()} />,
+                      Component: (
+                        <Payment
+                          total={calculateTotal()}
+                          orderToken={orderToken}
+                          onBack={() => setStartStep(1)}
+                        />
+                      ),
                       validate: async () => {
                         const result = formSchema.shape.shipping.safeParse(
                           formData.shipping
@@ -191,6 +255,7 @@ const CheckoutPage = () => {
                         return true;
                       },
                       header: "Payment",
+                      hideBackButton: true,
                     },
                   ]}
                 />

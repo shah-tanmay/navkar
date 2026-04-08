@@ -11,8 +11,11 @@ export const HeaderWrapper = styled.div`
   justify-content: space-between;
   padding: 10px 40px;
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
     padding: 10px 20px;
+  }
+  @media screen and (max-width: 480px) {
+    padding: 10px 15px;
   }
 `;
 
@@ -27,6 +30,11 @@ export const LogoImage = styled.img`
   image-rendering: auto;
   width: 206.14px;
   height: 44.22px;
+
+  @media screen and (max-width: 480px) {
+    width: 160px;
+    height: auto;
+  }
 `;
 
 export const HeaderMenu = styled.div`
@@ -78,28 +86,49 @@ export const HeaderUserDropdown = styled.div`
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
-  padding: 8px 16px;
+  padding: 10px 20px;
   gap: 0.8rem;
   border-radius: 8px;
   transition: all 0.25s ease;
   background: ${COLORS.primary};
-  border: 1px solid ${COLORS.gold};
+  border: 1px solid transparent; /* Initial transparent border */
   box-shadow: 0 2px 12px rgba(168, 123, 65, 0.08);
-  padding: 10px 20px; // Increased touch target
-  font-weight: 500; // Better medium weight for Outfit font
-  border: 1px solid transparent; // Initial transparent border
 
-  &:hover {
-    border-color: ${COLORS.gold}; // Gold border on hover
-    background: rgba(184, 159, 114, 0.05); // Subtle gold tint
+  @media screen and (max-width: 768px) {
+    font-size: 16px;
+    padding: 8px 12px;
+    gap: 0.5rem;
   }
 
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  @media screen and (max-width: 480px) {
+    font-size: 14px;
+    padding: 6px 10px;
+    gap: 0.25rem;
+
+    /* Truncate name text strongly on very small mobile screens */
+    span {
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &:hover {
+    border-color: ${COLORS.gold};
+    background: rgba(184, 159, 114, 0.05); /* Subtle gold tint */
+  }
+
+  /* transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); */
 
   .dropdown-arrow {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-left: 4px;
     font-size: 1.2rem;
+    
+    @media screen and (max-width: 768px) {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -178,9 +207,10 @@ export const MobileMenuText = styled.div``;
 
 export const MobileMenuWrapper = styled.div`
   background: linear-gradient(90deg, #f9f1e7 70%, #fcf8f3 30%);
-  padding: 0px 20px;
+  padding: 15px 20px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 15px;
   font-size: 20px;
   color: #542e00;
   text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);

@@ -125,6 +125,19 @@ const OrderTracking: FC<OrderResponse> = () => {
       ) : (
         <ProtectedRoute>
           <S.Container>
+            {router.query.success === 'true' && (
+              <S.SuccessBanner>
+                <div className="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div className="content">
+                  <h3>Payment Successful! 🎉</h3>
+                  <p>Your order has been placed and we're getting it ready.</p>
+                </div>
+              </S.SuccessBanner>
+            )}
             {orderDetails && (
               <S.OrderCard>
                 <S.OrderHeader>
@@ -132,7 +145,18 @@ const OrderTracking: FC<OrderResponse> = () => {
                     Order #{orderDetails?.order_token}
                   </S.OrderNumber>
                   <S.CustomerName>{session?.user?.name}</S.CustomerName>
-                  <S.DeliveryAddress>{"Address"}</S.DeliveryAddress>
+                  <S.DeliveryAddress>
+                    {orderDetails.shipping_address ? (
+                      <>
+                        {orderDetails.shipping_address.street},{" "}
+                        {orderDetails.shipping_address.city},{" "}
+                        {orderDetails.shipping_address.state} -{" "}
+                        {orderDetails.shipping_address.postal_code}
+                      </>
+                    ) : (
+                      "Address Details"
+                    )}
+                  </S.DeliveryAddress>
                 </S.OrderHeader>
 
                 <S.OrderSection>

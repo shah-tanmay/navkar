@@ -26,9 +26,8 @@ const CartPage = () => {
               </S.EmptyIcon>
               <S.EmptyText>Your Curated Collection Awaits</S.EmptyText>
               <S.EmptySubtext>
-                Your cart is currently empty, but our exclusive collection of
-                premium home textiles is ready to transform your space. Begin
-                your luxury journey.
+                Your cart is currently empty, but our exclusive Navkar collections are ready to transform your space. Begin
+                your journey.
               </S.EmptySubtext>
               <S.ShopButton onClick={() => router.push("/products")}>
                 <FiTag /> Explore Premium Collections
@@ -73,7 +72,11 @@ const CartPage = () => {
                           />
 
                           <S.DeliveryEstimate>
-                            <FiTruck /> Est. delivery 25 March
+                            <FiTruck /> Est. delivery by {(() => {
+                              const d = new Date();
+                              d.setDate(d.getDate() + 7);
+                              return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+                            })()}
                           </S.DeliveryEstimate>
                         </S.ItemDetails>
 

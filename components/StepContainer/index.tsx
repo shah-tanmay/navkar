@@ -12,7 +12,7 @@ import {
   StylesStepContainer,
 } from "./styles";
 import { toast } from "react-toastify";
-import { useState, useCallback, Fragment } from "react";
+import { useState, useCallback, Fragment, useEffect } from "react";
 import _ from "lodash";
 import { FaChevronLeft } from "react-icons/fa";
 
@@ -24,10 +24,15 @@ export interface Step {
   beforeNextStep?: () => void;
   onSubmit?: () => void;
   header: string;
+  hideBackButton?: boolean;
 }
 
-export const StepContainer = ({ steps }: { steps: Step[] }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export const StepContainer = ({ steps, initialStep = 0 }: { steps: Step[], initialStep?: number }) => {
+  const [currentIndex, setCurrentIndex] = useState(initialStep);
+
+  useEffect(() => {
+    setCurrentIndex(initialStep);
+  }, [initialStep]);
 
   const validatePreviousSteps = async (index: number) => {
     let isValid = true;
@@ -79,7 +84,10 @@ export const StepContainer = ({ steps }: { steps: Step[] }) => {
                   }
                 }}
               >
-                {index + 1}. {step.header}
+                <div className="step-content">
+                  <span className="step-number">{index + 1}.</span>
+                  <span className="step-text">{step.header}</span>
+                </div>
               </Step>
             );
           })}
@@ -93,7 +101,7 @@ export const StepContainer = ({ steps }: { steps: Step[] }) => {
                 <SectionTitle>{step.title}</SectionTitle>
                 <>{step.Component}</>
                 <NavigationButtons>
-                  {index > 0 && (
+                  {index > 0 && !step.hideBackButton && (
                     <BackButton
                       onClick={() => setCurrentIndex((index) => index - 1)}
                     >

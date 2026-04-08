@@ -35,8 +35,14 @@ export const apiRequest = async <T>(
     return result;
   } catch (error: any) {
     console.error("API request error:", error);
+    if (error.response?.data) {
+      console.error("Server Error Detail:", error.response.data);
+    }
     toast.error(
-      error.response?.data?.message || error.message || "An error occurred"
+      error.response?.data?.message || 
+      error.response?.data?.error || 
+      error.message || 
+      "An error occurred"
     );
     return null;
   }

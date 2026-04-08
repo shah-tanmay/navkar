@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useCart } from "../../context/CartContext";
 import { isUserloggedIn } from "../../utils/login";
 import { AddToCartButton } from "./styles";
+import { event as gaEvent } from "nextjs-google-analytics";
 
 export const AddToCart = ({
   cartId,
@@ -49,6 +50,16 @@ export const AddToCart = ({
       } else {
         addToCart(variantId, quantity);
       }
+
+      gaEvent("add_to_cart", {
+        currency: "INR",
+        items: [{ item_id: variantId, quantity }],
+      });
+      import("react-facebook-pixel").then((x) => x.default.track("AddToCart", {
+        content_ids: [variantId],
+        content_type: "product",
+        currency: "INR",
+      }));
     } catch (err) {
       // setError("Failed to update cart");
     } finally {

@@ -1,3 +1,4 @@
+export const FREE_SHIPPING_THRESHOLD = 2000;
 export const logoPath = "/logo.png";
 
 export const TitleFontSize = {

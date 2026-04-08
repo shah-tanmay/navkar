@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
-const primary = "#542e00";
-const accent = "#b89f72";
+const primary = "#111111";
+const accent = "#D4AF37";
 
 export const PaymentContainer = styled.div`
   display: flex;

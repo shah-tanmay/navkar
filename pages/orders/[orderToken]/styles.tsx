@@ -12,6 +12,11 @@ const liftUp = keyframes`
   to { transform: translateY(-3px); }
 `;
 
+const slideDown = keyframes`
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+`;
+
 export const Container = styled.div`
   padding: 2rem;
   font-family: "Outfit";
@@ -45,6 +50,10 @@ export const OrderHeader = styled.div`
   position: relative;
   overflow: hidden;
 
+  @media (max-width: 768px) {
+    padding: 1.25rem 1rem 2rem;
+  }
+
   &::after {
     content: "";
     position: absolute;
@@ -61,6 +70,12 @@ export const OrderNumber = styled.h1`
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   letter-spacing: -0.5px;
+  word-break: break-all;
+
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+    letter-spacing: 0;
+  }
 `;
 
 export const CustomerName = styled.p`
@@ -232,9 +247,10 @@ export const HorizontalTimeline = styled.div`
   padding: 0 1rem;
 
   @media (max-width: 768px) {
-    overflow-x: auto;
-    padding: 0 0.5rem;
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    margin: 1rem 0;
   }
 `;
 
@@ -255,7 +271,13 @@ export const TimelineStep = styled.div<{
   }
 
   @media (max-width: 768px) {
-    min-width: 120px;
+    min-width: unset;
+    flex: none;
+    padding: 0.75rem 0 0.75rem 2.5rem; /* Reduced padding to fit dot */
+    border-left: 2px solid ${({ $isCompleted, $isCurrent }) =>
+      $isCurrent ? COLORS.gold : $isCompleted ? COLORS.bronze : COLORS.accent};
+    margin-left: 1.5rem; /* Move line further right from edge */
+    position: relative;
   }
 `;
 
@@ -265,6 +287,13 @@ export const StepIndicator = styled.div`
   height: 32px;
   margin: 0 auto 1rem;
   transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    position: absolute;
+    left: -1.05rem; /* Adjusted to center 32px dot on 2px border at left of container */
+    top: 0.6rem;
+    margin: 0;
+  }
 `;
 
 const pulse = keyframes`
@@ -311,12 +340,21 @@ export const StepConnector = styled.div<{
   z-index: 1;
   transition: background 0.3s ease;
 
+  @media (max-width: 768px) {
+    display: none;
+  }
+
   ${({ $isFirst }) => $isFirst && `display: none;`}
 `;
 
 export const StepInfo = styled.div`
   text-align: center;
   padding: 0 0.5rem;
+
+  @media (max-width: 768px) {
+    text-align: left;
+    padding: 0;
+  }
 `;
 
 export const StepTitle = styled.div`
@@ -344,6 +382,10 @@ export const ItemsGrid = styled.div`
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const ProductCard = styled.div`
@@ -353,6 +395,13 @@ export const ProductCard = styled.div`
   transition: transform 0.3s ease;
   max-width: 300px;
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
 
   &:hover {
     transform: translateY(-5px);
@@ -364,6 +413,15 @@ export const ProductImage = styled.img`
   height: 200px;
   object-fit: cover;
   border-bottom: 2px solid ${COLORS.gold};
+
+  @media (max-width: 768px) {
+    width: 90px;
+    height: 90px;
+    border-bottom: none;
+    border-radius: 8px;
+    border: 2px solid ${COLORS.gold};
+    flex-shrink: 0;
+  }
 `;
 
 export const ProductDetails = styled.div`
@@ -381,4 +439,45 @@ export const ProductMeta = styled.div`
   justify-content: space-between;
   color: ${COLORS.slate};
   font-size: 0.9rem;
+`;
+
+export const SuccessBanner = styled.div`
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #166534;
+  animation: ${slideDown} 0.5s ease-out;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .icon {
+    background: #22c55e;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .content {
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    p {
+      margin: 0.25rem 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  }
 `;

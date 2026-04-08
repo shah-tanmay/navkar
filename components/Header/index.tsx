@@ -58,49 +58,66 @@ const Header = () => {
           )}
 
           {width <= 768 && (
-            <MobileMenuIconDiv onClick={() => setIsOpen(!isOpen)}>
-              <FaBars color="#70441b" size={25} />
-            </MobileMenuIconDiv>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {cartItems?.length > 0 && (
+                <div
+                  onClick={() => router.push("/cart")}
+                  style={{ position: "relative", cursor: "pointer", color: "#70441b", display: "flex", alignItems: "center" }}
+                >
+                  <FaShoppingCart size={22} color="#70441b" />
+                  <CartBadge>{cartItems.length}</CartBadge>
+                </div>
+              )}
+              <MobileMenuIconDiv onClick={() => setIsOpen(!isOpen)}>
+                <FaBars color="#70441b" size={25} />
+              </MobileMenuIconDiv>
+            </div>
           )}
 
-          {status === "authenticated" && session ? (
-            <div style={{ position: "relative" }}>
-              <HeaderUserDropdown
-                onClick={() =>
-                  setIsUserMenuOpen((isUserMenuOpen) => !isUserMenuOpen)
-                }
-              >
-                <FaUser />
-                <span>
-                  {_.first(
-                    _.split(
-                      _.truncate(session.user?.name as string, { length: 15 }),
-                      " "
-                    )
-                  )}
-                </span>
-                <FaChevronDown
-                  className={`dropdown-arrow ${
-                    isUserMenuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </HeaderUserDropdown>
+          {width > 768 && (
+            <>
+              {status === "authenticated" && session ? (
+                <div style={{ position: "relative" }}>
+                  <HeaderUserDropdown
+                    onClick={() =>
+                      setIsUserMenuOpen((isUserMenuOpen) => !isUserMenuOpen)
+                    }
+                  >
+                    <FaUser />
+                    <span>
+                      {_.first(
+                        _.split(
+                          _.truncate(session.user?.name as string, { length: 15 }),
+                          " "
+                        )
+                      )}
+                    </span>
+                    <FaChevronDown
+                      className={`dropdown-arrow ${
+                        isUserMenuOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </HeaderUserDropdown>
 
-              <UserDropdown $isOpen={isUserMenuOpen}>
-                <DropdownItem onClick={() => router.push("/account")}>
-                  My Account
-                </DropdownItem>
-                <DropdownItem onClick={() => signOut()}>Sign Out</DropdownItem>
-              </UserDropdown>
-            </div>
-          ) : (
-            <LoginButtonWrapper>
-              <Button
-                size="small"
-                text={"LogIn"}
-                onClick={() => router.push("/login")}
-              />
-            </LoginButtonWrapper>
+                  <UserDropdown $isOpen={isUserMenuOpen}>
+                    <DropdownItem onClick={() => router.push("/account")}>
+                      My Account
+                    </DropdownItem>
+                    <DropdownItem onClick={() => signOut({ callbackUrl: "/" })}>
+                      Sign Out
+                    </DropdownItem>
+                  </UserDropdown>
+                </div>
+              ) : (
+                <LoginButtonWrapper>
+                  <Button
+                    size="small"
+                    text={"LogIn"}
+                    onClick={() => router.push("/login")}
+                  />
+                </LoginButtonWrapper>
+              )}
+            </>
           )}
         </HeaderLinks>
       </HeaderWrapper>
@@ -118,6 +135,37 @@ const Header = () => {
               {menuItem.name}
             </MobileMenuText>
           ))}
+          {status === "authenticated" && session ? (
+            <>
+              <MobileMenuText
+                onClick={() => {
+                  router.push("/account");
+                  setIsOpen(false);
+                }}
+              >
+                My Account
+              </MobileMenuText>
+              <MobileMenuText
+                style={{ color: "#d9534f" }} /* Highlight Sign out */
+                onClick={() => {
+                  signOut({ callbackUrl: "/" });
+                  setIsOpen(false);
+                }}
+              >
+                Sign Out
+              </MobileMenuText>
+            </>
+          ) : (
+            <MobileMenuText
+              style={{ fontWeight: "700" }} /* Emphasize login */
+              onClick={() => {
+                router.push("/login");
+                setIsOpen(false);
+              }}
+            >
+              Log In
+            </MobileMenuText>
+          )}
         </MobileMenuWrapper>
       )}
     </Fragment>

@@ -31,16 +31,20 @@ export const getOrderByOrderToken = async (
   return orderResponse;
 };
 
-export const updateOrderShippingAddress = async (
+export const updateOrder = async (
   orderTokenId: string,
-  shippingAddressId: string
+  updateData: { shipping_address_id?: string; metadata?: any }
 ) => {
   const response = await apiRequest(() =>
-    api.put(`${BASE_ORDER_URL}/${orderTokenId}`, {
-      shipping_address_id: shippingAddressId,
-    })
+    api.put(`${BASE_ORDER_URL}/${orderTokenId}`, updateData)
   );
   return response?.data.order;
+};
+
+export const getAllUserOrders = async (): Promise<OrderResponse[]> => {
+  const response = await apiRequest(() => api.get(BASE_ORDER_URL));
+  const orders: OrderResponse[] = response?.data.orders as OrderResponse[];
+  return orders;
 };
 
 export const updateOrderitemQuantity = async (

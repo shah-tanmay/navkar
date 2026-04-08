@@ -36,6 +36,17 @@ export const AddressModal = ({
     }
   }, [defaultValues, methods]);
 
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
   return (
     <>
       <Modal isOpen={isModalOpen} onClose={closeModal} title={title}>

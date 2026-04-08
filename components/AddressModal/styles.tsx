@@ -19,36 +19,6 @@ export const Button = styled.button`
   }
 `;
 
-// Add global modal styles
-export const GlobalModalStyles = `
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    position: relative;
-    background: white;
-    border-radius: 8px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 90vh;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    outline: none;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-`;
-
 export const UpdateButton = styled.button`
   background: ${COLORS.gold};
   color: ${COLORS.primary};

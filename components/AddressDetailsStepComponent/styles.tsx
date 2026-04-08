@@ -10,6 +10,11 @@ export const AddressFormContainer = styled.div`
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(84, 46, 0, 0.08);
   border: 1px solid ${COLORS.accent};
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+  }
 `;
 
 export const FormColumn = styled.div`

@@ -19,6 +19,11 @@ export const CartContainer = styled.div`
     flex-direction: column;
   }
 
+  @media (max-width: ${breakpoints.medium}) {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
   > *:only-child {
     margin: auto;
   }
@@ -41,6 +46,17 @@ export const CartHeader = styled.div`
     color: ${COLORS.secondary};
     font-size: 2rem;
     margin: 0;
+  }
+
+  @media (max-width: ${breakpoints.medium}) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+
+    h1 {
+      font-size: 1.4rem;
+    }
   }
 `;
 
@@ -256,10 +272,11 @@ export const CheckoutButton = styled.button`
   background: ${COLORS.secondary};
   color: white;
   width: 100%;
-  padding: 1.5rem;
+  height: 44px;
+  padding: 0;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -270,7 +287,13 @@ export const CheckoutButton = styled.button`
   margin: 2rem 0;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px ${COLORS.accent};
+  }
+
+  @media (max-width: ${breakpoints.medium}) {
+    height: 42px;
+    font-size: 0.9rem;
   }
 `;
 

@@ -1,3 +1,4 @@
+export const BASE_AUTH_URL = "/auth";
 export const REGISTER_USER_URL = "/auth/register";
 
 //login
@@ -17,3 +18,9 @@ export const STATE_URL = "/states";
 
 //address
 export const BASE_ADDRESS_URL = "/addresses";
+
+//inventory
+export const BASE_INVENTORY_URL = "/inventory";
+
+//payment
+export const PAYMENT_URL = "/payments";

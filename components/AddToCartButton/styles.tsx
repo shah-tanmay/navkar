@@ -66,26 +66,26 @@ const spin = keyframes`
 export const AddToCartButton = styled.button<{ $loading?: boolean }>`
   width: 100%;
   margin-top: 1rem;
-  padding: 14px 24px;
-  height: 56px;
+  padding: 0 20px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   background: ${COLORS.secondary};
   color: ${COLORS.primary};
-  border: 2px solid ${COLORS.primary};
+  border: 1px solid ${COLORS.primary}; /* Thinner border for leaner look */
   border-radius: 12px;
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px ${COLORS.accent};
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px ${COLORS.accent};
   }
 
   &:disabled {
@@ -94,14 +94,14 @@ export const AddToCartButton = styled.button<{ $loading?: boolean }>`
   }
 
   svg {
-    font-size: 20px;
+    font-size: 18px;
     transition: transform 0.2s ease;
   }
 
   @media (max-width: 768px) {
-    height: 48px;
-    font-size: 1rem;
-    padding: 12px 20px;
+    height: 42px;
+    font-size: 0.9rem;
+    padding: 0 16px;
   }
 `;
 

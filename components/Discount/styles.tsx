@@ -50,13 +50,16 @@ export const DiscountTitle = styled.div`
   font-size: 40px;
   font-style: normal;
   font-weight: 600;
-  line-height: 135%; /* 54px */
+  line-height: 135%;
 
   @media screen and (max-width: 1024px) {
     font-size: ${TitleFontSize["1024"]};
   }
   @media screen and (max-width: 768px) {
-    font-size: 25px;
+    font-size: 22px;
+  }
+  @media screen and (max-width: 480px) {
+    font-size: 18px;
   }
 `;
 
@@ -75,30 +78,24 @@ export const DiscountText = styled.div`
 
 export const DiscountInput = styled.input`
   border-radius: 8px;
-  /* height: 60px; */
   border: 1px solid #794328;
   color: #b09b8c;
   font-family: "Saira";
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
-  line-height: 100%; /* 16px */
+  line-height: 100%;
   flex-grow: 1;
   outline: none;
   padding: 24px;
   margin-top: 20px;
 
   @media screen and (max-width: 768px) {
-    padding: 12px;
+    padding: 12px 16px;
     font-size: 14px;
-  }
-
-  @media screen and (max-width: 425px) {
-    width: 50%;
-  }
-
-  @media screen and (max-width: 320px) {
-    width: 70%;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
   }
 `;
 
@@ -112,11 +109,10 @@ export const DiscountInputDiv = styled.div`
   }
 
   @media screen and (max-width: 768px) {
-    gap: 20px;
-  }
-
-  @media screen and (max-width: 320px) {
-    gap: 10px;
+    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
   }
 `;
 

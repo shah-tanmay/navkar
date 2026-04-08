@@ -8,17 +8,20 @@ const fadeIn = keyframes`
 `;
 
 export const ProductPageWrapper = styled.div`
-  background: #f9f1e7;
+  background: ${COLORS.primary}; /* Clean white */
   padding: 4rem 2rem;
   min-height: 100vh;
   font-family: "Outfit", sans-serif;
   position: relative;
 
-  /* Reserve space at the bottom for the sticky button */
+  @media (max-width: 768px) {
+    padding: 0; /* Zero wrapper padding so sticky elements can form a solid edge-to-edge block */
+  }
+
   &::after {
-    content: "";
+    content: ""; /* Space for mobile sticky button */
     display: block;
-    height: 80px; /* Adjust to match the sticky button container’s height */
+    height: 80px; 
   }
 `;
 
@@ -32,68 +35,187 @@ export const HeroSection = styled.div`
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
   }
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Tighter vertical stacking */
+  }
 `;
 
 export const ImageGallery = styled.div`
   position: sticky;
   top: 100px;
   height: fit-content;
+  z-index: 20;
+
+  @media (max-width: 1200px) {
+    position: relative;
+    top: auto;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    display: contents; /* Completely detaches wrapper constraints, allowing MainImage to stick across the whole HeroSection */
+  }
 `;
 
 export const ProductDetails = styled.div`
   padding: 2rem;
-  background: rgba(249, 241, 231, 0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 30px;
+  background: ${COLORS.primary}; /* Same as wrapper */
+  border-radius: 20px;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem 1rem 1rem; /* Minimal breathable inner padding */
+    background: transparent;
+    border-radius: 0;
+  }
+`;
+
+export const SocialProof = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${COLORS.gold};
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+
+  span {
+    color: ${COLORS.secondary};
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+`;
+
+export const ScarcityLabel = styled.div`
+  display: inline-block;
+  background: ${COLORS.accent};
+  color: ${COLORS.secondary};
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  border-left: 3px solid ${COLORS.gold};
 `;
 
 export const ProductTitle = styled.h1`
   font-size: 2.2rem;
-  color: #542e00;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-`;
+  color: ${COLORS.secondary};
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -1px;
 
-export const PriceTag = styled.div`
-  font-size: 1.8rem;
-  color: #542e00;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-`;
-
-export const FeatureList = styled.ul`
-  margin: 2rem 0;
-  padding-left: 1.5rem;
-  position: relative;
-  list-style: none;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 2px;
-    background: #b89f72;
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
   }
 `;
 
-export const FeatureListItem = styled.li`
-  padding: 1rem 0;
-  position: relative;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  padding-left: 2rem;
+export const PriceTag = styled.div`
+  font-size: 2rem;
+  color: ${COLORS.secondary};
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 1.4rem;
-    width: 8px;
-    height: 8px;
-    background: #b89f72;
-    border-radius: 50%;
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+
+  span {
+    font-size: 1rem;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+`;
+
+export const SoldAsLine = styled.div`
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  strong { color: ${COLORS.secondary}; }
+  
+  .note {
+    font-size: 0.85rem;
+    color: #999;
+    font-style: italic;
+  }
+`;
+
+// Trust Badges
+export const TrustBadgesContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid #ebebeb;
+  border-bottom: 1px solid #ebebeb;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+`;
+
+export const TrustBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: ${COLORS.secondary};
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  svg {
+    color: ${COLORS.gold};
+    font-size: 1.2rem;
+  }
+`;
+
+// Accordions
+export const AccordionContainer = styled.div`
+  border-bottom: 1px solid #ebebeb;
+`;
+
+export const AccordionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  cursor: pointer;
+  color: ${COLORS.secondary};
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: ${COLORS.gold};
+  }
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+`;
+
+export const AccordionContent = styled.div<{ $isOpen: boolean }>`
+  max-height: ${(props) => (props.$isOpen ? "1000px" : "0")};
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out;
+  color: #555;
+  line-height: 1.7;
+  
+  .content-inner {
+    padding-bottom: 1.5rem;
   }
 `;
 
@@ -101,34 +223,126 @@ export const WarrantyBadge = styled.div`
   position: absolute;
   top: 20px;
   right: 20px;
-  background: #542e00;
-  color: #f9f1e7;
+  background: ${COLORS.secondary};
+  color: ${COLORS.gold};
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
   font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   z-index: 3;
-  box-shadow: 0 4px 12px rgba(84, 46, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
 
 export const PurchaseCard = styled.div`
-  background: #fcf8f3;
+  background: ${COLORS.primary};
   padding: 1.5rem;
-  border-radius: 20px;
+  border-radius: 12px;
   margin-bottom: 2rem;
+  margin-top: 1rem;
   position: sticky;
-  top: 20px; /* Adjust this value based on your header height */
+  top: 100px;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  /* Add height calculation */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   height: fit-content;
+  isolation: isolate; /* Creates its own stacking context */
+  
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (max-width: 1200px) {
+    position: relative;
+    top: auto;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    position: sticky;
+    top: 280px; /* Follows exactly after the 280px MainImage Block */
+    z-index: 100;
+    margin: 0; 
+    padding: 0.5rem 1rem 1rem 1rem; 
+    border-radius: 0; 
+    background: ${COLORS.primary}; 
+    border-bottom: 1px solid #eaeaea; 
+  }
+`;
+
+export const ShippingPromoBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1px dashed ${COLORS.gold};
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${COLORS.secondary};
+  
+  svg { color: ${COLORS.gold}; }
+`;
+
+export const DeliveryTimeline = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+  
+  svg { color: #27ae60; }
+`;
+
+export const PincodeWrapper = styled.div`
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ebebeb;
+
+  h4 {
+    font-size: 0.9rem;
+    color: ${COLORS.secondary};
+    margin-bottom: 0.75rem;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 0.5rem;
+
+    input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      &:focus { outline: none; border-color: ${COLORS.gold}; }
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      background: ${COLORS.secondary};
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
 `;
 
 export const ThumbnailGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+    padding: 1rem 1rem 0 1rem; /* Breathes perfectly in line with text */
+    margin-top: 0;
+  }
 `;
 
 export const Thumbnail = styled.div`
@@ -139,43 +353,37 @@ export const Thumbnail = styled.div`
   transition: all 0.3s ease;
   border: 2px solid transparent;
   background: #fff;
-  padding: 8px;
+  padding: 0px;
 
   &:hover {
     transform: translateY(-5px);
-    border-color: #b89f72;
+    border-color: ${COLORS.gold};
   }
 
   &.active {
-    border-color: #542e00;
+    border-color: ${COLORS.secondary};
   }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
   }
 `;
 
 export const SelectorRow = styled.div`
   display: flex;
-  gap: 5rem;
-  margin-bottom: 2rem;
-  background: #fcf8f3;
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1rem;
-  }
+  flex-direction: column;
+  margin-bottom: 1.5rem;
 `;
 
 export const ColorOptions = styled.div`
-  /* flex: 1; */
-
+  h3 {
+    color: ${COLORS.secondary};
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
   .swatches {
     display: flex;
     gap: 1rem;
@@ -184,44 +392,63 @@ export const ColorOptions = styled.div`
 `;
 
 export const ColorSwatch = styled.div<{ color: string }>`
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 2px solid #eaeaea;
   transition: all 0.3s ease;
   background: ${(props) => props.color};
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  z-index: 1; /* Keep base swatch low so it scrolls UNDER sticky headers natively */
 
   &:hover {
     transform: scale(1.1);
   }
 
   &.selected {
-    border-color: #542e00;
+    border-color: ${COLORS.secondary};
     transform: scale(1.15);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    z-index: 2; /* Stays slightly elevated among swatches, but still under sticky nav */
   }
 `;
 
 export const MainImage = styled.div`
-  background: #fff;
-  border-radius: 30px;
-  padding: 1.5rem;
+  background: #fdfdfd;
+  border-radius: 12px;
+  padding: 0;
   position: relative;
-  max-width: 600px;
+  max-width: 100%;
+  max-height: 650px;
   margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  z-index: 100;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    height: 280px;
+    max-height: none;
+    position: sticky;
+    top: 0px; 
+    border-radius: 0; 
+    margin: 0; 
+    background: ${COLORS.primary}; /* Solid outer background masks scrolling content */
+    padding: 0.5rem; /* Creates minimal gap visually between screen edges and image */
+    box-shadow: none;
+  }
 
   img {
     width: 100%;
-    height: auto;
-    max-height: 500px;
-    object-fit: contain;
-    transition: transform 0.3s ease;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 12px; /* Rounds the inner edges of the image itself! */
   }
 
   &:hover img {
-    transform: scale(1.02);
+    transform: scale(1.05);
   }
 `;
 
@@ -230,7 +457,7 @@ export const StickyButtonContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(249, 241, 231, 0.95);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   padding: 1rem;
   z-index: 1000;
@@ -240,166 +467,140 @@ export const StickyButtonContainer = styled.div`
   gap: 1rem;
 `;
 
-export const BuyNowButton = styled(ButtonWrapper)`
-  &&& {
-    background: #b89f72;
-    border-color: #b89f72;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-
-    &:hover {
-      background: #9d845a;
-      border-color: #9d845a;
-      transform: translateY(-2px);
-    }
-  }
-`;
-
-export const DescriptionBlock = styled.div`
-  background: rgba(252, 248, 243, 0.8);
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin: 2rem 0;
-  border-left: 4px solid #b89f72;
-  font-size: 1.1rem;
-  line-height: 1.7;
-`;
-
 export const SizeOptions = styled.div`
-  background: #fcf8f3;
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    color: ${COLORS.secondary};
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  .options-wrapper {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 `;
 
 export const SizeButton = styled.button<{ selected?: boolean }>`
-  display: block;
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  background: ${(props) => (props.selected ? "#b89f72" : "transparent")};
-  border: 2px solid ${(props) => (props.selected ? "#b89f72" : "#542e00")};
-  color: ${(props) => (props.selected ? "#fff" : "#542e00")};
-  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  background: ${(props) => (props.selected ? COLORS.secondary : "transparent")};
+  border: 1px solid ${(props) => (props.selected ? COLORS.secondary : "#ccc")};
+  color: ${(props) => (props.selected ? "#fff" : COLORS.secondary)};
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: "Outfit", sans-serif;
+  font-weight: 500;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-export const CompactQuantitySelector = styled.div`
-  flex: 1;
-
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-`;
-
-export const SmallQuantityButton = styled.button`
-  width: 28px;
-  height: 28px;
-  border: 1px solid #542e00;
-  background: transparent;
-  color: #542e00;
-  border-radius: 50%;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: #542e00;
-    color: #fff;
-  }
-`;
-
-// These styled components are no longer used but kept for reference
-export const SizeQuantitySection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  margin: 2rem 0;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-export const QuantitySelector = styled.div`
-  background: #fcf8f3;
-  padding: 1.5rem;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-export const QuantityButton = styled.button`
-  width: 40px;
-  height: 40px;
-  border: 2px solid #542e00;
-  background: transparent;
-  color: #542e00;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #542e00;
-    color: #fff;
-  }
-`;
-
-export const SectionTitle = styled.h2`
-  font-size: 1.8rem;
-  color: #542e00;
-  position: relative;
-  padding-left: 2rem;
-  margin: 2rem 0 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 28px;
-    width: 4px;
-    background: #b89f72;
-    border-radius: 2px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      #b89f72 0%,
-      rgba(184, 159, 114, 0.2) 100%
-    );
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 `;
 
 export const QuantitySelectorContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 `;
 
 export const QuantitySelectorText = styled.h3`
   color: ${COLORS.secondary};
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+`;
+
+export const FeatureList = styled.ul`
+  margin: 0;
+  padding-left: 1rem;
+  list-style: none;
+`;
+
+export const FeatureListItem = styled.li`
+  padding: 0.5rem 0;
+  position: relative;
+  font-size: 1rem;
+  padding-left: 1.5rem;
+
+  &::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: ${COLORS.gold};
+    font-weight: bold;
+  }
+`;
+
+export const FabricDetailsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #999;
+      letter-spacing: 0.5px;
+    }
+    span {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: ${COLORS.secondary};
+    }
+  }
+`;
+
+export const ReviewSection = styled.div`
+  max-width: 1400px;
+  margin: 6rem auto 0;
+  padding: 4rem 2rem;
+  border-top: 1px solid #ebebeb;
+  text-align: center;
+
+  h2 {
+    font-size: 2rem;
+    color: ${COLORS.secondary};
+    margin-bottom: 1rem;
+  }
+  p { color: #777; margin-bottom: 2rem; }
+`;
+
+export const RecommendationsContainer = styled.div`
+  display: none; /* User requested removal */
+`;
+
+export const RecommendationCard = styled.div`
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .img-wrapper {
+    aspect-ratio: 4/5;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  }
+
+  h3 { font-size: 1.1rem; color: ${COLORS.secondary}; margin-bottom: 0.25rem; }
+  p { color: ${COLORS.gold}; font-weight: 600; }
+
+  &:hover {
+    transform: translateY(-10px);
+    .img-wrapper img { transform: scale(1.1); }
+  }
 `;

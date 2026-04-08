@@ -17,12 +17,13 @@ export const WhatWeDeliverDiv = styled.div`
     width: 90%;
   }
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
     flex-wrap: wrap;
     justify-content: center;
     place-items: center;
     align-items: center;
     width: 100%;
-    padding: 0px 30px;
+    gap: 15px;
+    padding: 20px 20px;
   }
 `;
