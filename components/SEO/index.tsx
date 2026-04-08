@@ -16,16 +16,23 @@ const SEO: React.FC<SEOProps> = ({
   url,
   type = "website",
 }) => {
-  const siteName = "Navkar";
-  const defaultTitle = "Navkar | Exquisite Curtains, Drapes & Home Decor";
+  const siteName = "Navkar Curtains";
+  const defaultTitle = "Navkar | Exquisite Artisanal Curtains & Drapes";
   const defaultDescription =
-    "Discover Navkar's curated collection of premium curtains and bespoke drapes. Handcrafted with passion, our artisanal home decor brings timeless elegance to every room.";
-  const defaultImage = "https://navkarcurtains.com/og-image-main.jpg";
-  const siteUrl = "https://navkarcurtains.com";
+    "Elevate your living space with Navkar's handcrafted curtains and bespoke drapes. Premium fabrics, master tailoring, and timeless elegance for every window.";
+  const siteUrl = "https://navkar.shop";
+  const defaultImage = `${siteUrl}/images/logo.png`;
 
-  const seoTitle = title ? `${title} | ${siteName}` : defaultTitle;
-  const seoDescription = description || defaultDescription;
-  const seoImage = image || defaultImage;
+  // Fallback logic
+  const seoTitle = (title && title.trim().length > 0) ? `${title} | ${siteName}` : defaultTitle;
+  const seoDescription = (description && description.trim().length > 0) ? description : defaultDescription;
+  
+  // Robust image fallback
+  let seoImage = defaultImage;
+  if (image && image.trim().length > 0) {
+    seoImage = image.startsWith("http") ? image : `${siteUrl}${image}`;
+  }
+
   const seoUrl = url ? `${siteUrl}${url}` : siteUrl;
 
   return (
@@ -40,10 +47,12 @@ const SEO: React.FC<SEOProps> = ({
       <meta property="og:title" content={seoTitle} />
       <meta property="og:description" content={seoDescription} />
       <meta property="og:image" content={seoImage} />
+      <meta property="og:image:secure_url" content={seoImage} />
       <meta property="og:site_name" content={siteName} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:domain" content="navkar.shop" />
       <meta name="twitter:url" content={seoUrl} />
       <meta name="twitter:title" content={seoTitle} />
       <meta name="twitter:description" content={seoDescription} />
