@@ -31,76 +31,62 @@ import ProductNotFoundPage from "../../../components/ProductNotFound";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
 
-const ProductPage = () => {
+import { GetServerSideProps } from "next";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { slug } = context.query as { slug: string };
+  const details = await getProductVariantDetails(slug);
+
+  if (!details) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const variants = _.get(details, "variants", []);
+  const initialVariant = _.find(variants, (v) => v.slug === slug) || variants[0];
+
+  return {
+    props: {
+      initialProductDetails: details,
+      initialVariants: variants,
+      initialSelectedVariant: initialVariant,
+    },
+  };
+};
+
+interface ProductPageProps {
+  initialProductDetails: ProductVariantDetails;
+  initialVariants: ProductVariant[];
+  initialSelectedVariant: ProductVariant;
+}
+
+const ProductPage: React.FC<ProductPageProps> = ({
+  initialProductDetails,
+  initialVariants,
+  initialSelectedVariant,
+}) => {
   const router = useRouter();
   const { cartItems } = useCart();
-  const { slug } = router.query as { slug: string };
 
-  const [productDetails, setProductDetails] = useState<ProductVariantDetails>();
-  const [variants, setVariants] = useState<ProductVariant[]>();
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant>();
-  const [variantQuantities, setVariantQuantities] = useState<
-    Record<string, number>
-  >({});
+  const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
+  const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
+  const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>(() => {
+    return initialVariants.reduce((acc, variant) => {
+      acc[variant.id] = 1;
+      return acc;
+    }, {} as Record<string, number>);
+  });
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [notFound, setNotFound] = useState<boolean>(false);
-  const [activeImage, setActiveImage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || "");
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
-
-  const meta = (productDetails as any)?.metadata || {};
-  const variantMeta = (selectedVariant as any)?.metadata || {};
-
-  // Sensible Defaults for Curtains
-  const fabric = meta.fabric_details || {
-    material: "Premium Polyester Blend",
-    gsm: "250 - 280 GSM",
-    opacity: "Room Darkening / Blackout",
-    lining: "No"
-  };
-  const sizeGuide = meta.size_guide || {
-    door: "7ft × 4ft (214cm × 120cm)",
-    window: "5ft × 4ft (152cm × 120cm)"
-  };
-  const washCare = meta.wash_care || "Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach.";
-
-  const seoTitle = `Buy ${selectedVariant?.name || ""} ${productDetails?.name || ""} Online India | Navkar`;
 
   useEffect(() => {
     setActiveImage(selectedVariant?.image_url || (productDetails as any)?.image_url || "");
   }, [selectedVariant, productDetails]);
-
-  useEffect(() => {
-    if (slug) {
-      const productVariantDetails = async () => {
-        setLoading(true);
-        const details = await getProductVariantDetails(slug);
-        if (!details) {
-          setNotFound(true);
-          setLoading(false);
-          return;
-        }
-        let variants = _.get(details, "variants");
-
-        const quantitiesMapping = variants.reduce((acc, variant) => {
-          acc[variant.id] = 1;
-          return acc;
-        }, {} as Record<string, number>);
-        setVariantQuantities(quantitiesMapping);
-
-        const currentVariant = _.find(
-          variants,
-          (variant) => variant.slug === slug
-        );
-        setSelectedVariant(currentVariant);
-        setVariants(variants);
-        setProductDetails(details);
-        setLoading(false);
-      };
-      productVariantDetails();
-    }
-  }, [slug]);
 
   const updateQuantity = (variantId: string, newQuantity: number) => {
     setVariantQuantities((prev) => ({
@@ -124,6 +110,22 @@ const ProductPage = () => {
     });
   };
 
+  const meta = (productDetails as any)?.metadata || {};
+  const variantMeta = (selectedVariant as any)?.metadata || {};
+
+  // Sensible Defaults for Curtains
+  const fabric = meta.fabric_details || {
+    material: "Premium Polyester Blend",
+    gsm: "250 - 280 GSM",
+    opacity: "Room Darkening / Blackout",
+    lining: "No"
+  };
+  const sizeGuide = meta.size_guide || {
+    door: "7ft × 4ft (214cm × 120cm)",
+    window: "5ft × 4ft (152cm × 120cm)"
+  };
+  const washCare = meta.wash_care || "Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach.";
+
   return (
     <LoaderWrapper loading={loading}>
       <SEO 
@@ -133,10 +135,7 @@ const ProductPage = () => {
         type="product"
         url={`/products/${selectedVariant?.slug}`}
       />
-      {notFound ? (
-        <ProductNotFoundPage />
-      ) : (
-        <ProductPageWrapper>
+      <ProductPageWrapper>
           <HeroSection>
             <ImageGallery>
               <MainImage>
@@ -226,7 +225,7 @@ const ProductPage = () => {
                               variant.color_hex_code ===
                                 selectedVariant?.color_hex_code
                           );
-                          setSelectedVariant(newVariant);
+                          if (newVariant) setSelectedVariant(newVariant);
                         }}
                       >
                         {type}
@@ -367,8 +366,7 @@ const ProductPage = () => {
             </RecommendationsContainer>
           )}
         </ProductPageWrapper>
-      )}
-    </LoaderWrapper>
+      </LoaderWrapper>
   );
 };
 

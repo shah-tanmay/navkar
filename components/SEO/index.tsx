@@ -21,7 +21,7 @@ const SEO: React.FC<SEOProps> = ({
   const defaultDescription =
     "Elevate your living space with Navkar's handcrafted curtains and bespoke drapes. Premium fabrics, master tailoring, and timeless elegance for every window.";
   const siteUrl = "https://navkar.shop";
-  const defaultImage = `${siteUrl}/images/logo.png`;
+  const defaultImage = `${siteUrl}/logo.png`;
 
   // Fallback logic
   const seoTitle = (title && title.trim().length > 0) ? `${title} | ${siteName}` : defaultTitle;
@@ -30,7 +30,12 @@ const SEO: React.FC<SEOProps> = ({
   // Robust image fallback
   let seoImage = defaultImage;
   if (image && image.trim().length > 0) {
-    seoImage = image.startsWith("http") ? image : `${siteUrl}${image}`;
+    if (image.startsWith("http")) {
+      seoImage = image;
+    } else {
+      const path = image.startsWith("/") ? image : `/${image}`;
+      seoImage = `${siteUrl}${path}`;
+    }
   }
 
   const seoUrl = url ? `${siteUrl}${url}` : siteUrl;
