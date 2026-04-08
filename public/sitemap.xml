@@ -2,22 +2,22 @@
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://navkar-test.netlify.app/</loc>
+    <loc>https://navkar.shop/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://navkar-test.netlify.app/#about</loc>
+    <loc>https://navkar.shop/#about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://navkar-test.netlify.app/#contact</loc>
+    <loc>https://navkar.shop/#contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://navkar-test.netlify.app/#gallery</loc>
+    <loc>https://navkar.shop/#gallery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
