@@ -8,6 +8,7 @@ import { getAllProducts } from "../../services/productService";
 import { ProductResponse } from "../../types/api";
 import { ProductsWrapper } from "../../styles/pages/products/styles";
 import { LoaderWrapper } from "../../components/LoaderWrapper";
+import SEO from "../../components/SEO";
 
 const ProductPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -35,6 +36,11 @@ const ProductPage: React.FC = () => {
 
   return (
     <LoaderWrapper loading={loading}>
+      <SEO 
+        title="Artisanal Curtain Collection"
+        description="Explore our exclusive range of handcrafted curtains and bespoke drapes. From minimalist chic to ornate classics, find the perfect attire for your windows."
+        url="/products"
+      />
       <ProductCategoriesHeader
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}

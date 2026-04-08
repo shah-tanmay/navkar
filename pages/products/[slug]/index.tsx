@@ -29,6 +29,7 @@ import { getOrCreateOrderToken } from "../../../utils/orderManager";
 import { createOrder } from "../../../services/orderService";
 import ProductNotFoundPage from "../../../components/ProductNotFound";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
+import SEO from "../../../components/SEO";
 
 const ProductPage = () => {
   const router = useRouter();
@@ -125,10 +126,13 @@ const ProductPage = () => {
 
   return (
     <LoaderWrapper loading={loading}>
-      <Head>
-        <title>{seoTitle}</title>
-        <meta name="description" content={selectedVariant?.metadata?.variant_description || productDetails?.description} />
-      </Head>
+      <SEO 
+        title={`${productDetails?.name} - ${selectedVariant?.name}`}
+        description={selectedVariant?.metadata?.variant_description || productDetails?.description || `Explore our premium ${selectedVariant?.name} ${productDetails?.name}. Handcrafted curtains for a refined home.`}
+        image={selectedVariant?.image_url || activeImage}
+        type="product"
+        url={`/products/${selectedVariant?.slug}`}
+      />
       {notFound ? (
         <ProductNotFoundPage />
       ) : (

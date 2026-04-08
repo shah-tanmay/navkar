@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Layout } from "../components/Layout";
 import { CartProvider } from "../context/CartContext";
 import { LoaderProvider } from "../context/LoaderContext";
+import SEO from "../components/SEO";
 import "../styles/global.css";
 import { createGlobalStyle } from "styled-components";
 import { useAuthErrorHandler } from "../lib/useAuthErrorHandler";
@@ -47,9 +48,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   return (
     <LoaderProvider>
-      <Head>
-        <title>Navkar | Premium Home Decor & Bedding</title>
-      </Head>
+      <SEO />
       <CartProvider>
         <SessionProvider session={session}>
           <AuthErrorHandler />
