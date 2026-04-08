@@ -19,7 +19,7 @@ import {
 import { OrderItem } from "../../../types/api";
 import { CheckoutFormType } from "../../../types/type";
 import { FormData, schema } from "../../../types/zodSchema";
-import * as S from "./styles";
+import * as S from "../../../styles/pages/checkout/token-styles";
 import InvalidCheckout from "../../../components/InvalidCheckout";
 import { useReservations } from "../../../lib/useReservations";
 import { event as gaEvent } from "nextjs-google-analytics";

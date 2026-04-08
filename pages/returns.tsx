@@ -89,7 +89,7 @@ const ReturnsPage = () => {
       </BackButton>
       
       <Title>Returns & Exchange</Title>
-      <p>At Navkar, we take immense pride in the quality of our craftsmanship. If you are not entirely satisfied with your purchase, we're here to help make it right.</p>
+      <p>At Navkar, we take immense pride in the quality of our craftsmanship. If you are not entirely satisfied with your purchase, we&apos;re here to help make it right.</p>
 
       <CardGrid>
         <Card>
@@ -112,7 +112,7 @@ const ReturnsPage = () => {
       <Section>
         <SectionTitle>Why a return fee?</SectionTitle>
         <p>
-          We're a small business that takes pride in quality. The ₹500 fee helps us cover reverse logistics costs and 
+          We&apos;re a small business that takes pride in quality. The ₹500 fee helps us cover reverse logistics costs and 
           ensures we can keep offering you the best pricing possible. We deeply appreciate your understanding and support!
         </p>
       </Section>

@@ -15,7 +15,7 @@ import {
   LogoImage,
   Subtitle,
   Title,
-} from "./styles";
+} from "../../styles/pages/login/styles";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);

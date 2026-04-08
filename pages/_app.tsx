@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -10,11 +11,9 @@ import { CartProvider } from "../context/CartContext";
 import { LoaderProvider } from "../context/LoaderContext";
 import "../styles/global.css";
 import { createGlobalStyle } from "styled-components";
-import { GlobalModalStyles } from "../components/AddressModal/styles";
 import { useAuthErrorHandler } from "../lib/useAuthErrorHandler";
 
 const GlobalStyle = createGlobalStyle`
-  ${GlobalModalStyles}
   // Your other global styles here
 `;
 
@@ -48,6 +47,9 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   return (
     <LoaderProvider>
+      <Head>
+        <title>Navkar | Premium Home Decor & Bedding</title>
+      </Head>
       <CartProvider>
         <SessionProvider session={session}>
           <AuthErrorHandler />

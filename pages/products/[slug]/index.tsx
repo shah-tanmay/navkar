@@ -20,7 +20,7 @@ import {
   AccordionContainer, AccordionHeader, AccordionContent, ScarcityLabel, SocialProof,
   FeatureList, FeatureListItem, SoldAsLine, ShippingPromoBadge, DeliveryTimeline,
   PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard
-} from "./styles";
+} from "../../../styles/pages/products/slug-styles";
 import { useCart } from "../../../context/CartContext";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import QuantitySelector from "../../../components/QuantitySelector";

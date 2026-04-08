@@ -13,7 +13,7 @@ import {
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import * as S from "./styles";
+import * as S from "../../styles/pages/account/styles";
 import { getAllUserOrders } from "../../services/orderService";
 import { getAddresses, postAddress, updateAddress } from "../../services/addressService";
 import { updateProfile } from "../../services/authService";
@@ -260,11 +260,11 @@ const AccountPage = () => {
                       <S.SecurityForm onSubmit={handleUpdateProfile}>
                         <S.FormGroup>
                           <label>Full Name</label>
-                          <S.Input value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} />
+                          <S.Input value={profileForm.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({...profileForm, name: e.target.value})} />
                         </S.FormGroup>
                         <S.FormGroup>
                           <label>Phone Number</label>
-                          <S.Input value={profileForm.phone} onChange={e => setProfileForm({...profileForm, phone: e.target.value})} />
+                          <S.Input value={profileForm.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({...profileForm, phone: e.target.value})} />
                         </S.FormGroup>
                         <S.SaveButton type="submit">Save Changes</S.SaveButton>
                       </S.SecurityForm>

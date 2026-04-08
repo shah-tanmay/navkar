@@ -22,6 +22,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     );
   }
 );
+FormInput.displayName = "FormInput";
 
 type ControlledFormInputProps = FormInputProps & {
   name: string;
@@ -49,3 +50,4 @@ export const ControlledFormInput = forwardRef<
     />
   );
 });
+ControlledFormInput.displayName = "ControlledFormInput";

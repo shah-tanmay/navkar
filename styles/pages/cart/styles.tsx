@@ -1,5 +1,5 @@
 import styled, { keyframes } from "styled-components";
-import COLORS from "../../constants/color";
+import COLORS from "../../../constants/color";
 
 const breakpoints = {
   small: "480px",

@@ -43,7 +43,7 @@ const OrderNotFoundPage: React.FC = () => {
         <Title>This Curated Piece Has Left Our Collection</Title>
 
         <Description>
-          The order you're seeking has either been archived or never existed in
+          The order you&apos;re seeking has either been archived or never existed in
           our records. Our collection evolves constantly - explore current
           offerings or check your order history for previous acquisitions.
         </Description>

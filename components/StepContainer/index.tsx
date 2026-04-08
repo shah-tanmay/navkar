@@ -72,6 +72,7 @@ export const StepContainer = ({ steps, initialStep = 0 }: { steps: Step[], initi
           {steps.map((step, index) => {
             return (
               <Step
+                key={index}
                 active={currentIndex >= index}
                 onClick={async () => {
                   const arePreviousStepsValid = await validatePreviousSteps(
@@ -95,7 +96,7 @@ export const StepContainer = ({ steps, initialStep = 0 }: { steps: Step[], initi
       </CheckoutHeader>
       {steps.map((step, index) => {
         return (
-          <Fragment>
+          <Fragment key={index}>
             <StylesStepContainer active={currentIndex === index}>
               <SectionContainer>
                 <SectionTitle>{step.title}</SectionTitle>

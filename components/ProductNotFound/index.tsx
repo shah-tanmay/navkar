@@ -42,7 +42,7 @@ const ProductNotFoundPage: React.FC = () => {
         <Title>Crafting the Extraordinary Takes Time</Title>
 
         <Description>
-          The curated piece you're seeking has momentarily retreated. Our
+          The curated piece you&apos;re seeking has momentarily retreated. Our
           artisans are meticulously crafting exceptional alternatives. Explore
           our collection while we prepare something extraordinary.
         </Description>

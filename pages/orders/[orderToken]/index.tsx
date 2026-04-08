@@ -1,6 +1,6 @@
 // index.tsx
 import { FC, useEffect, useState } from "react";
-import * as S from "./styles";
+import * as S from "../../../styles/pages/orders/token-styles";
 import { OrderResponse, TrackingStatus } from "../../../types/api";
 import { getOrderByOrderToken } from "../../../services/orderService";
 import { useRouter } from "next/router";
@@ -134,7 +134,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                 </div>
                 <div className="content">
                   <h3>Payment Successful! 🎉</h3>
-                  <p>Your order has been placed and we're getting it ready.</p>
+                  <p>Your order has been placed and we&apos;re getting it ready.</p>
                 </div>
               </S.SuccessBanner>
             )}

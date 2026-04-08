@@ -42,7 +42,7 @@ const InvalidCheckout: React.FC = () => {
 
         <Description>
           The requested order token does not match our secured records. Please
-          ensure you're using a valid checkout link or return to initiate a new
+          ensure you&apos;re using a valid checkout link or return to initiate a new
           curated purchase experience.
         </Description>
 

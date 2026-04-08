@@ -8,7 +8,7 @@ import QuantitySelector from "../../components/QuantitySelector";
 import COLORS from "../../constants/color";
 import { useCart } from "../../context/CartContext";
 import { createOrder } from "../../services/orderService";
-import * as S from "./styles";
+import * as S from "../../styles/pages/cart/styles";
 
 const CartPage = () => {
   const router = useRouter();

@@ -6,7 +6,7 @@ import ProductCategoriesHeader from "../../components/ProductCategoriesHeader";
 import { useCart } from "../../context/CartContext";
 import { getAllProducts } from "../../services/productService";
 import { ProductResponse } from "../../types/api";
-import { ProductsWrapper } from "./styles";
+import { ProductsWrapper } from "../../styles/pages/products/styles";
 import { LoaderWrapper } from "../../components/LoaderWrapper";
 
 const ProductPage: React.FC = () => {

@@ -95,14 +95,14 @@ const AdminLogin: NextPage = () => {
             type="email" 
             placeholder="Admin Email" 
             value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} 
             required 
           />
           <Input 
             type="password" 
             placeholder="Access Key" 
             value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} 
             required 
           />
           <LoginButton type="submit">Unlock Dashboard</LoginButton>

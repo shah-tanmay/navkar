@@ -145,6 +145,8 @@ export interface OrderResponse {
   order_items: OrderItem[];
   order_tracking_statuses: TrackingStatus[];
   shipping_address?: Address;
+  shipping_address_id?: string;
+  metadata?: any;
 }
 
 export type StateOption = { value: string; label: string };

@@ -32,7 +32,7 @@ const AdminAbandonedCarts: NextPage = () => {
       </Head>
       <AdminLayout title="Abandoned Cart Tracker">
         <p style={{ marginBottom: "2rem", color: "#666" }}>
-          Showing users who have added items to their cart in the last 48 hours but haven't placed an order.
+          Showing users who have added items to their cart in the last 48 hours but haven&apos;t placed an order.
         </p>
         <Card>
           {loading ? (

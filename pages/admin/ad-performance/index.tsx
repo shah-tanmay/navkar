@@ -80,7 +80,7 @@ const AdminAdPerformance: NextPage = () => {
                     <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Meta Spend</th>
                     <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Google Spend</th>
                     <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Total Spend</th>
-                    <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Orders rec'd</th>
+                    <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Orders rec&apos;d</th>
                     <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>Revenue</th>
                     <th style={{ padding: "1rem", borderBottom: "2px solid #e2e8f0" }}>ROAS</th>
                   </tr>

@@ -20,14 +20,14 @@ const CartSummary = ({}: {}) => {
       </CartHeader>
 
       {cartItems.map((item) => (
-        <CartItem key={item.cart_item_id}>
+        <CartItem key={item.cart_id}>
           <ItemImage
-            src={item?.product_variant?.image_url}
-            alt={item?.product_variant?.color}
+            src={item.image_url}
+            alt={item.color}
           />
           <ItemDetails>
-            <strong>{item.product_variant?.color}</strong>
-            <span>Size: {item?.product?.name}</span>
+            <strong>{item.color}</strong>
+            <span>Size: {item.type}</span>
             <span>Qty: {item.quantity}</span>
           </ItemDetails>
           <FiX />

@@ -59,7 +59,7 @@ const AdminOrdersComprehensive: NextPage = () => {
       <AdminLayout title="Orders Management">
         <Card>
           <div style={{ marginBottom: "2rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "2rem", padding: "1rem", background: "#f8fafc", borderRadius: "12px" }}>
-            <div style={{ display: "flex", flexDir: "column", gap: "0.5rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <label style={{ fontWeight: "700", fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase" }}>Search Order</label>
               <input
                 type="text"
@@ -69,7 +69,7 @@ const AdminOrdersComprehensive: NextPage = () => {
                 style={{ padding: "0.6rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0", width: "220px", fontSize: "0.9rem" }}
               />
             </div>
-            <div style={{ display: "flex", flexDir: "column", gap: "0.5rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <label style={{ fontWeight: "700", fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase" }}>Payment Status</label>
               <select 
                 value={paymentFilter} 

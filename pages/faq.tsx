@@ -84,7 +84,7 @@ const FaqPage = () => {
   const faqs = [
     {
       q: "How do I measure for the right curtain size?",
-      a: "For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a 'full' gathered look. Detailed guides are available on each product page."
+      a: "For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a &apos;full&apos; gathered look. Detailed guides are available on each product page."
     },
     {
       q: "Can I customize the height of the curtains?",
@@ -100,7 +100,7 @@ const FaqPage = () => {
     },
     {
       q: "How do I track my order?",
-      a: "Log in to your account, go to the 'Orders' section, and click on 'Track'. You'll see a real-time status line for every step of the delivery."
+      a: "Log in to your account, go to the &apos;Orders&apos; section, and click on &apos;Track&apos;. You&apos;ll see a real-time status line for every step of the delivery."
     },
     {
       q: "Do you offer Cash on Delivery (COD)?",

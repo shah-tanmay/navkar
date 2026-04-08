@@ -5,14 +5,12 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <title>Navkar</title>
           <meta
             name="description"
             content="Best mattresses shop offering premium quality mattresses. Explore our collection now!"
           />
           <meta name="keywords" content="mattresses, bedding, sleep, comfort" />
-          {/* Other necessary meta tags */}
-          <link rel="canonical" href="https://navker-test.netlify.com/" />
+          <link rel="icon" href="/favicon.ico" />
         </Head>
         <body>
           <Main />
