@@ -131,7 +131,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <SEO 
         title={`${productDetails?.name} - ${selectedVariant?.name}`}
         description={selectedVariant?.metadata?.variant_description || productDetails?.description || `Explore our premium ${selectedVariant?.name} ${productDetails?.name}. Handcrafted curtains for a refined home.`}
-        image={selectedVariant?.image_url || activeImage}
+        image={initialSelectedVariant.image_url || activeImage}
         type="product"
         url={`/products/${selectedVariant?.slug}`}
       />
