@@ -4,9 +4,18 @@
  */
 export function toOgImage(url: string, title?: string): string {
   if (!url || !url.includes("cloudinary.com")) return url;
-  
-  // Basic robust transformation: 1200x630 with auto-cropping and auto-quality
-  const transform = "w_1200,h_630,c_fill,g_auto,f_auto,q_auto";
-  
-  return url.replace("/upload/", `/upload/${transform}/`);
+
+  const headline = title
+    ? encodeURIComponent(title).replace(/%2C/g, "%252C")
+    : "Premium%20Curtains";
+
+  const transforms = [
+    "w_1200,h_630,c_fill,g_auto,f_auto,q_auto",
+    "e_gradient_fade:symmetric_pad,x_0,y_-0.5,b_rgb:00000099",
+    `l_text:Arial_42_bold:${headline},co_white,g_south_west,x_60,y_120,w_900,c_fit`,
+    "l_text:Arial_28_semibold:Shop%20Now%20%E2%86%92,co_rgb:D4AF37,g_south_west,x_60,y_60",
+  ].join("/");
+
+
+  return url.replace("/upload/", `/upload/${transforms}/`);
 }
