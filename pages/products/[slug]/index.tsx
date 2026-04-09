@@ -89,6 +89,16 @@ const ProductPage: React.FC<ProductPageProps> = ({
     setActiveImage(selectedVariant?.image_url || (productDetails as any)?.image_url || "");
   }, [selectedVariant, productDetails]);
 
+  // Sync state with URL if it changes (e.g. back/forward buttons)
+  useEffect(() => {
+    if (router.query.slug && router.query.slug !== selectedVariant?.slug) {
+      const variant = variants.find(v => v.slug === router.query.slug);
+      if (variant) {
+        setSelectedVariant(variant);
+      }
+    }
+  }, [router.query.slug, variants, selectedVariant?.slug]);
+
   const updateQuantity = (variantId: string, newQuantity: number) => {
     setVariantQuantities((prev) => ({
       ...prev,
@@ -136,7 +146,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <SEO 
         title={`${productDetails?.name} - ${selectedVariant?.name}`}
         description={seoDescription}
-        image={toOgImage(initialSelectedVariant.image_url || "", `${productDetails?.name} - ${selectedVariant?.name}`)} 
+        image={toOgImage(selectedVariant?.image_url || "", `${productDetails?.name} - ${selectedVariant?.name}`)} 
         type="product"
         url={`/products/${selectedVariant?.slug}`}
       />
@@ -192,7 +202,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
                       onClick={() => {
                         let nextV = _.find(variants, v => v.color_hex_code === color && v.type === selectedVariant?.type);
                         if (!nextV) nextV = _.find(variants, v => v.color_hex_code === color);
-                        if (nextV) setSelectedVariant(nextV);
+                        if (nextV) {
+                          setSelectedVariant(nextV);
+                          router.push(`/products/${nextV.slug}`, undefined, { shallow: true });
+                        }
                       }}
                       title={color}
                     />
@@ -227,7 +240,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
                             variant.color_hex_code ===
                               selectedVariant?.color_hex_code
                         );
-                        if (newVariant) setSelectedVariant(newVariant);
+                        if (newVariant) {
+                          setSelectedVariant(newVariant);
+                          router.push(`/products/${newVariant.slug}`, undefined, { shallow: true });
+                        }
                       }}
                     >
                       {type}
