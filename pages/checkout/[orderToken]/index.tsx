@@ -367,8 +367,8 @@ const CheckoutPage = () => {
                       <S.CouponInput 
                         placeholder="ENTER CODE" 
                         value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value)}
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleApplyCoupon()}
                       />
                       <S.ApplyButton 
                         onClick={handleApplyCoupon} 
