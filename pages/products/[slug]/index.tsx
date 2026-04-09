@@ -32,11 +32,7 @@ import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
 import { GetServerSideProps } from "next";
 
-// ✅ Transforms any Cloudinary URL to a 1200x630 OG-safe image
-function toOgImage(url: string): string {
-  if (!url || !url.includes("cloudinary.com")) return url;
-  return url.replace("/upload/", "/upload/w_1200,h_630,c_fill,g_auto,f_auto/");
-}
+import { toOgImage } from "../../../utils/seo";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query as { slug: string };
@@ -130,12 +126,17 @@ const ProductPage: React.FC<ProductPageProps> = ({
   };
   const washCare = meta.wash_care || "Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach.";
 
+  const dynamicDescription = selectedVariant?.metadata?.variant_description || productDetails?.description;
+  const seoDescription = dynamicDescription && dynamicDescription.length > 110 
+    ? dynamicDescription.slice(0, 157) + "..."
+    : `Discover the premium ${selectedVariant?.name} ${productDetails?.name} at Navkar. Our handcrafted curtains offer refined style and superior quality for any room. Shop the range today.`;
+
   return (
     <LoaderWrapper loading={loading}>
       <SEO 
         title={`${productDetails?.name} - ${selectedVariant?.name}`}
-        description={selectedVariant?.metadata?.variant_description || productDetails?.description || `Explore our premium ${selectedVariant?.name} ${productDetails?.name}. Handcrafted curtains for a refined home.`}
-        image={toOgImage(initialSelectedVariant.image_url || "")} 
+        description={seoDescription}
+        image={toOgImage(initialSelectedVariant.image_url || "", `${productDetails?.name} - ${selectedVariant?.name}`)} 
         type="product"
         url={`/products/${selectedVariant?.slug}`}
       />
