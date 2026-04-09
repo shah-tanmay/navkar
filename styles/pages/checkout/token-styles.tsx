@@ -442,3 +442,102 @@ export const ModalBackdrop = styled(motion.div)`
   backdrop-filter: blur(4px);
   z-index: 999;
 `;
+
+export const CouponSection = styled.div`
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+
+  h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+    color: ${primary};
+  }
+`;
+
+export const CouponInputWrapper = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+export const CouponInput = styled.input`
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid ${accent};
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+
+  &:focus {
+    outline: none;
+    border-color: ${primary};
+  }
+`;
+
+export const ApplyButton = styled.button`
+  background: ${primary};
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${accent};
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+export const CouponMessage = styled.p<{ error?: boolean }>`
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: ${props => props.error ? "#d32f2f" : "#2e7d32"};
+`;
+
+export const AppliedCoupon = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f8e9;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  border: 1px dashed #2e7d32;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  span.code {
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 0.9rem;
+  }
+
+  span.label {
+    font-size: 0.75rem;
+    color: #558b2f;
+  }
+
+  button {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;

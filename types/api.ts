@@ -52,6 +52,7 @@ export interface ProductResponse {
   variants: ProductVariant[];
   is_discontinued?: boolean;
   tag?: string;
+  is_blackout?: boolean;
 }
 
 export interface Product {
@@ -68,6 +69,7 @@ export interface Product {
   is_discontinued?: boolean;
   product_id?: string;
   tag?: string;
+  is_blackout?: boolean;
 }
 
 export interface Variant {

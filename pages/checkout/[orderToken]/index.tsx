@@ -23,6 +23,8 @@ import * as S from "../../../styles/pages/checkout/token-styles";
 import InvalidCheckout from "../../../components/InvalidCheckout";
 import { useReservations } from "../../../lib/useReservations";
 import { event as gaEvent } from "nextjs-google-analytics";
+import { validateCoupon } from "../../../services/couponService";
+import { toast } from "react-toastify";
 
 
 const CheckoutPage = () => {
@@ -41,6 +43,11 @@ const CheckoutPage = () => {
   const [invalidOrder, setInvalidOrder] = useState(false);
   const [isCheckoutComplete, setIsCheckoutComplete] = useState(false);
   const [startStep, setStartStep] = useState(0);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [orderMetadata, setOrderMetadata] = useState<any>({});
 
   const [formData, setFormData] = useState<CheckoutFormType>({
     contact: {
@@ -112,7 +119,11 @@ const CheckoutPage = () => {
           setLoading(false);
           return;
         }
-        setOrderItems(orderDetails.order_items);
+         setOrderItems(orderDetails.order_items);
+        const metadata = typeof orderDetails.metadata === 'string' 
+          ? JSON.parse(orderDetails.metadata) 
+          : (orderDetails.metadata || {});
+        setOrderMetadata(metadata);
         
         let initialAddressId = orderDetails.shipping_address_id;
 
@@ -162,6 +173,52 @@ const CheckoutPage = () => {
 
   const calculateTotal = () =>
     _.reduce(orderItems, (sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setIsApplyingCoupon(true);
+    setCouponError("");
+    try {
+      const updatedOrder = await updateOrder(orderToken, { coupon_code: couponCode.trim().toUpperCase() });
+      const metadata = typeof updatedOrder.metadata === 'string' 
+        ? JSON.parse(updatedOrder.metadata) 
+        : (updatedOrder.metadata || {});
+      
+      if (metadata.coupon_code) {
+        setOrderMetadata(metadata);
+        setCouponCode("");
+        toast.success("Coupon applied successfully!");
+      } else {
+        setCouponError("Invalid or expired coupon code");
+      }
+    } catch (err) {
+      setCouponError("Invalid coupon code");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    setIsApplyingCoupon(true);
+    try {
+      const updatedOrder = await updateOrder(orderToken, { coupon_code: null });
+      const metadata = typeof updatedOrder.metadata === 'string' 
+        ? JSON.parse(updatedOrder.metadata) 
+        : (updatedOrder.metadata || {});
+      
+      setOrderMetadata(metadata);
+      toast.info("Coupon removed");
+    } catch (err) {
+      toast.error("Failed to remove coupon");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const subtotal = orderMetadata.subtotal || calculateTotal();
+  const shippingFee = orderMetadata.shipping_fee !== undefined ? orderMetadata.shipping_fee : (subtotal < 2000 && subtotal > 0 ? 50 : 0);
+  const discount = orderMetadata.discount || 0;
+  const finalTotal = subtotal + shippingFee - discount;
 
   const methods = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -240,7 +297,7 @@ const CheckoutPage = () => {
                       title: "Secure Payment",
                       Component: (
                         <Payment
-                          total={calculateTotal()}
+                          total={finalTotal}
                           orderToken={orderToken}
                           onBack={() => setStartStep(1)}
                         />
@@ -294,18 +351,58 @@ const CheckoutPage = () => {
                   ))}
                 </S.ProductItem>
 
+              <S.CouponSection>
+                <h4>Have a coupon?</h4>
+                {orderMetadata.coupon_code ? (
+                  <S.AppliedCoupon>
+                    <div>
+                      <span className="code">{orderMetadata.coupon_code}</span>
+                      <span className="label">Coupon Applied</span>
+                    </div>
+                    <button onClick={handleRemoveCoupon} disabled={isApplyingCoupon}>Remove</button>
+                  </S.AppliedCoupon>
+                ) : (
+                  <>
+                    <S.CouponInputWrapper>
+                      <S.CouponInput 
+                        placeholder="ENTER CODE" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                      />
+                      <S.ApplyButton 
+                        onClick={handleApplyCoupon} 
+                        disabled={isApplyingCoupon || !couponCode}
+                      >
+                        {isApplyingCoupon ? "..." : "APPLY"}
+                      </S.ApplyButton>
+                    </S.CouponInputWrapper>
+                    {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
+                  </>
+                )}
+              </S.CouponSection>
+
                 <S.PriceBreakdown>
                   <S.PriceRow>
                     <span>Subtotal</span>
-                    <span>₹{calculateTotal()}</span>
+                    <span>₹{subtotal}</span>
                   </S.PriceRow>
+                  
+                  {discount > 0 && (
+                    <S.PriceRow>
+                      <span style={{ color: "#2e7d32" }}>Discount ({orderMetadata.coupon_code})</span>
+                      <span style={{ color: "#2e7d32" }}>-₹{discount}</span>
+                    </S.PriceRow>
+                  )}
+
                   <S.PriceRow>
                     <span>Shipping</span>
-                    <span>FREE</span>
+                    <span>{shippingFee > 0 ? `₹${shippingFee}` : "FREE"}</span>
                   </S.PriceRow>
+                  
                   <S.TotalPrice>
                     <span>Total</span>
-                    <span>₹{calculateTotal()}</span>
+                    <span>₹{finalTotal}</span>
                   </S.TotalPrice>
                 </S.PriceBreakdown>
               </S.OrderSummary>

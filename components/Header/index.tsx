@@ -37,6 +37,9 @@ const Header = () => {
 
   return (
     <Fragment>
+      <div style={{ background: '#111', color: 'white', fontSize: '0.75rem', textAlign: 'center', padding: '8px', letterSpacing: '1px', fontWeight: '500' }}>
+        FREE SHIPPING ON ALL ORDERS ABOVE ₹2000
+      </div>
       <HeaderWrapper>
         <LogoImage src={logoPath} alt="logo" />
         <HeaderLinks>

@@ -30,6 +30,10 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     wash_care: string;
     is_discontinued: boolean;
     tag: string;
+    is_blackout: boolean;
+    door_size: string;
+    window_size: string;
+    sold_as: string;
   }
 
   // Base Product Data
@@ -48,6 +52,10 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     wash_care: "Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach. Warm iron if needed.",
     is_discontinued: false,
     tag: "sale",
+    is_blackout: false,
+    door_size: "7ft × 4ft (214cm × 120cm)",
+    window_size: "5ft × 4ft (152cm × 120cm)",
+    sold_as: "1 panel",
   });
 
   // Variant Data Context (Shared for a Color Group)
@@ -116,6 +124,10 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         wash_care: meta.wash_care || "",
         is_discontinued: p.is_discontinued || false,
         tag: p.tag || "sale",
+        is_blackout: p.is_blackout || false,
+        door_size: meta.size_guide?.door || "7ft × 4ft (214cm × 120cm)",
+        window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
+        sold_as: meta.sold_as || "1 panel",
       });
     }
   }, [editProduct]);
@@ -140,6 +152,10 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           wash_care: meta.wash_care || "",
           is_discontinued: productData.is_discontinued || false,
           tag: productData.tag || "sale",
+          is_blackout: productData.is_blackout || false,
+          door_size: meta.size_guide?.door || "7ft × 4ft (214cm × 120cm)",
+          window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
+          sold_as: meta.sold_as || "1 panel",
         });
       }
     } else if (activeTab === "new_color") {
@@ -202,9 +218,15 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
             lining: baseForm.fabric_lining,
           },
           wash_care: baseForm.wash_care,
+          size_guide: {
+            door: baseForm.door_size,
+            window: baseForm.window_size,
+          },
+          sold_as: baseForm.sold_as,
         },
         is_discontinued: baseForm.is_discontinued,
         tag: baseForm.tag,
+        is_blackout: baseForm.is_blackout,
       };
 
       if (editProduct && productId) {
@@ -368,7 +390,16 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                     />
                   </S.FormGroup>
                   <S.FormGroup>
-                    <label>Key Features (One per line)</label>
+                    <label style={{ display: "flex", justifyContent: "space-between" }}>
+                      Key Features (One per line)
+                      <button 
+                        type="button" 
+                        onClick={() => setBaseForm({...baseForm, features: "Premium Grade Fabric\nElegant Drape & Flow\nLight Filtering Efficiency\nWrinkle Resistant Maintenance\nEasy Installation Eyelets"})}
+                        style={{ background: "none", border: "none", color: "#005aee", fontSize: "0.7rem", cursor: "pointer", textDecoration: "underline" }}
+                      >
+                        Reset to Defaults
+                      </button>
+                    </label>
                     <textarea value={baseForm.features} onChange={e => setBaseForm({...baseForm, features: e.target.value})} />
                   </S.FormGroup>
                   <S.FormGroup>
@@ -393,32 +424,96 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                       <option value="eco">🌿 ECO FRIENDLY</option>
                     </select>
                   </S.FormGroup>
-                  <S.FormGroup>
-                    <label>Product Availability Status</label>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem", padding: "0.5rem", background: baseForm.is_discontinued ? "#fff1f0" : "#f6ffed", borderRadius: "8px", border: "1px solid", borderColor: baseForm.is_discontinued ? "#ffa39e" : "#b7eb8f" }}>
-                      <input 
-                        type="checkbox" 
-                        id="is_discontinued"
-                        checked={baseForm.is_discontinued} 
-                        onChange={e => setBaseForm({...baseForm, is_discontinued: e.target.checked})} 
-                        style={{ width: "20px", height: "20px", cursor: "pointer" }}
-                      />
-                      <label htmlFor="is_discontinued" style={{ margin: 0, cursor: "pointer", color: baseForm.is_discontinued ? "#cf1322" : "#389e0d", fontWeight: "bold", fontSize: "0.9rem" }}>
-                        {baseForm.is_discontinued ? "DISCONTINUED (Hidden from Store)" : "ACTIVE (Shown on Store)"}
-                      </label>
+                   <S.FormGroup $fullWidth>
+                    <label>Product Status & Type</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 1rem", background: baseForm.is_discontinued ? "#fff1f0" : "#f6ffed", borderRadius: "8px", border: "1px solid", borderColor: baseForm.is_discontinued ? "#ffa39e" : "#b7eb8f" }}>
+                        <input 
+                          type="checkbox" 
+                          id="is_discontinued"
+                          checked={baseForm.is_discontinued} 
+                          onChange={e => setBaseForm({...baseForm, is_discontinued: e.target.checked})} 
+                          style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                        />
+                        <label htmlFor="is_discontinued" style={{ margin: 0, cursor: "pointer", color: baseForm.is_discontinued ? "#cf1322" : "#389e0d", fontWeight: "bold", fontSize: "0.85rem" }}>
+                          {baseForm.is_discontinued ? "DISCONTINUED (HIDDEN)" : "ACTIVE (SHOWN)"}
+                        </label>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 1rem", background: baseForm.is_blackout ? "#e6f7ff" : "#f5f5f5", borderRadius: "8px", border: "1px solid", borderColor: baseForm.is_blackout ? "#91d5ff" : "#d9d9d9" }}>
+                        <input 
+                          type="checkbox" 
+                          id="is_blackout"
+                          checked={baseForm.is_blackout} 
+                          onChange={e => setBaseForm({...baseForm, is_blackout: e.target.checked})} 
+                          style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                        />
+                        <label htmlFor="is_blackout" style={{ margin: 0, cursor: "pointer", color: baseForm.is_blackout ? "#0050b3" : "#595959", fontWeight: "bold", fontSize: "0.85rem" }}>
+                          {baseForm.is_blackout ? "BLACKOUT PRODUCT" : "REGULAR PRODUCT"}
+                        </label>
+                      </div>
                     </div>
                   </S.FormGroup>
                 </S.FormGrid>
               </S.Card>
 
               <S.Card>
+                <S.SectionTitle>Measurements & Packaging</S.SectionTitle>
+                <S.FormGrid>
+                  <S.FormGroup><label>Door Size Label</label><input value={baseForm.door_size} onChange={e => setBaseForm({...baseForm, door_size: e.target.value})} placeholder="e.g. 7ft × 4ft (214cm × 120cm)" /></S.FormGroup>
+                  <S.FormGroup><label>Window Size Label</label><input value={baseForm.window_size} onChange={e => setBaseForm({...baseForm, window_size: e.target.value})} placeholder="e.g. 5ft × 4ft (152cm × 120cm)" /></S.FormGroup>
+                  <S.FormGroup><label>Sold As</label><input value={baseForm.sold_as} onChange={e => setBaseForm({...baseForm, sold_as: e.target.value})} placeholder="e.g. 1 panel" /></S.FormGroup>
+                </S.FormGrid>
+              </S.Card>
+
+              <S.Card>
                 <S.SectionTitle>Fabric & Care Details</S.SectionTitle>
                 <S.FormGrid>
-                  <S.FormGroup><label>Material</label><input value={baseForm.fabric_material} onChange={e => setBaseForm({...baseForm, fabric_material: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup><label>GSM</label><input value={baseForm.fabric_gsm} onChange={e => setBaseForm({...baseForm, fabric_gsm: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup><label>Opacity</label><input value={baseForm.fabric_opacity} onChange={e => setBaseForm({...baseForm, fabric_opacity: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup><label>Lining</label><input value={baseForm.fabric_lining} onChange={e => setBaseForm({...baseForm, fabric_lining: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup $fullWidth><label>Wash Care Instructions</label><textarea value={baseForm.wash_care} onChange={e => setBaseForm({...baseForm, wash_care: e.target.value})} /></S.FormGroup>
+                  <S.FormGroup>
+                    <label>Material</label>
+                    <input value={baseForm.fabric_material} onChange={e => setBaseForm({...baseForm, fabric_material: e.target.value})} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                      {["Premium Polyester Blend", "Velvet Touch Synthetic", "Linen-Look Polyester", "Cotton Canvas"].map(opt => (
+                        <button key={opt} type="button" onClick={() => setBaseForm({...baseForm, fabric_material: opt})} style={{ padding: "2px 6px", fontSize: "10px", background: "#f0f0f0", border: "1px solid #d9d9d9", borderRadius: "4px", cursor: "pointer" }}>{opt}</button>
+                      ))}
+                    </div>
+                  </S.FormGroup>
+                  <S.FormGroup>
+                    <label>GSM</label>
+                    <input value={baseForm.fabric_gsm} onChange={e => setBaseForm({...baseForm, fabric_gsm: e.target.value})} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                      {["180 GSM", "210 GSM", "250 GSM", "280 GSM", "320 GSM"].map(opt => (
+                        <button key={opt} type="button" onClick={() => setBaseForm({...baseForm, fabric_gsm: opt})} style={{ padding: "2px 6px", fontSize: "10px", background: "#f0f0f0", border: "1px solid #d9d9d9", borderRadius: "4px", cursor: "pointer" }}>{opt}</button>
+                      ))}
+                    </div>
+                  </S.FormGroup>
+                  <S.FormGroup>
+                    <label>Opacity</label>
+                    <input value={baseForm.fabric_opacity} onChange={e => setBaseForm({...baseForm, fabric_opacity: e.target.value})} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                      {["Room Darkening (70-80%)", "Blackout (95%+)", "Semi-Sheer", "Translucent"].map(opt => (
+                        <button key={opt} type="button" onClick={() => setBaseForm({...baseForm, fabric_opacity: opt})} style={{ padding: "2px 6px", fontSize: "10px", background: "#f0f0f0", border: "1px solid #d9d9d9", borderRadius: "4px", cursor: "pointer" }}>{opt}</button>
+                      ))}
+                    </div>
+                  </S.FormGroup>
+                  <S.FormGroup>
+                    <label>Lining</label>
+                    <input value={baseForm.fabric_lining} onChange={e => setBaseForm({...baseForm, fabric_lining: e.target.value})} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                      {["Unlined", "Lined (White Fabric)", "Lined (Blackout Fabric)"].map(opt => (
+                        <button key={opt} type="button" onClick={() => setBaseForm({...baseForm, fabric_lining: opt})} style={{ padding: "2px 6px", fontSize: "10px", background: "#f0f0f0", border: "1px solid #d9d9d9", borderRadius: "4px", cursor: "pointer" }}>{opt}</button>
+                      ))}
+                    </div>
+                  </S.FormGroup>
+                  <S.FormGroup $fullWidth>
+                    <label>Wash Care Instructions</label>
+                    <textarea value={baseForm.wash_care} onChange={e => setBaseForm({...baseForm, wash_care: e.target.value})} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                      {["Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach. Warm iron if needed.", "Dry clean recommended. Do not hand wash. Warm iron only.", "Hand wash cold. Do not wring. Drip dry in shade. Low iron."].map((opt, i) => (
+                        <button key={i} type="button" onClick={() => setBaseForm({...baseForm, wash_care: opt})} style={{ padding: "2px 6px", fontSize: "10px", background: "#f0f0f0", border: "1px solid #d9d9d9", borderRadius: "4px", cursor: "pointer", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Option {i+1}</button>
+                      ))}
+                    </div>
+                  </S.FormGroup>
                 </S.FormGrid>
               </S.Card>
 

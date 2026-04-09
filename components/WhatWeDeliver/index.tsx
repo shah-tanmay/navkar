@@ -12,13 +12,13 @@ const WhatWeDeliver = () => {
     },
     {
       icon: "/images/warranty.png",
-      title: "Warrany Protection",
+      title: "Warranty Protection",
       description: "Over 2 years",
     },
     {
       icon: "/images/shipping.png",
-      title: "Free Shiping",
-      description: "Order over ₹4000",
+      title: "Free Shipping",
+      description: "Order over ₹2000",
     },
     {
       icon: "/images/customer-support.png",

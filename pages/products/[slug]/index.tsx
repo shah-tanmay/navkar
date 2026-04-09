@@ -161,18 +161,31 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const meta = (productDetails as any)?.metadata || {};
   const variantMeta = (selectedVariant as any)?.metadata || {};
+  const isBlackout = (productDetails as any)?.is_blackout;
 
-  const fabric = meta.fabric_details || {
-    material: "Premium Polyester Blend",
-    gsm: "250 - 280 GSM",
-    opacity: "Room Darkening / Blackout",
-    lining: "No"
+  const fabric = {
+    material: meta.fabric_details?.material || "Premium High-Density Polyester",
+    gsm: meta.fabric_details?.gsm || "250-280 GSM",
+    opacity: meta.fabric_details?.opacity || (isBlackout ? "100% Blackout Efficiency" : "Room Darkening (70-80%)"),
+    lining: meta.fabric_details?.lining || "Unlined"
   };
-  const sizeGuide = meta.size_guide || {
-    door: "7ft × 4ft (214cm × 120cm)",
-    window: "5ft × 4ft (152cm × 120cm)"
+
+  const sizeGuide = {
+    door: meta.size_guide?.door || "7ft × 4ft (214cm × 120cm)",
+    window: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)"
   };
-  const washCare = meta.wash_care || "Machine wash cold, gentle cycle. Use mild detergent. Tumble dry low. Do not bleach.";
+
+  const washCare = meta.wash_care || "Machine wash cold. Gentle cycle. Mild detergent. Tumble dry low. Do not bleach. Warm iron.";
+  const soldAs = meta.sold_as || "1 panel";
+  
+  const defaultFeatures = [
+    "Premium Grade Fabric",
+    "Elegant Drape & Flow",
+    "Light Filtering Efficiency",
+    "Wrinkle Resistant Maintenance",
+    "Easy Installation Eyelets"
+  ];
+  const features = (meta.features && meta.features.length > 0) ? meta.features : defaultFeatures;
 
   const dynamicDescription = selectedVariant?.metadata?.variant_description || productDetails?.description;
   const seoDescription = dynamicDescription && dynamicDescription.length > 110 
@@ -215,10 +228,24 @@ const ProductPage: React.FC<ProductPageProps> = ({
             <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
             <PriceTag>₹{selectedVariant?.price} <span>₹{Math.floor(Number(selectedVariant?.price || 0) * 1.3)}</span></PriceTag>
             
+            <div style={{ padding: "4px 12px", background: "#f8f9fa", borderRadius: "4px", fontSize: "0.85rem", color: "#666", display: "inline-block", marginBottom: "1rem" }}>
+              {Number(selectedVariant?.price) >= 2000 ? (
+                <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Eligible for FREE Delivery</span>
+              ) : (
+                <span>Free delivery on orders above ₹2000</span>
+              )}
+            </div>
+            
             <SoldAsLine>
-              <strong>Sold as: 1 panel</strong>
+              <strong>Sold as: {soldAs}</strong>
               <span className="note">• Most windows require 2 panels</span>
             </SoldAsLine>
+
+            {isBlackout && (
+              <ScarcityLabel style={{ background: "#001529", color: "white" }}>
+                100% Blackout Fabric
+              </ScarcityLabel>
+            )}
 
             <ScarcityLabel>Exclusive Premium Batch</ScarcityLabel>
 
@@ -384,15 +411,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
               <AccordionContent $isOpen={openAccordion === "feat"}>
                 <div className="content-inner">
                   <FeatureList>
-                    {(productDetails?.metadata?.features || []).length > 0 ? (
-                      (productDetails?.metadata?.features || []).map(
-                        (feature: string, index: number) => (
-                          <FeatureListItem key={index}>{feature}</FeatureListItem>
-                        )
-                      )
-                    ) : (
-                      <FeatureListItem>No specific features listed.</FeatureListItem>
-                    )}
+                    {features.map((feature: string, index: number) => (
+                      <FeatureListItem key={index}>{feature}</FeatureListItem>
+                    ))}
                   </FeatureList>
                 </div>
               </AccordionContent>

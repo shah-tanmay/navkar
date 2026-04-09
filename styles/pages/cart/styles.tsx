@@ -230,9 +230,10 @@ export const SummaryRow = styled.div`
 export const PromoSection = styled.div`
   display: flex;
   gap: 0.5rem;
-  margin: 2rem 0;
-  padding: 1rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
   background: ${COLORS.primary};
+  border: 1px dashed ${COLORS.gold};
   border-radius: 8px;
 
   input {
@@ -240,20 +241,86 @@ export const PromoSection = styled.div`
     border: none;
     background: none;
     outline: none;
+    padding: 0.5rem;
+    font-family: inherit;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+
+    &::placeholder {
+      color: ${COLORS.slate};
+      text-transform: none;
+    }
   }
 `;
 
 export const ApplyButton = styled.button`
-  background: ${COLORS.gold};
-  color: ${COLORS.primary};
+  background: ${COLORS.secondary};
+  color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.2rem;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.85rem;
 
   &:hover {
-    background: ${COLORS.bronze};
+    background: ${COLORS.gold};
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+export const CouponMessage = styled.p<{ error?: boolean }>`
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  color: ${props => props.error ? "#d32f2f" : "#2e7d32"};
+  font-weight: 500;
+`;
+
+export const AppliedCouponBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f8e9;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  border: 1px dashed #2e7d32;
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .code {
+    font-weight: 700;
+    color: #2e7d32;
+    font-size: 0.9rem;
+  }
+
+  .label {
+    font-size: 0.75rem;
+    color: #558b2f;
+  }
+
+  button {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 2px 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 

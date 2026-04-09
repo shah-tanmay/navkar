@@ -10,12 +10,14 @@ interface OrderItems {
 //return order_id of creation
 export const createOrder = async (
   orderToken: string,
-  orderItems: OrderItems[]
+  orderItems: OrderItems[],
+  couponCode?: string
 ): Promise<string> => {
   const response = await apiRequest(() =>
     api.post(BASE_ORDER_URL, {
       order_items: orderItems,
       order_token: orderToken,
+      coupon_code: couponCode,
     })
   );
   return response?.data?.order.order_token;
@@ -33,7 +35,7 @@ export const getOrderByOrderToken = async (
 
 export const updateOrder = async (
   orderTokenId: string,
-  updateData: { shipping_address_id?: string; metadata?: any }
+  updateData: { shipping_address_id?: string; metadata?: any; coupon_code?: string | null }
 ) => {
   const response = await apiRequest(() =>
     api.put(`${BASE_ORDER_URL}/${orderTokenId}`, updateData)

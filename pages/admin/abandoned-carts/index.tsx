@@ -9,10 +9,12 @@ import { toast } from "react-toastify";
 const AdminAbandonedCarts: NextPage = () => {
   const [carts, setCarts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hours, setHours] = useState("48");
 
   const fetchCarts = async () => {
     try {
-      const res = await axios.get("/admin/abandoned-carts");
+      setLoading(true);
+      const res = await axios.get(`/admin/abandoned-carts?hours=${hours}`);
       setCarts(res.data);
       setLoading(false);
     } catch (e) {
@@ -23,7 +25,7 @@ const AdminAbandonedCarts: NextPage = () => {
 
   useEffect(() => {
     fetchCarts();
-  }, []);
+  }, [hours]);
 
   return (
     <>
@@ -31,9 +33,35 @@ const AdminAbandonedCarts: NextPage = () => {
         <title>Abandoned Cart Tracker | Navkar Admin</title>
       </Head>
       <AdminLayout title="Abandoned Cart Tracker">
-        <p style={{ marginBottom: "2rem", color: "#666" }}>
-          Showing users who have added items to their cart in the last 48 hours but haven&apos;t placed an order.
-        </p>
+         <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+          <p style={{ margin: 0, color: "#666" }}>
+            Showing users who have added items to their cart but haven&apos;t placed an order.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "0.9rem", fontWeight: "600", color: "#64748b" }}>Lookback Period:</span>
+            <select 
+              value={hours} 
+              onChange={(e) => setHours(e.target.value)}
+              style={{ 
+                padding: "8px 16px", 
+                borderRadius: "8px", 
+                border: "1px solid #cbd5e1", 
+                backgroundColor: "white",
+                color: "#1e293b",
+                fontWeight: "500",
+                cursor: "pointer",
+                outline: "none",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+              }}
+            >
+              <option value="24">Last 24 Hours</option>
+              <option value="48">Last 48 Hours</option>
+              <option value="72">Last 3 days</option>
+              <option value="168">Last 7 Days</option>
+              <option value="720">Last 30 Days</option>
+            </select>
+          </div>
+        </div>
         <Card>
           {loading ? (
             <p>Scanning Carts...</p>

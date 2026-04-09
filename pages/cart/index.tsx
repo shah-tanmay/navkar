@@ -8,12 +8,54 @@ import QuantitySelector from "../../components/QuantitySelector";
 import COLORS from "../../constants/color";
 import { useCart } from "../../context/CartContext";
 import { createOrder } from "../../services/orderService";
+import { validateCoupon } from "../../services/couponService";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import * as S from "../../styles/pages/cart/styles";
 
 const CartPage = () => {
   const router = useRouter();
   const { cartItems, updateQuantity, removeFromCart, isLoading, orderToken } =
     useCart();
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+
+  const subtotal = _.reduce(cartItems, (sum, item) => sum + item.price * item.quantity, 0);
+  const shippingFee = (subtotal < 2000 && subtotal > 0) ? 50 : 0;
+  const finalTotal = Math.max(0, subtotal + shippingFee - couponDiscount);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setIsApplyingCoupon(true);
+    setCouponError("");
+    try {
+      const coupon = await validateCoupon(couponCode.trim().toUpperCase());
+      let discount = 0;
+      if (coupon.type === "percentage") {
+        discount = (subtotal * parseFloat(coupon.value)) / 100;
+      } else if (coupon.type === "fixed") {
+        discount = parseFloat(coupon.value);
+      }
+      setCouponDiscount(discount);
+      setAppliedCoupon(coupon);
+      setCouponCode("");
+      toast.success("Coupon applied!");
+    } catch (err: any) {
+      setCouponError(err.message || "Invalid coupon");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+    setCouponError("");
+  };
 
   return (
     <ProtectedRoute>
@@ -94,34 +136,57 @@ const CartPage = () => {
                 <S.SummaryCard>
                   <h2>Order Summary</h2>
 
-                  <S.SummaryRow>
+                   <S.SummaryRow>
                     <span>Subtotal ({cartItems?.length} items)</span>
-                    <span>
-                      ₹
-                      {_.reduce(
-                        cartItems,
-                        (sum, item) => sum + item.price * item.quantity,
-                        0
-                      )}
-                    </span>
+                    <span>₹{subtotal}</span>
                   </S.SummaryRow>
+
+                  {couponDiscount > 0 && (
+                    <S.SummaryRow style={{ color: "#2e7d32" }}>
+                      <span>Discount ({appliedCoupon?.code})</span>
+                      <span>-₹{couponDiscount}</span>
+                    </S.SummaryRow>
+                  )}
 
                   <S.SummaryRow>
                     <span>Delivery</span>
-                    <span>FREE</span>
+                    <span style={{ color: shippingFee === 0 ? "#2e7d32" : "inherit", fontWeight: shippingFee === 0 ? "600" : "inherit" }}>
+                      {shippingFee === 0 ? "FREE" : `₹${shippingFee}`}
+                    </span>
                   </S.SummaryRow>
 
-                  <S.TotalRow>
+                   <S.TotalRow>
                     <span>Total</span>
-                    <S.TotalPrice>
-                      ₹
-                      {_.reduce(
-                        cartItems,
-                        (sum, item) => sum + item.price * item.quantity,
-                        0
-                      )}
-                    </S.TotalPrice>
+                    <S.TotalPrice>₹{finalTotal}</S.TotalPrice>
                   </S.TotalRow>
+
+                  {appliedCoupon ? (
+                    <S.AppliedCouponBox>
+                      <div className="details">
+                        <span className="code">{appliedCoupon.code}</span>
+                        <span className="label">Coupon Applied</span>
+                      </div>
+                      <button onClick={handleRemoveCoupon}>Remove</button>
+                    </S.AppliedCouponBox>
+                  ) : (
+                    <>
+                      <S.PromoSection>
+                        <input 
+                          placeholder="Coupon Code" 
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                        />
+                        <S.ApplyButton 
+                          onClick={handleApplyCoupon} 
+                          disabled={isApplyingCoupon || !couponCode}
+                        >
+                          {isApplyingCoupon ? "..." : "Apply"}
+                        </S.ApplyButton>
+                      </S.PromoSection>
+                      {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
+                    </>
+                  )}
 
                   <S.CheckoutButton
                     onClick={async () => {
@@ -132,7 +197,8 @@ const CartPage = () => {
                             product_variant_id: item.variant_id,
                             quantity: item.quantity,
                           };
-                        })
+                        }),
+                        appliedCoupon?.code
                       );
                       if (orderResponse) {
                         router.push(`/checkout/${orderToken}`);
