@@ -30,8 +30,13 @@ import { createOrder } from "../../../services/orderService";
 import ProductNotFoundPage from "../../../components/ProductNotFound";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
-
 import { GetServerSideProps } from "next";
+
+// ✅ Transforms any Cloudinary URL to a 1200x630 OG-safe image
+function toOgImage(url: string): string {
+  if (!url || !url.includes("cloudinary.com")) return url;
+  return url.replace("/upload/", "/upload/w_1200,h_630,c_fill,g_auto,f_auto/");
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query as { slug: string };
@@ -113,7 +118,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const meta = (productDetails as any)?.metadata || {};
   const variantMeta = (selectedVariant as any)?.metadata || {};
 
-  // Sensible Defaults for Curtains
   const fabric = meta.fabric_details || {
     material: "Premium Polyester Blend",
     gsm: "250 - 280 GSM",
@@ -131,242 +135,236 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <SEO 
         title={`${productDetails?.name} - ${selectedVariant?.name}`}
         description={selectedVariant?.metadata?.variant_description || productDetails?.description || `Explore our premium ${selectedVariant?.name} ${productDetails?.name}. Handcrafted curtains for a refined home.`}
-        image={initialSelectedVariant.image_url || activeImage}
+        image={toOgImage(initialSelectedVariant.image_url || "")} 
         type="product"
         url={`/products/${selectedVariant?.slug}`}
       />
       <ProductPageWrapper>
-          <HeroSection>
-            <ImageGallery>
-              <MainImage>
-                <img src={activeImage} alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`} />
-                <WarrantyBadge>Grade Quality Curtain</WarrantyBadge>
-              </MainImage>
-              <ThumbnailGrid>
-                {_.uniq([
-                  selectedVariant?.image_url || (productDetails as any)?.image_url,
-                  ...(((selectedVariant as any)?.metadata?.gallery_images || productDetails?.metadata?.gallery_images || []) as string[])
-                ].filter(Boolean)).slice(0, 4).map((img, index) => (
-                    <Thumbnail
+        <HeroSection>
+          <ImageGallery>
+            <MainImage>
+              <img src={activeImage} alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`} />
+              <WarrantyBadge>Grade Quality Curtain</WarrantyBadge>
+            </MainImage>
+            <ThumbnailGrid>
+              {_.uniq([
+                selectedVariant?.image_url || (productDetails as any)?.image_url,
+                ...(((selectedVariant as any)?.metadata?.gallery_images || productDetails?.metadata?.gallery_images || []) as string[])
+              ].filter(Boolean)).slice(0, 4).map((img, index) => (
+                <Thumbnail
+                  key={index}
+                  className={activeImage === img ? "active" : ""}
+                  onClick={() => setActiveImage(img)}
+                >
+                  <img src={img} alt={`Gallery Preview ${index + 1}`} />
+                </Thumbnail>
+              ))}
+            </ThumbnailGrid>
+          </ImageGallery>
+
+          <ProductDetails>
+            <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
+            <PriceTag>₹{selectedVariant?.price} <span>₹{Math.floor(Number(selectedVariant?.price || 0) * 1.3)}</span></PriceTag>
+            
+            <SoldAsLine>
+              <strong>Sold as: 1 panel</strong>
+              <span className="note">• Most windows require 2 panels</span>
+            </SoldAsLine>
+
+            <ScarcityLabel>Exclusive Premium Batch</ScarcityLabel>
+
+            <SelectorRow>
+              <ColorOptions>
+                <h3>Select Color</h3>
+                <div className="swatches">
+                  {_.uniq(
+                    _.map(variants, "color_hex_code")
+                  ).map((color: string, index: number) => (
+                    <ColorSwatch
                       key={index}
-                      className={activeImage === img ? "active" : ""}
-                      onClick={() => setActiveImage(img)}
-                    >
-                      <img src={img} alt={`Gallery Preview ${index + 1}`} />
-                    </Thumbnail>
-                ))}
-              </ThumbnailGrid>
-            </ImageGallery>
-
-            <ProductDetails>
-              <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
-              <PriceTag>₹{selectedVariant?.price} <span>₹{Math.floor(Number(selectedVariant?.price || 0) * 1.3)}</span></PriceTag>
-              
-              <SoldAsLine>
-                <strong>Sold as: 1 panel</strong>
-                <span className="note">• Most windows require 2 panels</span>
-              </SoldAsLine>
-
-              <ScarcityLabel>Exclusive Premium Batch</ScarcityLabel>
-
-              <SelectorRow>
-                <ColorOptions>
-                  <h3>Select Color</h3>
-                  <div className="swatches">
-                    {_.uniq(
-                      _.map(variants, "color_hex_code")
-                    ).map((color: string, index: number) => (
-                      <ColorSwatch
-                        key={index}
-                        color={color}
-                        className={
-                          selectedVariant?.color_hex_code === color
-                            ? "selected"
+                      color={color}
+                      className={
+                        selectedVariant?.color_hex_code === color
+                          ? "selected"
                           : ""
-                        }
-                        onClick={() => {
-                          // Find variant with same type
-                          let nextV = _.find(variants, v => v.color_hex_code === color && v.type === selectedVariant?.type);
-                          // Fallback to any variant of that color if type missing
-                          if (!nextV) nextV = _.find(variants, v => v.color_hex_code === color);
-                          
-                          if (nextV) setSelectedVariant(nextV);
-                        }}
-                        title={color}
-                      />
-                    ))}
-                  </div>
-                </ColorOptions>
-              </SelectorRow>
+                      }
+                      onClick={() => {
+                        let nextV = _.find(variants, v => v.color_hex_code === color && v.type === selectedVariant?.type);
+                        if (!nextV) nextV = _.find(variants, v => v.color_hex_code === color);
+                        if (nextV) setSelectedVariant(nextV);
+                      }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </ColorOptions>
+            </SelectorRow>
 
-              {_.uniq(_.map(variants, "type")).length > 1 && (
-                <SizeOptions>
-                  <h3>Select Size / Type</h3>
-                  <div className="options-wrapper">
-                    {_.uniq(
-                      _.map(
-                        _.filter(
+            {_.uniq(_.map(variants, "type")).length > 1 && (
+              <SizeOptions>
+                <h3>Select Size / Type</h3>
+                <div className="options-wrapper">
+                  {_.uniq(
+                    _.map(
+                      _.filter(
+                        variants,
+                        (variant) =>
+                          variant.color_hex_code ===
+                          selectedVariant?.color_hex_code
+                      ),
+                      "type"
+                    )
+                  ).map((type: string, index: number) => (
+                    <SizeButton
+                      key={index}
+                      selected={selectedVariant?.type === type}
+                      onClick={() => {
+                        const newVariant = _.find(
                           variants,
                           (variant) =>
+                            variant.type === type &&
                             variant.color_hex_code ===
-                            selectedVariant?.color_hex_code
-                        ),
-                        "type"
-                      )
-                    ).map((type: string, index: number) => (
-                      <SizeButton
-                        key={index}
-                        selected={selectedVariant?.type === type}
-                        onClick={() => {
-                          const newVariant = _.find(
-                            variants,
-                            (variant) =>
-                              variant.type === type &&
-                              variant.color_hex_code ===
-                                selectedVariant?.color_hex_code
-                          );
-                          if (newVariant) setSelectedVariant(newVariant);
-                        }}
-                      >
-                        {type}
-                      </SizeButton>
-                    ))}
-                  </div>
-                </SizeOptions>
-              )}
+                              selectedVariant?.color_hex_code
+                        );
+                        if (newVariant) setSelectedVariant(newVariant);
+                      }}
+                    >
+                      {type}
+                    </SizeButton>
+                  ))}
+                </div>
+              </SizeOptions>
+            )}
 
-              <QuantitySelectorContainer>
-                <QuantitySelectorText>Quantity</QuantitySelectorText>
-                <QuantitySelector
-                  quantity={_.get(
-                    variantQuantities,
-                    `${selectedVariant?.id}`
-                  )}
-                  onQuantityChange={(newQuantity) =>
-                    updateQuantity(selectedVariant?.id!, newQuantity)
-                  }
-                />
-              </QuantitySelectorContainer>
+            <QuantitySelectorContainer>
+              <QuantitySelectorText>Quantity</QuantitySelectorText>
+              <QuantitySelector
+                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+                onQuantityChange={(newQuantity) =>
+                  updateQuantity(selectedVariant?.id!, newQuantity)
+                }
+              />
+            </QuantitySelectorContainer>
 
-              <ShippingPromoBadge>
-                <FaGift /> Free shipping on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}
-              </ShippingPromoBadge>
+            <ShippingPromoBadge>
+              <FaGift /> Free shipping on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}
+            </ShippingPromoBadge>
 
-              <PurchaseCard>
-                <BuyNow onClick={handleBuyNow} />
-                <AddToCart
-                  cartId={cartItem?.cart_id}
-                  variantId={selectedVariant?.id as string}
-                  quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
-                />
-              </PurchaseCard>
+            <PurchaseCard>
+              <BuyNow onClick={handleBuyNow} />
+              <AddToCart
+                cartId={cartItem?.cart_id}
+                variantId={selectedVariant?.id as string}
+                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+              />
+            </PurchaseCard>
 
-              <DeliveryTimeline>
-                <FaCheckCircle /> Delivered in 5–7 business days
-              </DeliveryTimeline>
+            <DeliveryTimeline>
+              <FaCheckCircle /> Delivered in 5–7 business days
+            </DeliveryTimeline>
 
-              <TrustBadgesContainer>
-                <TrustBadge><FaShieldAlt /> Premium Craftsmanship</TrustBadge>
-                <TrustBadge><FaLock /> 100% Secure Payment</TrustBadge>
-                <TrustBadge><FaTruck /> Express VIP Shipping</TrustBadge>
-                <TrustBadge><FaStar /> Easy 7 Day Returns</TrustBadge>
-              </TrustBadgesContainer>
+            <TrustBadgesContainer>
+              <TrustBadge><FaShieldAlt /> Premium Craftsmanship</TrustBadge>
+              <TrustBadge><FaLock /> 100% Secure Payment</TrustBadge>
+              <TrustBadge><FaTruck /> Express VIP Shipping</TrustBadge>
+              <TrustBadge><FaStar /> Easy 7 Day Returns</TrustBadge>
+            </TrustBadgesContainer>
 
-              <AccordionContainer>
-                <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "desc" ? null : "desc")}>
-                  Product Description {openAccordion === "desc" ? <FaChevronUp /> : <FaChevronDown />}
-                </AccordionHeader>
-                <AccordionContent $isOpen={openAccordion === "desc"}>
-                  <div className="content-inner">
-                    <p>{variantMeta?.variant_description || productDetails?.description}</p>
-                  </div>
-                </AccordionContent>
-              </AccordionContainer>
+            <AccordionContainer>
+              <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "desc" ? null : "desc")}>
+                Product Description {openAccordion === "desc" ? <FaChevronUp /> : <FaChevronDown />}
+              </AccordionHeader>
+              <AccordionContent $isOpen={openAccordion === "desc"}>
+                <div className="content-inner">
+                  <p>{variantMeta?.variant_description || productDetails?.description}</p>
+                </div>
+              </AccordionContent>
+            </AccordionContainer>
 
-                <AccordionContainer>
-                  <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "fabric" ? null : "fabric")}>
-                    Fabric & Material {openAccordion === "fabric" ? <FaChevronUp /> : <FaChevronDown />}
-                  </AccordionHeader>
-                  <AccordionContent $isOpen={openAccordion === "fabric"}>
-                    <div className="content-inner">
-                      <FabricDetailsGrid>
-                        <div className="item"><label>Material</label><span>{fabric.material}</span></div>
-                        <div className="item"><label>GSM</label><span>{fabric.gsm}</span></div>
-                        <div className="item"><label>Opacity</label><span>{fabric.opacity}</span></div>
-                        <div className="item"><label>Lining</label><span>{fabric.lining}</span></div>
-                      </FabricDetailsGrid>
-                    </div>
-                  </AccordionContent>
-                </AccordionContainer>
+            <AccordionContainer>
+              <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "fabric" ? null : "fabric")}>
+                Fabric & Material {openAccordion === "fabric" ? <FaChevronUp /> : <FaChevronDown />}
+              </AccordionHeader>
+              <AccordionContent $isOpen={openAccordion === "fabric"}>
+                <div className="content-inner">
+                  <FabricDetailsGrid>
+                    <div className="item"><label>Material</label><span>{fabric.material}</span></div>
+                    <div className="item"><label>GSM</label><span>{fabric.gsm}</span></div>
+                    <div className="item"><label>Opacity</label><span>{fabric.opacity}</span></div>
+                    <div className="item"><label>Lining</label><span>{fabric.lining}</span></div>
+                  </FabricDetailsGrid>
+                </div>
+              </AccordionContent>
+            </AccordionContainer>
 
-                <AccordionContainer>
-                  <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "care" ? null : "care")}>
-                    Wash Care Instructions {openAccordion === "care" ? <FaChevronUp /> : <FaChevronDown />}
-                  </AccordionHeader>
-                  <AccordionContent $isOpen={openAccordion === "care"}>
-                    <div className="content-inner">
-                      <p>{washCare}</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionContainer>
+            <AccordionContainer>
+              <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "care" ? null : "care")}>
+                Wash Care Instructions {openAccordion === "care" ? <FaChevronUp /> : <FaChevronDown />}
+              </AccordionHeader>
+              <AccordionContent $isOpen={openAccordion === "care"}>
+                <div className="content-inner">
+                  <p>{washCare}</p>
+                </div>
+              </AccordionContent>
+            </AccordionContainer>
 
-                <AccordionContainer>
-                  <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "size" ? null : "size")}>
-                    Size Guide {openAccordion === "size" ? <FaChevronUp /> : <FaChevronDown />}
-                  </AccordionHeader>
-                  <AccordionContent $isOpen={openAccordion === "size"}>
-                    <div className="content-inner">
-                      <FabricDetailsGrid>
-                        <div className="item"><label>Door Size</label><span>{sizeGuide.door}</span></div>
-                        <div className="item"><label>Window Size</label><span>{sizeGuide.window}</span></div>
-                      </FabricDetailsGrid>
-                    </div>
-                  </AccordionContent>
-                </AccordionContainer>
+            <AccordionContainer>
+              <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "size" ? null : "size")}>
+                Size Guide {openAccordion === "size" ? <FaChevronUp /> : <FaChevronDown />}
+              </AccordionHeader>
+              <AccordionContent $isOpen={openAccordion === "size"}>
+                <div className="content-inner">
+                  <FabricDetailsGrid>
+                    <div className="item"><label>Door Size</label><span>{sizeGuide.door}</span></div>
+                    <div className="item"><label>Window Size</label><span>{sizeGuide.window}</span></div>
+                  </FabricDetailsGrid>
+                </div>
+              </AccordionContent>
+            </AccordionContainer>
 
-              <AccordionContainer>
-                <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "feat" ? null : "feat")}>
-                  Premium Features {openAccordion === "feat" ? <FaChevronUp /> : <FaChevronDown />}
-                </AccordionHeader>
-                <AccordionContent $isOpen={openAccordion === "feat"}>
-                  <div className="content-inner">
-                    <FeatureList>
-                      {(productDetails?.metadata?.features || []).length > 0 ? (
-                        (productDetails?.metadata?.features || []).map(
-                          (feature: string, index: number) => (
-                            <FeatureListItem key={index}>{feature}</FeatureListItem>
-                          )
+            <AccordionContainer>
+              <AccordionHeader onClick={() => setOpenAccordion(openAccordion === "feat" ? null : "feat")}>
+                Premium Features {openAccordion === "feat" ? <FaChevronUp /> : <FaChevronDown />}
+              </AccordionHeader>
+              <AccordionContent $isOpen={openAccordion === "feat"}>
+                <div className="content-inner">
+                  <FeatureList>
+                    {(productDetails?.metadata?.features || []).length > 0 ? (
+                      (productDetails?.metadata?.features || []).map(
+                        (feature: string, index: number) => (
+                          <FeatureListItem key={index}>{feature}</FeatureListItem>
                         )
-                      ) : (
-                        <FeatureListItem>No specific features listed.</FeatureListItem>
-                      )}
-                    </FeatureList>
+                      )
+                    ) : (
+                      <FeatureListItem>No specific features listed.</FeatureListItem>
+                    )}
+                  </FeatureList>
+                </div>
+              </AccordionContent>
+            </AccordionContainer>
+
+          </ProductDetails>
+        </HeroSection>
+        
+
+        {variants && variants.length > 0 && (
+          <RecommendationsContainer>
+            <h2>You May Also Like: More Colors</h2>
+            <div className="grid">
+              {variants.filter(v => v.id !== selectedVariant?.id).slice(0, 4).map((v) => (
+                <RecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
+                  <div className="img-wrapper">
+                    <img src={v.image_url} alt={`${v.name} Variant Preview`} />
                   </div>
-                </AccordionContent>
-              </AccordionContainer>
-
-            </ProductDetails>
-          </HeroSection>
-
-
-          {variants && variants.length > 0 && (
-            <RecommendationsContainer>
-              <h2>You May Also Like: More Colors</h2>
-              <div className="grid">
-                {variants.filter(v => v.id !== selectedVariant?.id).slice(0, 4).map((v) => (
-                  <RecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
-                    <div className="img-wrapper">
-                      <img src={v.image_url} alt={`${v.name} Variant Preview`} />
-                    </div>
-                    <h3>{productDetails?.name}</h3>
-                    <p>{v.name} Edition • ₹{v.price}</p>
-                  </RecommendationCard>
-                ))}
-              </div>
-            </RecommendationsContainer>
-          )}
-        </ProductPageWrapper>
-      </LoaderWrapper>
+                  <h3>{productDetails?.name}</h3>
+                  <p>{v.name} Edition • ₹{v.price}</p>
+                </RecommendationCard>
+              ))}
+            </div>
+          </RecommendationsContainer>
+        )}
+      </ProductPageWrapper>
+    </LoaderWrapper>
   );
 };
 
