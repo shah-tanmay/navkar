@@ -129,6 +129,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           metadata: {},
           type: "type",
           variant_id: variantId,
+          product_id: "", // Placeholder for optimistic update
         };
 
         setCartItems((prev) => [...prev, tempItem]);
