@@ -21,7 +21,7 @@ export const ProductPageWrapper = styled.div`
   &::after {
     content: ""; /* Space for mobile sticky button */
     display: block;
-    height: 80px; 
+    height: 140px; 
   }
 `;
 
@@ -258,14 +258,34 @@ export const PurchaseCard = styled.div`
   }
 
   @media (max-width: 768px) {
-    position: sticky;
-    top: 280px; /* Follows exactly after the 280px MainImage Block */
-    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
     margin: 0; 
-    padding: 0.5rem 1rem 1rem 1rem; 
+    padding: 1rem; 
     border-radius: 0; 
     background: ${COLORS.primary}; 
-    border-bottom: 1px solid #eaeaea; 
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #efefef;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+
+    /* Ensure children components like wrappers around buttons don't have margins */
+    & > div {
+      flex: none;
+      margin: 0 !important;
+      width: 100%;
+
+      button {
+        margin: 0 !important;
+        height: 48px;
+        font-size: 0.95rem;
+        width: 100% !important;
+      }
+    }
   }
 `;
 

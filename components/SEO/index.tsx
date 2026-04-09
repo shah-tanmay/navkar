@@ -22,7 +22,7 @@ const SEO: React.FC<SEOProps> = ({
     "Elevate your living space with Navkar's handcrafted curtains and bespoke drapes. Premium fabrics, master tailoring, and timeless elegance for every window.";
   const siteUrl = "https://navkar.shop";
   const backendUrl = process.env.NEXT_PUBLIC_CUSTOM_BACKEND_URL || "https://api.navkar.shop";
-  const defaultImage = `${siteUrl}/logo.png`;
+  const defaultImage = `${siteUrl}/logo.jpeg`;
 
   // Fallback logic
   const seoTitle = (title && title.trim().length > 0) ? `${title} | ${siteName}` : defaultTitle;
@@ -35,7 +35,7 @@ const SEO: React.FC<SEOProps> = ({
       seoImage = image;
     } else {
       // Determine if it's a backend path or a frontend public path
-      const isPublicAsset = image.startsWith("/images/") || image.startsWith("/favicon") || image === "/logo.png";
+      const isPublicAsset = image.startsWith("/images/") || image.startsWith("/favicon") || image === "/logo.jpeg";
       const path = image.startsWith("/") ? image : `/${image}`;
       
       if (isPublicAsset) {
@@ -61,6 +61,9 @@ const SEO: React.FC<SEOProps> = ({
       <meta property="og:title" content={seoTitle} />
       <meta property="og:description" content={seoDescription} />
       <meta property="og:image" content={seoImage} />
+      <meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
       <meta property="og:image:secure_url" content={seoImage} />
       <meta property="og:site_name" content={siteName} />
 
