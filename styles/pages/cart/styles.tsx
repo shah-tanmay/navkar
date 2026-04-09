@@ -236,6 +236,10 @@ export const PromoSection = styled.div`
   border: 1px dashed ${COLORS.gold};
   border-radius: 8px;
 
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
+
   input {
     flex: 1;
     border: none;
@@ -271,6 +275,10 @@ export const ApplyButton = styled.button`
   &:disabled {
     background: #ccc;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 400px) {
+    width: 100%;
   }
 `;
 

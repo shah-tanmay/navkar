@@ -459,6 +459,10 @@ export const CouponSection = styled.div`
 export const CouponInputWrapper = styled.div`
   display: flex;
   gap: 0.5rem;
+
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
 `;
 
 export const CouponInput = styled.input`
@@ -493,6 +497,10 @@ export const ApplyButton = styled.button`
   &:disabled {
     background: #ccc;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 400px) {
+    width: 100%;
   }
 `;
 
