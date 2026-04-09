@@ -113,6 +113,7 @@ export interface CartItems {
   metadata: Record<string, any>;
   type: string;
   variant_id: string;
+  product_id: string;
 }
 
 export interface ViewCartResponse {

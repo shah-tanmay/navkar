@@ -34,18 +34,54 @@ const CartPage = () => {
     setCouponError("");
     try {
       const coupon = await validateCoupon(couponCode.trim().toUpperCase());
-      let discount = 0;
-      if (coupon.type === "percentage") {
-        discount = (subtotal * parseFloat(coupon.value)) / 100;
-      } else if (coupon.type === "fixed") {
-        discount = parseFloat(coupon.value);
+      
+      // 1. Min Amount Check
+      if (coupon.min_order_amount && subtotal < parseFloat(coupon.min_order_amount)) {
+        throw new Error(`Minimum order of ₹${coupon.min_order_amount} required`);
       }
+
+      let discount = 0;
+      if (coupon.type === "free_shipping") {
+        // Handled in subtotal/total calculation by setting couponDiscount to 0 
+        // but marking shipping as free in UI if needed, or by setting a flag.
+        // For simplicity, we'll let the user see -₹50 if they use a free shipping code.
+        discount = shippingFee; 
+      } else if (coupon.product_id) {
+        // Product specific
+        let targetSubtotal = 0;
+        cartItems.forEach(item => {
+          if (item.product_id === coupon.product_id) {
+            targetSubtotal += item.price * item.quantity;
+          }
+        });
+        if (targetSubtotal === 0) {
+          throw new Error("This coupon is not applicable to any item in your cart");
+        }
+        if (coupon.type === "percentage") {
+          discount = (targetSubtotal * parseFloat(coupon.value)) / 100;
+        } else {
+          discount = Math.min(targetSubtotal, parseFloat(coupon.value));
+        }
+      } else {
+        // Global
+        if (coupon.type === "percentage") {
+          discount = (subtotal * parseFloat(coupon.value)) / 100;
+        } else {
+          discount = parseFloat(coupon.value);
+        }
+      }
+
+      // Add free shipping bonus if coupon says so
+      if (coupon.is_free_shipping && coupon.type !== "free_shipping") {
+        discount += shippingFee;
+      }
+
       setCouponDiscount(discount);
       setAppliedCoupon(coupon);
       setCouponCode("");
       toast.success("Coupon applied!");
     } catch (err: any) {
-      setCouponError(err.message || "Invalid coupon");
+      setCouponError(err.response?.data?.message || err.message || "Invalid coupon");
     } finally {
       setIsApplyingCoupon(false);
     }
