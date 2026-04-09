@@ -52,6 +52,7 @@ const SEO: React.FC<SEOProps> = ({
   return (
     <Head>
       <title>{seoTitle}</title>
+      <meta name="facebook-domain-verification" content="xzvl9y4rmhhpgw7kg6i2s25xpga9y9" />
       <meta name="description" content={seoDescription} />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
 
