@@ -3,6 +3,7 @@ import styled from "styled-components";
 import COLORS from "../constants/color";
 import { FiArrowLeft, FiRefreshCw, FiTruck, FiShield } from "react-icons/fi";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Container = styled.div`
   max-width: 900px;
@@ -77,6 +78,15 @@ const Card = styled.div`
     font-size: 0.95rem;
     color: ${COLORS.slate};
   }
+
+  a {
+    color: ${COLORS.gold};
+    text-decoration: none;
+    font-weight: 600;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const ReturnsPage = () => {
@@ -85,11 +95,11 @@ const ReturnsPage = () => {
   return (
     <Container>
       <BackButton onClick={() => router.back()}>
-        <FiArrowLeft /> Back to Account
+        <FiArrowLeft /> Back
       </BackButton>
       
       <Title>Returns & Exchange</Title>
-      <p>At Navkar, we take immense pride in the quality of our craftsmanship. If you are not entirely satisfied with your purchase, we&apos;re here to help make it right.</p>
+      <p>At Navkar, we take immense pride in the quality of our craftsmanship. If you are not entirely satisfied with your purchase, we're here to help make it right.</p>
 
       <CardGrid>
         <Card>
@@ -112,7 +122,7 @@ const ReturnsPage = () => {
       <Section>
         <SectionTitle>Why a return fee?</SectionTitle>
         <p>
-          We&apos;re a small business that takes pride in quality. The ₹500 fee helps us cover reverse logistics costs and 
+          We're a small business that takes pride in quality. The ₹500 fee helps us cover reverse logistics costs and 
           ensures we can keep offering you the best pricing possible. We deeply appreciate your understanding and support!
         </p>
       </Section>
@@ -120,9 +130,9 @@ const ReturnsPage = () => {
       <Section>
         <SectionTitle>How to Return?</SectionTitle>
         <ol>
-          <li>Go to your <strong>Order History</strong> in the My Account section.</li>
+          <li>Go to your <Link href="/account" style={{ color: COLORS.gold, fontWeight: "600" }}>Order History</Link> in the My Account section.</li>
           <li>Click on <strong>Support</strong> next to the order you wish to return.</li>
-          <li>Share the reason for return via WhatsApp.</li>
+          <li>Share the reason for return via <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noreferrer" style={{ color: COLORS.gold, fontWeight: "600" }}>WhatsApp</a>.</li>
           <li>Once approved, a reverse pickup will be scheduled.</li>
         </ol>
       </Section>

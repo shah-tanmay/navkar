@@ -3,6 +3,7 @@ import styled from "styled-components";
 import COLORS from "../constants/color";
 import { FiArrowLeft, FiPlus, FiMinus, FiHelpCircle } from "react-icons/fi";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Container = styled.div`
   max-width: 900px;
@@ -75,6 +76,15 @@ const Content = styled.div<{ open: boolean }>`
   background: white;
   color: ${COLORS.slate};
   border-top: ${props => props.open ? `1px solid ${COLORS.accent}` : "none"};
+
+  a {
+    color: ${COLORS.gold};
+    text-decoration: none;
+    font-weight: 600;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const FaqPage = () => {
@@ -84,11 +94,20 @@ const FaqPage = () => {
   const faqs = [
     {
       q: "How do I measure for the right curtain size?",
-      a: "For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a &apos;full&apos; gathered look. Detailed guides are available on each product page."
+      a: (
+        <>
+          For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a 'full' gathered look. Detailed guides are available on each <Link href="/products">product page</Link>.
+        </>
+      )
     },
     {
       q: "Can I customize the height of the curtains?",
-      a: "Yes! While our standard sizes cover most windows and doors, we do offer custom tailoring for bulk orders. Please reach out to our support via WhatsApp for custom height requests."
+      a: (
+        <>
+          Yes! While our standard sizes cover most windows and doors, we do offer custom tailoring for bulk orders. Please {" "}
+          <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noreferrer">reach out to our support via WhatsApp</a> for custom height requests.
+        </>
+      )
     },
     {
       q: "Are the curtains blackout or light-filtering?",
@@ -96,11 +115,19 @@ const FaqPage = () => {
     },
     {
       q: "What is your return policy for custom items?",
-      a: "We offer easy 7-day returns from the date of delivery. A return handling fee of ₹500 will be deducted to cover reverse shipping. However, please note that custom length orders are non-returnable and non-refundable."
+      a: (
+        <>
+          We offer easy 7-day returns from the date of delivery. A return handling fee of ₹500 will be deducted to cover reverse shipping. However, please note that custom length orders are non-returnable and non-refundable. Read our full <Link href="/returns">Return Policy</Link>.
+        </>
+      )
     },
     {
       q: "How do I track my order?",
-      a: "Log in to your account, go to the &apos;Orders&apos; section, and click on &apos;Track&apos;. You&apos;ll see a real-time status line for every step of the delivery."
+      a: (
+        <>
+          <Link href="/account">Log in to your account</Link>, go to the 'Orders' section, and click on 'Track'. You'll see a real-time status line for every step of the delivery.
+        </>
+      )
     },
     {
       q: "Do you offer Cash on Delivery (COD)?",
@@ -111,7 +138,7 @@ const FaqPage = () => {
   return (
     <Container>
       <BackButton onClick={() => router.back()}>
-        <FiArrowLeft /> Back to Account
+        <FiArrowLeft /> Back
       </BackButton>
       
       <Title><FiHelpCircle style={{ verticalAlign: "middle", marginRight: "0.5rem" }} /> Frequently Asked Questions</Title>

@@ -90,7 +90,7 @@ const ShippingPage = () => {
   return (
     <Container>
       <BackButton onClick={() => router.back()}>
-        <FiArrowLeft /> Back to Account
+        <FiArrowLeft /> Back
       </BackButton>
       
       <Title>Payment & Shipping</Title>
