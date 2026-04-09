@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
 import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock } from "react-icons/fa";
@@ -19,7 +19,8 @@ import {
   Thumbnail, ThumbnailGrid, WarrantyBadge, TrustBadgesContainer, TrustBadge, 
   AccordionContainer, AccordionHeader, AccordionContent, ScarcityLabel, SocialProof,
   FeatureList, FeatureListItem, SoldAsLine, ShippingPromoBadge, DeliveryTimeline,
-  PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard
+  PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard,
+  MobileStickyActions
 } from "../../../styles/pages/products/slug-styles";
 import { useCart } from "../../../context/CartContext";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
@@ -84,6 +85,43 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || "");
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
+  const [showMobileSticky, setShowMobileSticky] = useState(true);
+  const bottomTriggerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkVisibility = () => {
+      if (!bottomTriggerRef.current) return;
+      const rect = bottomTriggerRef.current.getBoundingClientRect();
+      
+      // The static CTA is 'visible' if its top is above the bottom of the viewport
+      const isBelowViewport = rect.top > window.innerHeight;
+      
+      // Force show at the very top of the page for immediate accessibility
+      if (window.scrollY < 50) {
+        setShowMobileSticky(true);
+      } else {
+        // Otherwise, hide it if the static CTA has scrolled into view or is above us
+        setShowMobileSticky(isBelowViewport);
+      }
+    };
+
+    const observer = new IntersectionObserver(checkVisibility, { 
+      threshold: 0,
+      rootMargin: "0px"
+    });
+
+    if (bottomTriggerRef.current) {
+      observer.observe(bottomTriggerRef.current);
+    }
+
+    // Add scroll listener as a backup for rapid scrolling/top-of-page cases
+    window.addEventListener("scroll", checkVisibility, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", checkVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     setActiveImage(selectedVariant?.image_url || (productDetails as any)?.image_url || "");
@@ -267,7 +305,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
               <FaGift /> Free shipping on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}
             </ShippingPromoBadge>
 
-            <PurchaseCard>
+            <PurchaseCard $hideOnMobile>
               <BuyNow onClick={handleBuyNow} />
               <AddToCart
                 cartId={cartItem?.cart_id}
@@ -360,8 +398,23 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </AccordionContent>
             </AccordionContainer>
 
+            {/* Mobile Only: CTA Block after all details and description */}
+            <PurchaseCard ref={bottomTriggerRef} $isSecondary>
+              <BuyNow onClick={handleBuyNow} />
+              <AddToCart
+                cartId={cartItem?.cart_id}
+                variantId={selectedVariant?.id as string}
+                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+              />
+            </PurchaseCard>
+
           </ProductDetails>
         </HeroSection>
+
+        {/* Mobile Sticky CTA: Visible only at the top of the page */}
+        <MobileStickyActions $visible={showMobileSticky}>
+          <BuyNow onClick={handleBuyNow} />
+        </MobileStickyActions>
         
 
         {variants && variants.length > 0 && (

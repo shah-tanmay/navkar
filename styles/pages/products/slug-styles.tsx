@@ -234,7 +234,7 @@ export const WarrantyBadge = styled.div`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
 
-export const PurchaseCard = styled.div`
+export const PurchaseCard = styled.div<{ $hideOnMobile?: boolean; $isSecondary?: boolean }>`
   background: ${COLORS.primary};
   padding: 1.5rem;
   border-radius: 12px;
@@ -245,7 +245,7 @@ export const PurchaseCard = styled.div`
   z-index: 100;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   height: fit-content;
-  isolation: isolate; /* Creates its own stacking context */
+  isolation: isolate; 
   
   display: flex;
   flex-direction: column;
@@ -258,22 +258,20 @@ export const PurchaseCard = styled.div`
   }
 
   @media (max-width: 768px) {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    margin: 0; 
-    padding: 1rem; 
-    border-radius: 0; 
-    background: ${COLORS.primary}; 
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
-    border-top: 1px solid #efefef;
+    display: ${props => (props.$hideOnMobile ? "none" : "flex")};
+    position: relative;
+    top: auto;
+    z-index: 10;
+    margin: ${props => (props.$isSecondary ? "2.5rem 0" : "1.5rem 0")}; 
+    padding: 1.5rem; 
+    border-radius: 12px; 
+    background: #fff; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border: 1px solid #efefef;
     flex-direction: column;
     gap: 0.75rem;
     align-items: stretch;
 
-    /* Ensure children components like wrappers around buttons don't have margins */
     & > div {
       flex: none;
       margin: 0 !important;
@@ -281,9 +279,43 @@ export const PurchaseCard = styled.div`
 
       button {
         margin: 0 !important;
-        height: 48px;
-        font-size: 0.95rem;
+        height: 52px;
+        font-size: 1rem;
         width: 100% !important;
+      }
+    }
+  }
+
+  /* Hide secondary (mobile-flow) CTA on desktop */
+  @media (min-width: 769px) {
+    display: ${props => (props.$isSecondary ? "none" : "flex")};
+  }
+`;
+
+export const MobileStickyActions = styled.div<{ $visible: boolean }>`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: ${COLORS.primary};
+    padding: 1.5rem; 
+    z-index: 3000;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #efefef;
+    transform: translateY(${props => (props.$visible ? "0" : "100%")});
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    & > div {
+      width: 100%;
+
+      button {
+        height: 52px; 
+        font-size: 1rem;
+        font-weight: 600;
       }
     }
   }
