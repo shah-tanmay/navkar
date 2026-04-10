@@ -72,7 +72,9 @@ export const GalleryImageDiv = styled.div`
   }
 `;
 
-export const GalleryStaticImage = styled.img`
+import Image from "next/image";
+
+export const GalleryStaticImage = styled(Image)`
   @media screen and (max-width: 768px) {
     max-width: 40%;
   }

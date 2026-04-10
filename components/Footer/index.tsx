@@ -1,6 +1,7 @@
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import Link from "next/link";
 import { logoPath } from "../../constants";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   FooterDivider,
   FooterLogo,
@@ -21,10 +22,12 @@ const Footer = () => {
       <FooterMain>
         <FooterLogoDiv>
           <FooterLogo
-            src={logoPath}
+            loader={cloudinaryLoader}
+            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775820455/navkar_assets/logo.png"
             alt="Navkar Logo"
             width={206.14}
             height={44.22}
+            loading="lazy"
           />
         </FooterLogoDiv>
         <FooterSocials>

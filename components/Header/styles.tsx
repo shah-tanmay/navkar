@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Image from "next/image";
 import COLORS from "../../constants/color";
 
 export const HeaderWrapper = styled.div`
@@ -26,7 +27,7 @@ export const HeaderLinks = styled.div`
   align-items: center;
 `;
 
-export const LogoImage = styled.img`
+export const LogoImage = styled(Image)`
   image-rendering: auto;
   width: 206.14px;
   height: 44.22px;

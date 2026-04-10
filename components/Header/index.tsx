@@ -15,6 +15,8 @@ import {
   DropdownItem,
   HeaderUserDropdown,
 } from "./styles";
+import Image from "next/image";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import { useWindowWidth } from "@react-hook/window-size";
 import { FaBars, FaShoppingCart, FaUser, FaChevronDown } from "react-icons/fa";
 import Button from "../Button";
@@ -52,7 +54,14 @@ const Header = () => {
           FREE SHIPPING ON ALL ORDERS ABOVE ₹2000
         </div>
         <HeaderWrapper>
-          <LogoImage src={logoPath} alt="logo" />
+          <LogoImage
+            loader={cloudinaryLoader}
+            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775820455/navkar_assets/logo.png"
+            alt="logo"
+            width={160}
+            height={34}
+            priority
+          />
           <HeaderLinks>
             {width > 768 && (
               <HeaderMenu>

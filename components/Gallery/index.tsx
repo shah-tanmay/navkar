@@ -1,5 +1,7 @@
 import { useWindowWidth } from "@react-hook/window-size";
 import GalleryCarousel from "./GalleryCarousel";
+import Image from "next/image";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   GalleryImageDiv,
   GalleryInfoDiv,
@@ -26,9 +28,13 @@ const Gallery = () => {
       <GalleryImageDiv>
         {width > 425 && (
           <GalleryStaticImage
-            src="/images/gallery-4.jpg"
+            loader={cloudinaryLoader}
+            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816222/navkar_assets/gallery-4.jpg"
+            alt="Styled Interior Space"
             width={404}
             height={582}
+            sizes="(max-width: 768px) 40vw, 404px"
+            style={{ objectFit: "cover" }}
           />
         )}
         <GalleryCarousel />
