@@ -121,10 +121,12 @@ const CheckoutPage = () => {
           currency: "INR",
           value: orderTotal
         });
-        import("react-facebook-pixel").then((x) => x.default.track("InitiateCheckout", {
-          currency: "INR",
-          value: orderTotal
-        }));
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq("track", "InitiateCheckout", {
+            currency: "INR",
+            value: orderTotal
+          });
+        }
 
         // Calculate Smart Skip - check validity silently to avoid premature UI errors
         setTimeout(async () => {
