@@ -79,10 +79,12 @@ export const Payment = ({
             value: total,
             transaction_id: orderToken
           });
-          import("react-facebook-pixel").then((x) => x.default.track("Purchase", {
-            currency: "INR",
-            value: total
-          }));
+          if (typeof window !== "undefined" && (window as any).fbq) {
+            (window as any).fbq("track", "Purchase", {
+              currency: "INR",
+              value: total
+            });
+          }
           toast.success("Payment successful!");
           router.push(`/orders/${orderToken}?success=true`);
         } else {

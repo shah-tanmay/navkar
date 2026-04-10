@@ -55,11 +55,13 @@ export const AddToCart = ({
         currency: "INR",
         items: [{ item_id: variantId, quantity }],
       });
-      import("react-facebook-pixel").then((x) => x.default.track("AddToCart", {
-        content_ids: [variantId],
-        content_type: "product",
-        currency: "INR",
-      }));
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "AddToCart", {
+          content_ids: [variantId],
+          content_type: "product",
+          currency: "INR",
+        });
+      }
     } catch (err) {
       // setError("Failed to update cart");
     } finally {

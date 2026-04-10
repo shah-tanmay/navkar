@@ -495,8 +495,10 @@ export const MainImage = styled.div`
   border-radius: 12px;
   padding: 0;
   position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
   max-width: 100%;
-  max-height: 650px;
+  max-height: 750px;
   margin: 0 auto;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);

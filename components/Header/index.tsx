@@ -56,7 +56,7 @@ const Header = () => {
         <HeaderWrapper>
           <LogoImage
             loader={cloudinaryLoader}
-            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775820455/navkar_assets/logo.png"
+            src={logoPath}
             alt="logo"
             width={160}
             height={34}

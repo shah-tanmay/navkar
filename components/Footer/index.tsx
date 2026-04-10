@@ -23,7 +23,7 @@ const Footer = () => {
         <FooterLogoDiv>
           <FooterLogo
             loader={cloudinaryLoader}
-            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775820455/navkar_assets/logo.png"
+            src={logoPath}
             alt="Navkar Logo"
             width={206.14}
             height={44.22}

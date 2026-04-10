@@ -1,12 +1,13 @@
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
-// Credentials from backend .env
+// Credentials from environment variables
 cloudinary.config({
-  cloud_name: 'dhxa5zutl',
-  api_key: '534623915147932',
-  api_secret: 'kDl2Qmmv9TQLmZ2Rz6xpgOcRY8Q'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const imagesToUpload = [

@@ -51,7 +51,7 @@ export const HeaderMenuText = styled.div<{ $isActive: boolean }>`
   position: relative;
   color: #542e00;
   text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  font-family: "Outfit";
+  font-family: var(--font-outfit), sans-serif;
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
