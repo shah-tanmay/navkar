@@ -32,10 +32,10 @@ export const DiscountImageDiv = styled.div`
 
 export const DiscountImage = styled.img`
   border-radius: 30px;
-
-  @media screen and (max-width: 1024px) {
-    max-width: 100%;
-  }
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  max-height: 350px;
 `;
 
 export const DiscountInfo = styled.div`
@@ -79,15 +79,13 @@ export const DiscountText = styled.div`
 export const DiscountInput = styled.input`
   border-radius: 8px;
   border: 1px solid #794328;
-  color: #b09b8c;
-  font-family: "Saira";
+  color: #5f5d5b;
+  font-family: inherit;
   font-size: 16px;
-  font-style: normal;
   font-weight: 400;
-  line-height: 100%;
   flex-grow: 1;
   outline: none;
-  padding: 24px;
+  padding: 16px 24px;
   margin-top: 20px;
 
   @media screen and (max-width: 768px) {
@@ -96,6 +94,7 @@ export const DiscountInput = styled.input`
     width: 100%;
     box-sizing: border-box;
     margin-top: 10px;
+    height: 48px;
   }
 `;
 

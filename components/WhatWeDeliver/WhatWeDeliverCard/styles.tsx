@@ -6,7 +6,7 @@ export const WhatWeDeliverCardWrapper = styled.div`
   padding: 10px 0px;
 
   @media screen and (max-width: 425px) {
-    width: 50%;
+    width: 100%;
   }
 `;
 
@@ -30,11 +30,11 @@ export const WhatWeDeliverCardContent = styled.div`
 `;
 
 export const WhatWeDeliverCardTitle = styled.div`
-  color: #794328;
-  font-family: "Saira";
+  color: #2a3d4f;
+  font-family: "Outfit", sans-serif;
   font-size: 18px;
-  font-style: normal;
   font-weight: 600;
+  letter-spacing: 0.25px;
 
   @media screen and (max-width: 1024px) {
     font-size: 16px;
@@ -46,11 +46,11 @@ export const WhatWeDeliverCardTitle = styled.div`
 `;
 
 export const WhatWeDeliverCardDescription = styled.div`
-  color: #b09b8c;
-  font-family: "Saira";
-  font-size: 16px;
-  font-style: normal;
+  color: #5f5d5b;
+  font-family: "Outfit", sans-serif;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
 
   @media screen and (max-width: 1024px) {
     font-size: 12px;

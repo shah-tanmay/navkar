@@ -97,10 +97,11 @@ export const ReviewrInfoWrapper = styled.div`
 export const ReviewerImage = styled.img`
   width: 80px;
   height: 80px;
-  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
 
   @media screen and (max-width: 768px) {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
   }
 `;

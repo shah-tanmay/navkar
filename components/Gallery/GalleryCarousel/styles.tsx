@@ -13,9 +13,17 @@ const slideOut = keyframes`
 `;
 
 export const GalleryCarouselImage = styled.img`
-  width: 372px;
-  height: 486px;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 372px;
+  height: 480px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  @media screen and (max-width: 768px) {
+    height: 320px;
+    border-radius: 12px;
+  }
 `;
 
 export const GallerySlideShowWrapper = styled.div`

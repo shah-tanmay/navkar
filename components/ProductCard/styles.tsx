@@ -22,6 +22,12 @@ export const ProductCardImageDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+  }
 `;
 
 // Add new styled component
@@ -72,6 +78,9 @@ export const ProductTag = styled.div<{ variant?: string }>`
 `;
 
 export const ProductCardImage = styled(Image)`
+  width: 100%;
+  height: auto;
+  object-fit: cover;
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   filter: drop-shadow(0 4px 8px ${COLORS.accent});
 `;
@@ -104,7 +113,8 @@ export const ProductPrice = styled.div`
 `;
 
 export const ProductCardWrapper = styled.div`
-  width: 320px;
+  width: 100%;
+  max-width: 360px;
   background: ${COLORS.primary};
   padding: 1.5rem;
   border-radius: 24px;
@@ -115,6 +125,11 @@ export const ProductCardWrapper = styled.div`
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    border-radius: 12px;
+  }
 
   &:hover {
     transform: translateY(-5px);
@@ -165,6 +180,15 @@ export const ProductName = styled.div`
     height: 8px;
     background: ${COLORS.secondary};
     border-radius: 50%;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    padding-left: 0.75rem;
+    &::before {
+      width: 5px;
+      height: 5px;
+    }
   }
 `;
 
@@ -379,16 +403,21 @@ export const TypePantheon = styled.div`
   margin: 1.5rem 0;
   padding: 0 1rem;
   position: relative;
+
+  @media (max-width: 768px) {
+    margin: 0.5rem 0;
+  }
 `;
 
 export const TypeOracle = styled.span`
   font-size: 0.875rem;
   font-weight: 500;
   color: ${COLORS.gold};
-  letter-spacing: 0.75px;
-  position: relative;
-  display: inline-block;
-  padding: 0 0.5rem;
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+    padding: 0 0.15rem;
+    letter-spacing: 0.1px;
+  }
 
   &::after {
     content: "";
@@ -414,6 +443,11 @@ export const TypeDivider = styled.span`
   background: rgba(184, 159, 114, 0.3);
   margin: 0 0.75rem;
   transform: rotate(15deg);
+
+  @media (max-width: 768px) {
+    height: 0.75rem;
+    margin: 0 0.4rem;
+  }
 `;
 
 export const PriceDisplay = styled.div`
@@ -434,6 +468,13 @@ export const PriceDisplay = styled.div`
     width: 100%;
     height: 1px;
     background: linear-gradient(90deg, ${COLORS.gold} 0%, transparent 100%);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    &::after {
+      bottom: -2px;
+    }
   }
 `;
 
@@ -561,6 +602,13 @@ export const BeastBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    padding: 0.25rem 0.5rem;
+    gap: 0.35rem;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
 `;
 
 export const BeastLabel = styled.span`
@@ -569,6 +617,10 @@ export const BeastLabel = styled.span`
   color: ${COLORS.secondary};
   letter-spacing: 1px;
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const BeastSwatches = styled.div`
@@ -582,6 +634,11 @@ export const BeastSwatch = styled.div<{ $color: string }>`
   border-radius: 50%;
   background: ${({ $color }) => $color};
   border: 1.5px solid ${COLORS.primary};
+
+  @media (max-width: 768px) {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
 `;
 
 export const BeastCount = styled.div`

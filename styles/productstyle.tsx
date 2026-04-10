@@ -23,8 +23,12 @@ export const ProductDetails = styled.div`
 `;
 
 export const ProductName = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: #333;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 export const ProductPrice = styled.p`

@@ -30,7 +30,12 @@ export const ButtonWrapper = styled.button<ButtonProps>`
   /* Add transition here */
   transition: all 0.3s ease, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 
-  @media screen and (max-width: 1024px) {
-    /* ...existing media query styles... */
+  @media screen and (max-width: 768px) {
+    height: ${(props) =>
+      props.size === "small" ? "40px" : props.size === "large" ? "54px" : "48px"};
+    font-size: ${(props) =>
+      props.size === "small" ? "14px" : props.size === "large" ? "18px" : "16px"};
+    padding: ${(props) =>
+      props.size === "small" ? "0 12px" : "0 20px"};
   }
 `;

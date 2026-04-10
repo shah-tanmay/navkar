@@ -43,10 +43,10 @@ const AccountPage = () => {
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (session) {
+    if (session?.user) {
       setProfileForm({
         name: session.user.name || "",
-        phone: session.user.phone || "",
+        phone: (session.user as any).phone || "",
       });
       fetchData();
     }

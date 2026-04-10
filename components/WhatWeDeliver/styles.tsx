@@ -1,10 +1,12 @@
 import styled from "styled-components";
+import COLORS from "../../constants/color";
 
 export const WhatWeDeliverWrapper = styled.div`
-  background-color: #fcf8f3;
+  background: linear-gradient(135deg, #fdfbf7 0%, #f4e8d9 100%);
   display: flex;
   justify-content: center;
-  padding: 15px 0px;
+  padding: 40px 0px;
+  border-bottom: 1px solid rgba(184, 159, 114, 0.1);
 `;
 
 export const WhatWeDeliverDiv = styled.div`
@@ -18,12 +20,10 @@ export const WhatWeDeliverDiv = styled.div`
   }
 
   @media screen and (max-width: 768px) {
-    flex-wrap: wrap;
-    justify-content: center;
-    place-items: center;
-    align-items: center;
-    width: 100%;
-    gap: 15px;
-    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    gap: 25px;
+    padding: 30px 0;
   }
 `;

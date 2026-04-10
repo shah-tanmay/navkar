@@ -52,4 +52,8 @@ export const QuantityText = styled.span`
   font-weight: 400;
   font-size: 20px;
   font-family: "Outfit";
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;

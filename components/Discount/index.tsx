@@ -58,8 +58,8 @@ const Discount = () => {
       </DiscountImageDiv>
       <DiscountInfoWrapper>
         <DiscountInfo>
-          <DiscountTitle>Get more discount Off your order</DiscountTitle>
-          <DiscountText>Join our mailing list</DiscountText>
+          <DiscountTitle>Join the Inner Circle</DiscountTitle>
+          <DiscountText>Unlock early access to new collections and exclusive artisanal offers.</DiscountText>
           <DiscountInputDiv>
             <DiscountInput
               placeholder="Your email address"

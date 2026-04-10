@@ -7,23 +7,23 @@ const WhatWeDeliver = () => {
   const whatWeDeliverOptions: WhatWeDeliverCardType[] = [
     {
       icon: "/images/high-quality.png",
-      title: "High Quality",
-      description: "Crafted from top materials",
+      title: "Artisanal Mastery",
+      description: "Bespoke tailoring by master drapery artisans.",
     },
     {
       icon: "/images/warranty.png",
-      title: "Warranty Protection",
-      description: "Over 2 years",
+      title: "Everlasting Quality",
+      description: "Materials designed to last for generations.",
     },
     {
       icon: "/images/shipping.png",
-      title: "Free Shipping",
-      description: "Order over ₹2000",
+      title: "White-Glove Delivery",
+      description: "Carefully shipped to your doorstep.",
     },
     {
       icon: "/images/customer-support.png",
-      title: "24 / 7 Support",
-      description: "Dedicated support",
+      title: "Expert Consulting",
+      description: "Personal styling for your unique space.",
     },
   ];
   return (

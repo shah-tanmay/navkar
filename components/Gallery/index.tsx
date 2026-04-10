@@ -16,10 +16,10 @@ const Gallery = () => {
     <GalleryWrapper id="gallery">
       <GalleryInfoWrapper>
         <GalleryInfoDiv>
-          <GalleryTitle>Our Gallery</GalleryTitle>
+          <GalleryTitle>The Design Atelier</GalleryTitle>
           <GalleryText>
-            Our designer already made a lot of beautiful prototype of rooms that
-            inspire you
+            Explore our curated gallery of styled spaces. Each environment is a unique collaboration 
+            between our master drapers and the architecture of a home.
           </GalleryText>
         </GalleryInfoDiv>
       </GalleryInfoWrapper>

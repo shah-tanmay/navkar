@@ -18,16 +18,14 @@ const CarouselComponent = () => {
         showThumbs={false}
         showStatus={false}
         autoPlay
+        interval={4000}
+        transitionTime={800}
       >
-        <CarouselImageDiv>
-          <CarouselImage src={CarouselImages[0]} />
-        </CarouselImageDiv>
-        <CarouselImageDiv>
-          <CarouselImage src={CarouselImages[1]} />
-        </CarouselImageDiv>
-        <CarouselImageDiv>
-          <CarouselImage src={CarouselImages[2]} />
-        </CarouselImageDiv>
+        {CarouselImages.map((src, index) => (
+          <CarouselImageDiv key={index}>
+            <CarouselImage src={src} alt={`Slide ${index + 1}`} />
+          </CarouselImageDiv>
+        ))}
       </Carousel>
     </CarouselWrapper>
   );

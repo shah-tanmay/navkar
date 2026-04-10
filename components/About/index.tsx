@@ -13,10 +13,10 @@ import {
 import AboutStats from "./AboutStats";
 
 const About = () => {
-  const AboutStatsInfo: { stats: number; text: string }[] = [
-    { stats: 620, text: "Project Complete" },
-    { stats: 620, text: "Project Complete" },
-    { stats: 620, text: "Project Complete" },
+  const AboutStatsInfo: { stats: string; text: string }[] = [
+    { stats: "1k+", text: "Windows Styled" },
+    { stats: "20+", text: "Years of Mastery" },
+    { stats: "100%", text: "Handcrafted" },
   ];
   return (
     <AboutContainer id="about">
@@ -30,14 +30,14 @@ const About = () => {
       </AboutImageDiv>
       <AboutInfoDiv>
         <AboutTitle>
-          <AboutHighLighted>About</AboutHighLighted> The Shop
+          The Legacy of <AboutHighLighted>Navkar</AboutHighLighted>
         </AboutTitle>
         <AboutInfoSecondDiv>
           <AboutText>
-            Furnitre power is a software as services for multiperpose business
-            management system, expecially for them who are running two or more
-            business exploree the future Furnitre power is a software as
-            services{" "}
+            Navkar is more than just a curtain shop; it&apos;s a testament to the art of fine drapery. 
+            For over two decades, our master tailors have been hand-crafting bespoke curtains that transform 
+            houses into homes. We blend traditional artisanal techniques with modern design sensibilities 
+            to deliver window attire that is truly one-of-a-kind.
           </AboutText>
           <AboutStatsDiv>
             {Children.toArray(

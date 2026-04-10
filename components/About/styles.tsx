@@ -26,8 +26,11 @@ export const AboutImageDiv = styled.div`
 `;
 
 export const AboutImage = styled(Image)`
-  border-radius: 10px;
-  max-width: 100%;
+  border-radius: 20px;
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 `;
 
 export const AboutText = styled.div`

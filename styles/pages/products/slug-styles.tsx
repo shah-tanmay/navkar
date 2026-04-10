@@ -99,6 +99,12 @@ export const ScarcityLabel = styled.div`
   text-transform: uppercase;
   margin-bottom: 2rem;
   border-left: 3px solid ${COLORS.gold};
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+  }
 `;
 
 export const ProductTitle = styled.h1`
@@ -197,6 +203,11 @@ export const AccordionHeader = styled.div`
   font-size: 1.1rem;
   font-weight: 600;
   transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+    font-size: 1rem;
+  }
 
   &:hover {
     color: ${COLORS.gold};
@@ -452,7 +463,12 @@ export const ColorSwatch = styled.div<{ color: string }>`
   transition: all 0.3s ease;
   background: ${(props) => props.color};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  z-index: 1; /* Keep base swatch low so it scrolls UNDER sticky headers natively */
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+  }
 
   &:hover {
     transform: scale(1.1);
@@ -546,6 +562,11 @@ export const SizeButton = styled.button<{ selected?: boolean }>`
   transition: all 0.3s ease;
   font-family: "Outfit", sans-serif;
   font-weight: 500;
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
 
   &:hover {
     transform: translateY(-2px);

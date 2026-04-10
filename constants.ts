@@ -3,12 +3,12 @@ export const logoPath = "/logo.png";
 
 export const TitleFontSize = {
   "1024": "40px",
-  "768": "30px",
+  "768": "24px",
 };
 
 export const TextFontSize = {
   "1024": "18px",
-  "768": "15px",
+  "768": "14px",
 };
 
 export const excludeLayouts = ["/login"];

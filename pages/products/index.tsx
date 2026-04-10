@@ -11,7 +11,6 @@ import { LoaderWrapper } from "../../components/LoaderWrapper";
 import SEO from "../../components/SEO";
 
 const ProductPage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<ProductResponse[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -25,14 +24,13 @@ const ProductPage: React.FC = () => {
         setProducts(allProducts);
       } catch (error) {
         setLoading(true);
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
       }
     };
     getProducts();
-  }, [selectedCategory]);
-  const tags = ["sale", "eco", "premium", "limited", "new"];
+  }, []);
 
   return (
     <LoaderWrapper loading={loading}>
@@ -40,10 +38,6 @@ const ProductPage: React.FC = () => {
         title="Artisanal Curtain Collection"
         description="Explore our exclusive range of handcrafted curtains and bespoke drapes. From minimalist chic to ornate classics, find the perfect attire for your windows."
         url="/products"
-      />
-      <ProductCategoriesHeader
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
       />
       <Container>
         <ProductsWrapper>
