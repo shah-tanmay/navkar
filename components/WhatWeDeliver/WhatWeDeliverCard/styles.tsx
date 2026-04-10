@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Image from "next/image";
 
 export const WhatWeDeliverCardWrapper = styled.div`
   display: flex;
@@ -10,17 +11,11 @@ export const WhatWeDeliverCardWrapper = styled.div`
   }
 `;
 
-export const WhatWeDeliverCaredIcon = styled.img`
+export const WhatWeDeliverCaredIcon = styled(Image)`
   display: flex;
   align-self: center;
-  width: 40px;
-  height: 40px;
   mix-blend-mode: multiply;
-
-  @media screen and (max-width: 768px) {
-    width: 30px;
-    height: 30px;
-  }
+  object-fit: contain;
 `;
 
 export const WhatWeDeliverCardContent = styled.div`

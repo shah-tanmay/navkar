@@ -30,10 +30,10 @@ export const DiscountImageDiv = styled.div`
   }
 `;
 
-export const DiscountImage = styled.img`
+export const DiscountImage = styled(Image)`
   border-radius: 30px;
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: auto !important;
   object-fit: cover;
   max-height: 350px;
 `;

@@ -14,16 +14,17 @@ import {
   ViewAllButtonContainer,
 } from "./styles";
 
-const FeaturedCurtains = () => {
-  const [products, setProducts] = useState<ProductResponse[]>([]);
+const FeaturedCurtains = ({ initialProducts }: { initialProducts?: ProductResponse[] }) => {
+  const [products, setProducts] = useState<ProductResponse[]>(initialProducts || []);
   const router = useRouter();
 
   useEffect(() => {
+    if (initialProducts && initialProducts.length > 0) return;
+    
     const fetchProducts = async () => {
       try {
         const data = await getAllProducts();
         // Filter for products that should be shown on home page
-        // If the property doesn't exist yet, we take the top ones
         const featured = data.filter(p => p.show_on_home || p.metadata?.show_on_home).slice(0, 3);
         const finalData = featured.length > 0 ? featured : data.slice(0, 3);
         setProducts(finalData);
@@ -32,7 +33,7 @@ const FeaturedCurtains = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [initialProducts]);
 
   if (!products || products.length === 0) return null;
 

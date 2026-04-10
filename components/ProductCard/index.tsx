@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { ProductName } from "../../styles/productstyle";
 import { ProductVariant } from "../../types/api";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   BeastBadge,
   BeastCount,
@@ -57,11 +58,13 @@ const ProductCard = ({
       <ProductCardImageDiv>
         <ProductTag variant={tag}>{_.toUpper(tag)}</ProductTag>
         <ProductCardImage
+          loader={cloudinaryLoader}
           src={imageUrl}
           alt={name}
-          width={240}
-          height={320}
-          priority
+          width={310}
+          height={410}
+          loading="lazy"
+          sizes="(max-width: 768px) 45vw, 310px"
         />
       </ProductCardImageDiv>
 

@@ -28,18 +28,17 @@ export const ReviewsInfo = styled.div`
 export const ReviewImageDiv = styled.div`
   width: 100%;
   max-width: 100%;
-  display: grid;
-  place-items: center;
+  position: relative;
+  height: 500px;
 
   @media screen and (max-width: 768px) {
     display: none;
   }
 `;
 
-export const ReviewImage = styled.img`
-  width: 100%;
-  object-fit: contain;
-  height: auto;
+import Image from "next/image";
+
+export const ReviewImage = styled(Image)`
   border-radius: 30px;
 `;
 

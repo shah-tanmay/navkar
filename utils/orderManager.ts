@@ -5,11 +5,12 @@ const STORAGE_KEY_PREFIX = "buy_now_";
 
 export const getOrCreateOrderToken = async (
   variantId: string,
-  quantity: number
+  quantity: number,
+  userId?: string
 ): Promise<string | null> => {
   if (typeof window === "undefined") return null;
 
-  const key = `${STORAGE_KEY_PREFIX}${variantId}`;
+  const key = `${STORAGE_KEY_PREFIX}${userId || "guest"}_${variantId}`;
   let token = localStorage.getItem(key);
 
   if (!token) {
@@ -29,9 +30,8 @@ export const getOrCreateOrderToken = async (
   return token;
 };
 
-export const clearOrderToken = (variantId: string): void => {
+export const clearOrderToken = (variantId: string, userId?: string): void => {
   if (typeof window !== "undefined") {
-    //update orderstatus here.
-    localStorage.removeItem(`${STORAGE_KEY_PREFIX}${variantId}`);
+    localStorage.removeItem(`${STORAGE_KEY_PREFIX}${userId || "guest"}_${variantId}`);
   }
 };

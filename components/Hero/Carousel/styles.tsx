@@ -1,21 +1,14 @@
 import styled from "styled-components";
 import COLORS from "../../../constants/color";
+import Image from "next/image";
 
-export const CarouselImage = styled.img`
-  max-width: 100%;
-  height: 550px;
-  object-fit: cover;
+export const CarouselImage = styled(Image)`
   border-radius: 24px;
   box-shadow: 0 20px 50px rgba(84, 46, 0, 0.1);
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-
+  
   @media screen and (max-width: 768px) {
-    height: 350px;
     border-radius: 16px;
-  }
-
-  @media screen and (max-width: 425px) {
-    height: 250px;
   }
 `;
 
@@ -23,11 +16,23 @@ export const CarouselImageDiv = styled.div`
   display: flex;
   justify-content: center;
   padding: 40px 10px;
+  position: relative;
+  height: 550px;
+  width: 100%;
   
+  @media screen and (max-width: 768px) {
+    height: 350px;
+  }
+
+  @media screen and (max-width: 425px) {
+    height: 250px;
+  }
+
   .selected & {
-     ${CarouselImage} {
+     div:first-child {
        transform: scale(1.05);
        box-shadow: 0 30px 60px rgba(84, 46, 0, 0.15);
+       z-index: 2;
      }
   }
 `;

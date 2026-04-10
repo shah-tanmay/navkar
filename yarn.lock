@@ -1863,6 +1863,13 @@
   "resolved" "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz"
   "version" "0.0.1"
 
+"cloudinary@^2.9.0":
+  "integrity" "sha512-F3iKMOy4y0zy0bi5JBp94SC7HY7i/ImfTPSUV07iJmRzH1Iz8WavFfOlJTR1zvYM/xKGoiGZ3my/zy64In0IQQ=="
+  "resolved" "https://registry.npmjs.org/cloudinary/-/cloudinary-2.9.0.tgz"
+  "version" "2.9.0"
+  dependencies:
+    "lodash" "^4.17.21"
+
 "clsx@^2.1.1":
   "integrity" "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="
   "resolved" "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"

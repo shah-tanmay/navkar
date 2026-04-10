@@ -1,17 +1,18 @@
 import { Carousel } from "react-responsive-carousel";
 import {
   GalleryCarouselWrapper,
-  GalleryImageDiv,
-  GalleryCarouselImage,
   GallerySlideShowWrapper,
+  GalleryCarouselImage,
+  GalleryImageDiv
 } from "./styles";
+import { cloudinaryLoader } from "../../../utils/imageLoader";
 
 const GalleryCarousel = () => {
   const galleryImages = [
-    "/images/gallery-1.jpg",
-    "/images/gallery-2.jpg",
-    "/images/gallery-3.jpg",
-    "/images/gallery-5.jpg",
+    "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816220/navkar_assets/gallery-1.jpg",
+    "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816221/navkar_assets/gallery-2.jpg",
+    "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816222/navkar_assets/gallery-3.jpg",
+    "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816223/navkar_assets/gallery-5.jpg",
   ];
   return (
     <GalleryCarouselWrapper>
@@ -27,7 +28,15 @@ const GalleryCarousel = () => {
           {galleryImages.map((image, idx) => {
             return (
               <GalleryImageDiv key={idx}>
-                <GalleryCarouselImage src={image} />
+                <GalleryCarouselImage 
+                  loader={cloudinaryLoader}
+                  src={image} 
+                  alt={`Gallery Image ${idx + 1}`} 
+                  fill 
+                  loading="lazy"
+                  style={{ objectFit: "cover" }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 840px"
+                />
               </GalleryImageDiv>
             );
           })}

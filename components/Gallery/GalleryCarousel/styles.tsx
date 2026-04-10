@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import Image from "next/image";
 
 export const GalleryCarouselWrapper = styled.div``;
 
@@ -12,16 +13,11 @@ const slideOut = keyframes`
     100% { transform: translateX(100%); }
 `;
 
-export const GalleryCarouselImage = styled.img`
-  width: 100%;
-  max-width: 372px;
-  height: 480px;
-  object-fit: cover;
+export const GalleryCarouselImage = styled(Image)`
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 
   @media screen and (max-width: 768px) {
-    height: 320px;
     border-radius: 12px;
   }
 `;

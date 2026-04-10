@@ -1,4 +1,5 @@
 import { Children } from "react";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   AboutContainer,
   AboutHighLighted,
@@ -22,10 +23,13 @@ const About = () => {
     <AboutContainer id="about">
       <AboutImageDiv>
         <AboutImage
-          src="/images/shop.jpg"
+          loader={cloudinaryLoader}
+          src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816224/navkar_assets/shop.jpg"
           alt="About the shop"
           width={518}
           height={540}
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 518px"
         />
       </AboutImageDiv>
       <AboutInfoDiv>

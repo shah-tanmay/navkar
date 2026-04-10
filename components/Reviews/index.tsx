@@ -1,5 +1,6 @@
 import { Children, useState } from "react";
 import ReviewerCard from "./ReviewerCard";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   ReviewControls,
   ReviewImage,
@@ -16,21 +17,21 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 export const Reviews = () => {
   const reviewInfo = [
     {
-      image: "/images/josh.png",
+      image: "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816873/navkar_assets/josh.png",
       name: "Anoop Sahu",
       designation: "Navkar Home Decor Enthusiast",
       review:
         "“Incredible quality curtains. We ordered custom drapes for our living room and the fabric texture is truly premium. The artisanal finish and perfect pleats have transformed our space. Thanks to the Navkar team for such elegance.”",
     },
     {
-      image: "/images/josh.png",
+      image: "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816873/navkar_assets/josh.png",
       name: "Aamena Hirani",
       designation: "Verified Premium Customer",
       review:
         "“Bespoke drapes with great fabric and quality stitching work. Delivered exactly as promised and fits our windows perfectly. The attention to detail is outstanding.”",
     },
     {
-      image: "/images/josh.png",
+      image: "https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816873/navkar_assets/josh.png",
       name: "Tina Mistry",
       designation: "Interior Decor Connoisseur",
       review:
@@ -78,7 +79,14 @@ export const Reviews = () => {
         </ReviewControls>
       </ReviewInfoDiv>
       <ReviewImageDiv>
-        <ReviewImage src="/images/carousel-5.jpg" />
+        <ReviewImage 
+          loader={cloudinaryLoader}
+          src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816872/navkar_assets/carousel-5.jpg" 
+          alt="Artisanal Curtains"
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: 'cover' }}
+        />
       </ReviewImageDiv>
     </ReviewsWrapper>
   );

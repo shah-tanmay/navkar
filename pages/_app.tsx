@@ -6,16 +6,36 @@ import type { AppProps } from "next/app";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { createGlobalStyle } from "styled-components";
 import { Layout } from "../components/Layout";
 import { CartProvider } from "../context/CartContext";
 import { LoaderProvider } from "../context/LoaderContext";
 import SEO from "../components/SEO";
 import "../styles/global.css";
-import { createGlobalStyle } from "styled-components";
 import { useAuthErrorHandler } from "../lib/useAuthErrorHandler";
+import { Outfit, Saira } from "next/font/google";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const saira = Saira({
+  subsets: ["latin"],
+  variable: "--font-saira",
+  display: "swap",
+});
 
 const GlobalStyle = createGlobalStyle`
-  // Your other global styles here
+  :root {
+    --font-outfit: ${outfit.style.fontFamily};
+    --font-saira: ${saira.style.fontFamily};
+  }
+  
+  body {
+    font-family: var(--font-outfit), sans-serif;
+  }
 `;
 
 function AuthErrorHandler() {

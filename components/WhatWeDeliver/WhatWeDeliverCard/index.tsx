@@ -5,6 +5,7 @@ import {
   WhatWeDeliverCardWrapper,
   WhatWeDeliverCaredIcon,
 } from "./styles";
+import { cloudinaryLoader } from "../../../utils/imageLoader";
 
 export type WhatWeDeliverCardType = {
   icon: string;
@@ -19,7 +20,14 @@ export const WhatWeDeliverCard = ({
 }: WhatWeDeliverCardType) => {
   return (
     <WhatWeDeliverCardWrapper>
-      <WhatWeDeliverCaredIcon src={icon} />
+      <WhatWeDeliverCaredIcon 
+        loader={cloudinaryLoader}
+        src={icon} 
+        alt={title}
+        width={40}
+        height={40}
+        loading="lazy"
+      />
       <WhatWeDeliverCardContent>
         <WhatWeDeliverCardTitle>{title}</WhatWeDeliverCardTitle>
         <WhatWeDeliverCardDescription>

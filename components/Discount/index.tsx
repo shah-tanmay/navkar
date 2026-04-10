@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "../Button";
+import { cloudinaryLoader } from "../../utils/imageLoader";
 import {
   DiscountImage,
   DiscountImageDiv,
@@ -50,10 +51,13 @@ const Discount = () => {
     <DiscountWrapper id="contact">
       <DiscountImageDiv>
         <DiscountImage
-          src="/images/blinds.jpg"
+          loader={cloudinaryLoader}
+          src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816871/navkar_assets/blinds.jpg"
           alt="BedRoom"
           width={586}
           height={346}
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, 586px"
         />
       </DiscountImageDiv>
       <DiscountInfoWrapper>

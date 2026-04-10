@@ -9,10 +9,16 @@ import Hero from "../components/Hero";
 import FeaturedCurtains from "../components/FeaturedCurtains";
 import dynamic from "next/dynamic";
 import SEO from "../components/SEO";
+import { getAllProducts } from "../services/productService";
+import { ProductResponse } from "../types/api";
 
 const Gallery = dynamic(() => import("../components/Gallery"), { ssr: false });
 
-const Home: NextPage = () => {
+interface HomeProps {
+  featuredProducts: ProductResponse[];
+}
+
+const Home: NextPage<HomeProps> = ({ featuredProducts }) => {
   return (
     <>
       <SEO 
@@ -23,13 +29,33 @@ const Home: NextPage = () => {
       <WhatWeDeliver />
       <Container>
         <About />
-        <FeaturedCurtains />
+        <FeaturedCurtains initialProducts={featuredProducts} />
         <Gallery />
         <Reviews />
         <Discount />
       </Container>
     </>
   );
+};
+
+export const getServerSideProps = async () => {
+  try {
+    const data = await getAllProducts();
+    const featured = data.filter(p => p.show_on_home || p.metadata?.show_on_home).slice(0, 3);
+    const finalData = featured.length > 0 ? featured : data.slice(0, 3);
+    
+    return {
+      props: {
+        featuredProducts: JSON.parse(JSON.stringify(finalData)),
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        featuredProducts: [],
+      },
+    };
+  }
 };
 
 export default Home;

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
 import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock } from "react-icons/fa";
@@ -70,7 +71,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
 }) => {
   const router = useRouter();
   const { cartItems } = useCart();
-
+  const { data: session } = useSession();
   const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
@@ -148,7 +149,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
     if (!selectedVariant) return;
     const variantId = selectedVariant.id;
     const variantQuantity = _.get(variantQuantities, `${selectedVariant?.id}`);
-    const orderToken = await getOrCreateOrderToken(variantId, variantQuantity);
+    const userId = (session?.user as any)?.id;
+    const orderToken = await getOrCreateOrderToken(variantId, variantQuantity, userId);
     if (!orderToken) return;
 
     router.push({
