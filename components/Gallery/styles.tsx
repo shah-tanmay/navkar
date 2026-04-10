@@ -8,7 +8,7 @@ export const GalleryWrapper = styled.div`
   overflow: hidden;
 
   @media screen and (max-width: 768px) {
-    padding: 0px 0px;
+    padding: 30px 0px;
     gap: 50px;
     flex-direction: column;
     text-align: center;

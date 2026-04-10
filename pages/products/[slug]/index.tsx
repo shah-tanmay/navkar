@@ -440,7 +440,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
         {variants && variants.length > 0 && (
           <RecommendationsContainer>
-            <h2>You May Also Like: More Colors</h2>
+            <h2>You May Also Like: More Curtains</h2>
             <div className="grid">
               {variants.filter(v => v.id !== selectedVariant?.id).slice(0, 4).map((v) => (
                 <RecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>

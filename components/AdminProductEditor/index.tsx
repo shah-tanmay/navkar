@@ -34,6 +34,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     door_size: string;
     window_size: string;
     sold_as: string;
+    show_on_home: boolean;
   }
 
   // Base Product Data
@@ -56,6 +57,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     door_size: "7ft × 4ft (214cm × 120cm)",
     window_size: "5ft × 4ft (152cm × 120cm)",
     sold_as: "1 panel",
+    show_on_home: false,
   });
 
   // Variant Data Context (Shared for a Color Group)
@@ -128,6 +130,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         door_size: meta.size_guide?.door || "7ft × 4ft (214cm × 120cm)",
         window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
         sold_as: meta.sold_as || "1 panel",
+        show_on_home: meta.show_on_home || false,
       });
     }
   }, [editProduct]);
@@ -156,6 +159,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           door_size: meta.size_guide?.door || "7ft × 4ft (214cm × 120cm)",
           window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
           sold_as: meta.sold_as || "1 panel",
+          show_on_home: meta.show_on_home || false,
         });
       }
     } else if (activeTab === "new_color") {
@@ -223,6 +227,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
             window: baseForm.window_size,
           },
           sold_as: baseForm.sold_as,
+          show_on_home: baseForm.show_on_home,
         },
         is_discontinued: baseForm.is_discontinued,
         tag: baseForm.tag,
@@ -449,7 +454,20 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                           style={{ width: "18px", height: "18px", cursor: "pointer" }}
                         />
                         <label htmlFor="is_blackout" style={{ margin: 0, cursor: "pointer", color: baseForm.is_blackout ? "#0050b3" : "#595959", fontWeight: "bold", fontSize: "0.85rem" }}>
-                          {baseForm.is_blackout ? "BLACKOUT PRODUCT" : "REGULAR PRODUCT"}
+                          {baseForm.is_blackout ? "BLACKOUT" : "REGULAR"}
+                        </label>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 1rem", background: baseForm.show_on_home ? "#fff7e6" : "#f5f5f5", borderRadius: "8px", border: "1px solid", borderColor: baseForm.show_on_home ? "#ffd591" : "#d9d9d9" }}>
+                        <input 
+                          type="checkbox" 
+                          id="show_on_home"
+                          checked={baseForm.show_on_home} 
+                          onChange={e => setBaseForm({...baseForm, show_on_home: e.target.checked})} 
+                          style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                        />
+                        <label htmlFor="show_on_home" style={{ margin: 0, cursor: "pointer", color: baseForm.show_on_home ? "#d46b08" : "#595959", fontWeight: "bold", fontSize: "0.85rem" }}>
+                          {baseForm.show_on_home ? "FEATURED (HOME PAGE)" : "NOT FEATURED"}
                         </label>
                       </div>
                     </div>

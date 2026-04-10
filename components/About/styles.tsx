@@ -13,6 +13,7 @@ export const AboutContainer = styled.div`
     place-items: center;
     text-align: center;
     gap: 20px;
+    padding: 30px 0;
   }
 `;
 

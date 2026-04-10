@@ -40,6 +40,16 @@ const ProductPage: React.FC = () => {
         url="/products"
       />
       <Container>
+        <h1 style={{ 
+          fontFamily: "Outfit", 
+          fontSize: "2.5rem", 
+          color: "#2a3d4f", 
+          marginBottom: "2rem",
+          marginTop: "1rem",
+          textAlign: "center"
+        }}>
+          The Curtain Collection
+        </h1>
         <ProductsWrapper>
           {products &&
             Children.toArray(

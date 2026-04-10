@@ -11,7 +11,7 @@ export const DiscountWrapper = styled.div`
   @media screen and (max-width: 767px) {
     display: grid;
     place-items: center;
-    padding: 20px;
+    padding: 30px 0px;
     text-align: center;
   }
 `;

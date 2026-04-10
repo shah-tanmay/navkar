@@ -53,6 +53,8 @@ export interface ProductResponse {
   is_discontinued?: boolean;
   tag?: string;
   is_blackout?: boolean;
+  show_on_home?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface Product {
@@ -70,6 +72,7 @@ export interface Product {
   product_id?: string;
   tag?: string;
   is_blackout?: boolean;
+  show_on_home?: boolean;
 }
 
 export interface Variant {

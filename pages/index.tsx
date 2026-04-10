@@ -6,6 +6,7 @@ import Discount from "../components/Discount";
 import Footer from "../components/Footer";
 import Container from "../components/Container";
 import Hero from "../components/Hero";
+import FeaturedCurtains from "../components/FeaturedCurtains";
 import dynamic from "next/dynamic";
 import SEO from "../components/SEO";
 
@@ -22,6 +23,7 @@ const Home: NextPage = () => {
       <WhatWeDeliver />
       <Container>
         <About />
+        <FeaturedCurtains />
         <Gallery />
         <Reviews />
         <Discount />

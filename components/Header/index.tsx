@@ -26,7 +26,7 @@ import { useCart } from "../../context/CartContext";
 const Header = () => {
   const { cartItems } = useCart();
   const menuItems = [
-    { name: "Products", page: "/products" },
+    { name: "Curtains", page: "/products" },
     { name: "Cart", page: "/cart", Component: <FaShoppingCart /> },
   ];
   const width = useWindowWidth();

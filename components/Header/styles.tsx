@@ -206,15 +206,21 @@ export const MobileMenuIconDiv = styled.div`
 export const MobileMenuText = styled.div``;
 
 export const MobileMenuWrapper = styled.div`
-  background: linear-gradient(90deg, #f9f1e7 70%, #fcf8f3 30%);
-  padding: 15px 20px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  font-size: 20px;
-  color: #542e00;
-  text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  font-family: "Outfit";
+  gap: 20px;
+  font-size: 18px;
+  color: ${COLORS.secondary};
+  font-family: "Outfit", sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(184, 159, 114, 0.1);
+  z-index: 2000;
 `;
 
 export const LoginButtonWrapper = styled.div`

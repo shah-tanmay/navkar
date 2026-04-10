@@ -64,6 +64,7 @@ const ProductCard = ({
           priority
         />
       </ProductCardImageDiv>
+
       {types.length > 0 && (
         <TypePantheon>
           {types.map((type, index) => (

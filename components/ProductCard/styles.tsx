@@ -24,9 +24,11 @@ export const ProductCardImageDiv = styled.div`
   align-items: center;
 
   @media (max-width: 768px) {
-    padding: 0.5rem;
-    margin-bottom: 0.75rem;
+    padding: 0;
+    margin-bottom: 0.5rem;
     border-radius: 12px;
+    aspect-ratio: 4 / 5;
+    background: transparent;
   }
 `;
 
@@ -75,6 +77,13 @@ export const ProductTag = styled.div<{ variant?: string }>`
         `;
     }
   }}
+
+  @media (max-width: 768px) {
+    top: 10px;
+    right: -35px;
+    padding: 4px 35px;
+    font-size: 0.65rem;
+  }
 `;
 
 export const ProductCardImage = styled(Image)`
@@ -127,7 +136,7 @@ export const ProductCardWrapper = styled.div`
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
   @media (max-width: 768px) {
-    padding: 0.5rem;
+    padding: 0.35rem;
     border-radius: 12px;
   }
 
@@ -183,11 +192,20 @@ export const ProductName = styled.div`
   }
 
   @media (max-width: 768px) {
-    font-size: 0.75rem;
-    padding-left: 0.75rem;
+    font-size: 0.85rem;
+    padding: 0 0.5rem;
+    margin: 0;
+    text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.2rem; /* Fixed height for precisely 2 lines */
+    line-height: 1.1rem;
+    width: 100%;
+    
     &::before {
-      width: 5px;
-      height: 5px;
+      display: none;
     }
   }
 `;
@@ -406,6 +424,12 @@ export const TypePantheon = styled.div`
 
   @media (max-width: 768px) {
     margin: 0.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
   }
 `;
 
@@ -414,9 +438,9 @@ export const TypeOracle = styled.span`
   font-weight: 500;
   color: ${COLORS.gold};
   @media (max-width: 768px) {
-    font-size: 0.6rem;
-    padding: 0 0.15rem;
-    letter-spacing: 0.1px;
+    font-size: 0.65rem;
+    padding: 0 0.1rem;
+    letter-spacing: 0px;
   }
 
   &::after {
@@ -446,7 +470,7 @@ export const TypeDivider = styled.span`
 
   @media (max-width: 768px) {
     height: 0.75rem;
-    margin: 0 0.4rem;
+    margin: 0 0.25rem;
   }
 `;
 
@@ -471,7 +495,8 @@ export const PriceDisplay = styled.div`
   }
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
     &::after {
       bottom: -2px;
     }
