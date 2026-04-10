@@ -6,11 +6,16 @@ const STORAGE_KEY_PREFIX = "buy_now_";
 export const getOrCreateOrderToken = async (
   variantId: string,
   quantity: number,
-  userId?: string
+  userId?: string,
+  metadata?: any
 ): Promise<string | null> => {
   if (typeof window === "undefined") return null;
 
-  const key = `${STORAGE_KEY_PREFIX}${userId || "guest"}_${variantId}`;
+  // Create a unique key based on variant, quantity, and dimensions
+  const metaHash = metadata ? JSON.stringify(metadata) : "none";
+  const key = `${STORAGE_KEY_PREFIX}${userId || "guest"}_${variantId}_q${quantity}_m${metaHash}`;
+  
+  // We check if an order with these EXACT specs already exists in this session
   let token = localStorage.getItem(key);
 
   if (!token) {
@@ -20,11 +25,13 @@ export const getOrCreateOrderToken = async (
       {
         product_variant_id: variantId,
         quantity,
+        metadata,
       },
     ];
     await createOrder(token, orderItems);
   } else {
-    await updateOrderitemQuantity(token, variantId, quantity);
+    // Even if we have a token, we ensure the backend item is synced (especially for quantity changes)
+    await updateOrderitemQuantity(token, variantId, quantity, { metadata });
   }
 
   return token;

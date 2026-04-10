@@ -140,6 +140,9 @@ const CartPage = () => {
                           <S.ItemOptions>
                             <span>Color: {item.color}</span>
                             <span>Type: {_.capitalize(item.type)}</span>
+                            {item.type?.toLowerCase() === "custom" && item.metadata && (
+                              <span>Dimensions: {item.metadata.width_ft} ft × {item.metadata.length_ft} ft</span>
+                            )}
                           </S.ItemOptions>
 
                           <QuantitySelector
@@ -232,6 +235,7 @@ const CartPage = () => {
                           return {
                             product_variant_id: item.variant_id,
                             quantity: item.quantity,
+                            metadata: item.metadata,
                           };
                         }),
                         appliedCoupon?.code

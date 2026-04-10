@@ -142,9 +142,24 @@ const AdminOrdersComprehensive: NextPage = () => {
                       <td style={{ padding: "1.2rem 1rem", borderTop: "1px solid #f1f5f9", borderBottom: "1px solid #f1f5f9" }}>
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                           {o.items.map((it: any, i: number) => (
-                            <div key={i} style={{ fontSize: "0.85rem", display: "flex", justifyContent: "space-between", gap: "1rem" }}>
-                              <span style={{ fontWeight: "600" }}>{it.quantity}x {it.product_name}</span>
-                              <span style={{ color: "#94a3b8" }}>{it.type}</span>
+                            <div key={i} style={{ fontSize: "0.85rem", display: "flex", flexDirection: "column", borderBottom: i < o.items.length - 1 ? "1px solid #f1f5f9" : "none", paddingBottom: "0.4rem" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+                                <span style={{ fontWeight: "600" }}>{it.quantity}x {it.product_name}</span>
+                                <span style={{ color: "#94a3b8" }}>{it.type}</span>
+                              </div>
+                              {(() => {
+                                const m = it.metadata || {};
+                                if (m.width_ft || m.length_ft || m.width || m.length) {
+                                  const w = m.width_ft || (m.width ? (parseFloat(m.width) / 12).toFixed(1) : null);
+                                  const l = m.length_ft || (m.length ? (parseFloat(m.length) / 12).toFixed(1) : null);
+                                  return (
+                                    <div style={{ fontSize: "0.8rem", color: "#722ed1", fontWeight: "700", marginTop: "0.2rem", background: "#f9f0ff", padding: "2px 6px", borderRadius: "4px", width: "fit-content" }}>
+                                      {w || "?"} ft × {l || "?"} ft
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </div>
                           ))}
                         </div>

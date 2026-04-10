@@ -36,10 +36,15 @@ const ProductCard = ({
   variants: ProductVariant[];
 }) => {
   const router = useRouter();
-  const types = _.uniq(_.map(variants, "type"));
+  const types = _.uniq(_.map(variants, "type")).sort((a, b) => {
+    if (a.toLowerCase() === 'custom') return 1;
+    if (b.toLowerCase() === 'custom') return -1;
+    return 0;
+  });
   const colors = _.uniq(_.map(variants, "color_hex_code"));
   const firstVariant = _.first(variants);
-  const prices = _.map(variants, "price");
+  const displayVariants = variants.length > 1 ? variants.filter(v => v.type?.toLowerCase() !== 'custom') : variants;
+  const prices = _.map(displayVariants, "price");
 
   return (
     <ProductCardWrapper

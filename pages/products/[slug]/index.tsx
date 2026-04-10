@@ -23,7 +23,7 @@ import {
   AccordionContainer, AccordionHeader, AccordionContent, ScarcityLabel, SocialProof,
   FeatureList, FeatureListItem, SoldAsLine, ShippingPromoBadge, DeliveryTimeline,
   PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard,
-  MobileStickyActions
+  MobileStickyActions, CustomSizeContainer, BadgeContainer
 } from "../../../styles/pages/products/slug-styles";
 import { useCart } from "../../../context/CartContext";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
@@ -37,6 +37,7 @@ import SEO from "../../../components/SEO";
 import { GetServerSideProps } from "next";
 
 import { toOgImage } from "../../../utils/seo";
+import { toast } from "react-toastify";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query as { slug: string };
@@ -77,12 +78,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
-  const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>(() => {
-    return initialVariants.reduce((acc, variant) => {
-      acc[variant.id] = 1;
-      return acc;
-    }, {} as Record<string, number>);
-  });
+  const [quantity, setQuantity] = useState<number>(1);
+
+  const [customWidth, setCustomWidth] = useState<string>("");
+  const [customLength, setCustomLength] = useState<string>("");
+  const [customUnit, setCustomUnit] = useState<string>("ft");
+  const [customPrice, setCustomPrice] = useState<number>(0);
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -130,6 +131,36 @@ const ProductPage: React.FC<ProductPageProps> = ({
     setActiveImage(selectedVariant?.image_url || (productDetails as any)?.image_url || "");
   }, [selectedVariant, productDetails]);
 
+  useEffect(() => {
+    if (selectedVariant?.type?.toLowerCase() === "custom") {
+      const toInches = (val: string, unit: string) => {
+        const v = parseFloat(val) || 0;
+        if (unit === "ft") return v * 12;
+        if (unit === "m") return v * 39.3701;
+        return v;
+      };
+
+      if (!customWidth || !customLength) {
+        setCustomPrice(0);
+        return;
+      }
+
+      const lengthInInches = toInches(customLength, customUnit);
+      const widthInInches = toInches(customWidth, customUnit);
+      const longerSide = Math.max(lengthInInches, widthInInches);
+      const basePrice = parseFloat(selectedVariant.price);
+      
+      if (longerSide > 0) {
+        // Lower bound: Window curtain size (60 inches)
+        const effectiveLongerSide = Math.max(longerSide, 60);
+        const calculated = Math.floor(((effectiveLongerSide + 15) / 31) * basePrice);
+        setCustomPrice(calculated);
+      } else {
+        setCustomPrice(0);
+      }
+    }
+  }, [selectedVariant, customWidth, customLength, customUnit]);
+
   // Sync state with URL if it changes (e.g. back/forward buttons)
   useEffect(() => {
     if (router.query.slug && router.query.slug !== selectedVariant?.slug) {
@@ -140,19 +171,53 @@ const ProductPage: React.FC<ProductPageProps> = ({
     }
   }, [router.query.slug, variants, selectedVariant?.slug]);
 
-  const updateQuantity = (variantId: string, newQuantity: number) => {
-    setVariantQuantities((prev) => ({
-      ...prev,
-      [variantId]: newQuantity,
-    }));
+  const updateQuantity = (newQuantity: number) => {
+    setQuantity(newQuantity);
   };
 
   const handleBuyNow = async () => {
     if (!selectedVariant) return;
+
+    if (selectedVariant.type?.toLowerCase() === "custom") {
+      if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
+        toast.error("Please enter valid dimensions (Width and Length) for your custom curtain.");
+        return;
+      }
+    }
+
     const variantId = selectedVariant.id;
-    const variantQuantity = _.get(variantQuantities, `${selectedVariant?.id}`);
+    const variantQuantity = quantity;
     const userId = (session?.user as any)?.id;
-    const orderToken = await getOrCreateOrderToken(variantId, variantQuantity, userId);
+    
+    let metadata = {};
+    if (selectedVariant.type?.toLowerCase() === "custom") {
+      const toFeet = (val: string, unit: string) => {
+        const v = parseFloat(val) || 0;
+        if (unit === "in") return v / 12;
+        if (unit === "m") return v * 3.28084;
+        return v;
+      };
+
+      const toInches = (val: string, unit: string) => {
+        const v = parseFloat(val) || 0;
+        if (unit === "ft") return v * 12;
+        if (unit === "m") return v * 39.3701;
+        return v;
+      };
+
+      metadata = {
+        width: customWidth,
+        length: customLength,
+        unit: customUnit,
+        width_ft: toFeet(customWidth, customUnit).toFixed(1),
+        length_ft: toFeet(customLength, customUnit).toFixed(1),
+        width_in: toInches(customWidth, customUnit),
+        length_in: toInches(customLength, customUnit),
+        custom_price: customPrice
+      };
+    }
+
+    const orderToken = await getOrCreateOrderToken(variantId, variantQuantity, userId, metadata);
     if (!orderToken) return;
 
     router.push({
@@ -245,7 +310,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
           <ProductDetails>
             <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
-            <PriceTag>₹{selectedVariant?.price} <span>₹{Math.floor(Number(selectedVariant?.price || 0) * 1.3)}</span></PriceTag>
+            <PriceTag>
+              ₹{selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : selectedVariant?.price} 
+              <span>₹{Math.floor(Number(selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (selectedVariant?.price || 0)) * 1.3)}</span>
+            </PriceTag>
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
               <FaTruck style={{ color: "#ba8160" }} /> 
@@ -261,13 +329,18 @@ const ProductPage: React.FC<ProductPageProps> = ({
               <span className="note">• Most windows require 2 panels</span>
             </SoldAsLine>
 
-            {isBlackout && (
-              <ScarcityLabel style={{ background: "#001529", color: "white" }}>
-                100% Blackout Fabric
-              </ScarcityLabel>
-            )}
-
-            <ScarcityLabel>Exclusive Premium Batch</ScarcityLabel>
+            <BadgeContainer>
+              {productDetails?.is_blackout && (
+                <ScarcityLabel $isBlackout>
+                  100% Blackout Fabric
+                </ScarcityLabel>
+              )}
+              {productDetails?.tag && (
+                <ScarcityLabel $tag={productDetails.tag}>
+                  {productDetails?.tag}
+                </ScarcityLabel>
+              )}
+            </BadgeContainer>
 
             <SelectorRow>
               <ColorOptions>
@@ -338,12 +411,58 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </SizeOptions>
             )}
 
+            {selectedVariant?.type?.toLowerCase() === "custom" && (
+              <CustomSizeContainer>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0, color: '#111827', fontWeight: '600' }}>Custom Size</h3>
+                  <select 
+                    value={customUnit} 
+                    onChange={(e) => setCustomUnit(e.target.value)}
+                    style={{ background: '#f9fafb', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.4rem 0.8rem', outline: 'none', fontSize: '0.85rem', cursor: 'pointer' }}
+                  >
+                    <option value="in">Inches (in)</option>
+                    <option value="ft">Feet (ft)</option>
+                    <option value="m">Meters (m)</option>
+                  </select>
+                </div>
+                
+                <div className="inputs">
+                  <div className="field">
+                    <label>Width ({customUnit})</label>
+                    <input 
+                      type="number" 
+                      placeholder={`Width (${customUnit})`}
+                      value={customWidth} 
+                      onChange={(e) => setCustomWidth(e.target.value)} 
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label>Length / Height ({customUnit})</label>
+                    <input 
+                      type="number" 
+                      placeholder={`Length (${customUnit})`}
+                      value={customLength} 
+                      onChange={(e) => setCustomLength(e.target.value)} 
+                    />
+                  </div>
+                </div>
+
+                {customPrice > 0 && customWidth && customLength && (
+                  <div style={{ marginTop: '1.5rem', padding: '1.25rem', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                    <span style={{ fontSize: '0.9rem', color: '#4b5563', fontWeight: '500' }}>Estimated Price (per panel):</span>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>₹{customPrice}</div>
+                  </div>
+                )}
+              </CustomSizeContainer>
+            )}
+
             <QuantitySelectorContainer>
               <QuantitySelectorText>Quantity</QuantitySelectorText>
               <QuantitySelector
-                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+                quantity={quantity}
                 onQuantityChange={(newQuantity) =>
-                  updateQuantity(selectedVariant?.id!, newQuantity)
+                  updateQuantity(newQuantity)
                 }
               />
             </QuantitySelectorContainer>
@@ -354,7 +473,40 @@ const ProductPage: React.FC<ProductPageProps> = ({
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
-                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+                quantity={quantity}
+                onBeforeAdd={() => {
+                  if (selectedVariant.type?.toLowerCase() === "custom") {
+                    if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
+                      toast.error("Please enter valid dimensions (Width and Length) for your custom curtain.");
+                      return false;
+                    }
+                  }
+                  return true;
+                }}
+                metadata={selectedVariant?.type?.toLowerCase() === "custom" ? (() => {
+                  const toFeet = (val: string, unit: string) => {
+                    const v = parseFloat(val) || 0;
+                    if (unit === "in") return v / 12;
+                    if (unit === "m") return v * 3.28084;
+                    return v;
+                  };
+                  const toInches = (val: string, unit: string) => {
+                    const v = parseFloat(val) || 0;
+                    if (unit === "ft") return v * 12;
+                    if (unit === "m") return v * 39.3701;
+                    return v;
+                  };
+                  return {
+                    width: customWidth, 
+                    length: customLength, 
+                    unit: customUnit,
+                    width_ft: toFeet(customWidth, customUnit).toFixed(1),
+                    length_ft: toFeet(customLength, customUnit).toFixed(1),
+                    width_in: toInches(customWidth, customUnit),
+                    length_in: toInches(customLength, customUnit),
+                    custom_price: customPrice 
+                  };
+                })() : undefined}
               />
             </PurchaseCard>
 
@@ -442,7 +594,40 @@ const ProductPage: React.FC<ProductPageProps> = ({
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
-                quantity={_.get(variantQuantities, `${selectedVariant?.id}`)}
+                quantity={quantity}
+                onBeforeAdd={() => {
+                  if (selectedVariant.type?.toLowerCase() === "custom") {
+                    if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
+                      toast.error("Please enter valid dimensions for your custom curtain.");
+                      return false;
+                    }
+                  }
+                  return true;
+                }}
+                metadata={selectedVariant?.type?.toLowerCase() === "custom" ? (() => {
+                  const toFeet = (val: string, unit: string) => {
+                    const v = parseFloat(val) || 0;
+                    if (unit === "in") return v / 12;
+                    if (unit === "m") return v * 3.28084;
+                    return v;
+                  };
+                  const toInches = (val: string, unit: string) => {
+                    const v = parseFloat(val) || 0;
+                    if (unit === "ft") return v * 12;
+                    if (unit === "m") return v * 39.3701;
+                    return v;
+                  };
+                  return {
+                    width: customWidth, 
+                    length: customLength, 
+                    unit: customUnit,
+                    width_ft: toFeet(customWidth, customUnit).toFixed(1),
+                    length_ft: toFeet(customLength, customUnit).toFixed(1),
+                    width_in: toInches(customWidth, customUnit),
+                    length_in: toInches(customLength, customUnit),
+                    custom_price: customPrice 
+                  };
+                })() : undefined}
               />
             </PurchaseCard>
 

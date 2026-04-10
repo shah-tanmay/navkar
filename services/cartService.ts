@@ -8,12 +8,13 @@ export const getCartItems = async () => {
   return mappedResponse;
 };
 
-export const addItemToCart = async (variantId: string, quantity: number) => {
+export const addItemToCart = async (variantId: string, quantity: number, metadata?: any) => {
   const response = await apiRequest(
     () =>
       api.post(BASE_CART_URL, {
         product_variant_id: variantId,
         quantity,
+        metadata,
       }),
     { successStatusCode: 201, showSuccess: true }
   );

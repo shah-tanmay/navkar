@@ -5,6 +5,7 @@ import { OrderResponse } from "../types/api";
 interface OrderItems {
   product_variant_id: string;
   quantity: number;
+  metadata?: any;
 }
 
 //return order_id of creation
@@ -52,12 +53,14 @@ export const getAllUserOrders = async (): Promise<OrderResponse[]> => {
 export const updateOrderitemQuantity = async (
   orderToken: string,
   variantId: string,
-  quantity: number
+  quantity: number,
+  options?: { metadata?: any }
 ) => {
   const response = await apiRequest(
     () =>
       api.put(`${BASE_ORDER_ITEM_URL}/${orderToken}/items/${variantId}`, {
         quantity,
+        metadata: options?.metadata
       }),
     { showSuccess: false }
   );

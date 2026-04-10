@@ -19,6 +19,7 @@ export const ProductCardImageDiv = styled.div`
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px ${COLORS.accent};
   transition: transform 0.3s ease;
+  aspect-ratio: 4 / 5;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -27,7 +28,6 @@ export const ProductCardImageDiv = styled.div`
     padding: 0;
     margin-bottom: 0.5rem;
     border-radius: 12px;
-    aspect-ratio: 4 / 5;
     background: transparent;
   }
 `;
@@ -88,7 +88,7 @@ export const ProductTag = styled.div<{ variant?: string }>`
 
 export const ProductCardImage = styled(Image)`
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   filter: drop-shadow(0 4px 8px ${COLORS.accent});
@@ -125,7 +125,7 @@ export const ProductCardWrapper = styled.div`
   width: 100%;
   max-width: 360px;
   background: ${COLORS.primary};
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-radius: 24px;
   font-family: "Outfit", sans-serif;
   color: ${COLORS.secondary};
@@ -136,7 +136,7 @@ export const ProductCardWrapper = styled.div`
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
   @media (max-width: 768px) {
-    padding: 0.35rem;
+    padding: 0.5rem;
     border-radius: 12px;
   }
 
@@ -418,10 +418,10 @@ export const CardFooter = styled.div`
 
 export const TypePantheon = styled.div`
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 1rem 0 0.5rem;
   padding: 0 1rem;
   position: relative;
-
+  
   @media (max-width: 768px) {
     margin: 0.5rem 0;
     display: flex;
@@ -434,29 +434,17 @@ export const TypePantheon = styled.div`
 `;
 
 export const TypeOracle = styled.span`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${COLORS.gold};
+  font-size: 0.725rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: ${COLORS.secondary};
+  opacity: 0.6;
+
   @media (max-width: 768px) {
-    font-size: 0.65rem;
-    padding: 0 0.1rem;
+    font-size: 0.6rem;
+    padding: 0 1rem;
     letter-spacing: 0px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    width: 0;
-    height: 1px;
-    background: ${COLORS.gold};
-    transition: width 0.4s ease;
-  }
-
-  &:hover::after {
-    width: 100%;
-    left: 0;
   }
 `;
 
@@ -478,28 +466,16 @@ export const PriceDisplay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 25px;
-  margin: auto;
-  font-weight: 600;
+  font-size: 22px;
+  margin: 0.5rem auto 1rem;
+  font-weight: 700;
   color: ${COLORS.secondary};
   position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, ${COLORS.gold} 0%, transparent 100%);
-  }
+  letter-spacing: -0.5px;
 
   @media (max-width: 768px) {
     font-size: 0.9rem;
     margin: 0.25rem 0;
-    &::after {
-      bottom: -2px;
-    }
   }
 `;
 

@@ -347,8 +347,13 @@ const CheckoutPage = () => {
                       <S.ProductImage src={item.image_url} alt={item.name} />
                       <S.ProductDetails>
                         <h4>{item.product_name}</h4>
-                        <p>Color: {item.name}</p>
+                        <p>Color: {item.color}</p>
                         <p>Size: {item.type}</p>
+                        {item.type?.toLowerCase() === "custom" && item.metadata && (
+                          <p style={{ color: '#D4AF37', fontWeight: '500' }}>
+                            {item.metadata.width_ft} ft × {item.metadata.length_ft} ft
+                          </p>
+                        )}
                         <p>Quantity: {item.quantity}</p>
                       </S.ProductDetails>
                       <S.Price>₹{item.price * item.quantity}</S.Price>

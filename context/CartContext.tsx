@@ -24,7 +24,7 @@ type CartContextType = {
   cartItems: CartItems[];
   isLoading: boolean;
   orderToken: string;
-  addToCart: (variantId: string, quantity: number) => Promise<void>;
+  addToCart: (variantId: string, quantity: number, metadata?: any) => Promise<void>;
   removeFromCart: (cartItemId: string) => Promise<void>;
   updateQuantity: (cartItemId: string, newQuantity: number) => void;
 };
@@ -113,7 +113,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Add to cart with optimistic UI
   const addToCart = useCallback(
-    async (variantId: string, quantity: number) => {
+    async (variantId: string, quantity: number, metadata?: any) => {
       if (!authCheck()) return;
       const previousItems = [...cartItems];
 
@@ -126,7 +126,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           color_hex_code: "",
           price: 0,
           image_url: "",
-          metadata: {},
+          metadata: metadata || {},
           type: "type",
           variant_id: variantId,
           product_id: "", // Placeholder for optimistic update
@@ -135,7 +135,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCartItems((prev) => [...prev, tempItem]);
 
         // Actual API call
-        const response = await addItemToCart(variantId, quantity);
+        const response = await addItemToCart(variantId, quantity, metadata);
 
         // Replace temp item with real data
         setCartItems((prev) =>

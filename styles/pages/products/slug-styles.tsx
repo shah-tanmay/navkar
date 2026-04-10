@@ -29,8 +29,8 @@ export const HeroSection = styled.div`
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 3rem;
 
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
@@ -87,23 +87,42 @@ export const SocialProof = styled.div`
   }
 `;
 
-export const ScarcityLabel = styled.div`
-  display: inline-block;
-  background: ${COLORS.accent};
-  color: ${COLORS.secondary};
-  padding: 0.4rem 1rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+export const BadgeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 2rem;
-  border-left: 3px solid ${COLORS.gold};
+  flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    margin-bottom: 1rem;
-    padding: 0.3rem 0.75rem;
-    font-size: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+`;
+
+export const ScarcityLabel = styled.div<{ $tag?: string; $isBlackout?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1rem;
+  border-radius: 4px; /* Minimal rounding for sleek look */
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: default;
+  border-left: 3px solid ${COLORS.gold};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  background: ${props => props.$isBlackout ? COLORS.secondary : COLORS.accent};
+  color: ${props => props.$isBlackout ? COLORS.primary : COLORS.secondary};
+
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+    width: fit-content;
   }
 `;
 
@@ -498,7 +517,7 @@ export const MainImage = styled.div`
   width: 100%;
   aspect-ratio: 4/5;
   max-width: 100%;
-  max-height: 750px;
+  max-height: 520px;
   margin: 0 auto;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -589,6 +608,68 @@ export const QuantitySelectorContainer = styled.div`
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
+`;
+
+export const CustomSizeContainer = styled.div`
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #fdfdfd;
+  border: 1px dashed #ddd;
+  border-radius: 12px;
+  animation: ${fadeIn} 0.4s ease;
+
+  h4 {
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+    color: ${COLORS.secondary};
+    font-weight: 600;
+  }
+
+  .inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.8rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    input {
+      padding: 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: "Outfit", sans-serif;
+      transition: all 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: ${COLORS.gold};
+        box-shadow: 0 0 0 3px rgba(186, 129, 96, 0.1);
+      }
+    }
+  }
+
+  .helper-text {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.4;
+    font-style: italic;
+  }
 `;
 
 export const QuantitySelectorText = styled.h3`

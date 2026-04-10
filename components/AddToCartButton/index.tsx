@@ -13,10 +13,14 @@ export const AddToCart = ({
   cartId,
   variantId,
   quantity,
+  metadata,
+  onBeforeAdd,
 }: {
   cartId?: string;
   variantId: string;
   quantity: number;
+  metadata?: any;
+  onBeforeAdd?: () => boolean | Promise<boolean>;
 }) => {
   const { addToCart, cartItems, updateQuantity } = useCart();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +29,11 @@ export const AddToCart = ({
 
   const handleQuantityChange = async () => {
     if (!variantId || isLoading) return;
+
+    if (onBeforeAdd) {
+      const allowed = await onBeforeAdd();
+      if (!allowed) return;
+    }
 
     if (status === "unauthenticated") {
       // send them to login, and come back here after
@@ -48,7 +57,7 @@ export const AddToCart = ({
         const newQuantity = existingCartItem.quantity + quantity;
         updateQuantity(cartId, newQuantity);
       } else {
-        addToCart(variantId, quantity);
+        addToCart(variantId, quantity, metadata);
       }
 
       gaEvent("add_to_cart", {

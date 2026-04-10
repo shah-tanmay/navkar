@@ -87,7 +87,7 @@ export interface Variant {
   metadata?: VariantMetaData;
 }
 
-export type ProductVariantType = "window" | "door";
+export type ProductVariantType = "window" | "door" | "custom";
 
 export interface VariantSize {
   id: ProductVariantType;
@@ -100,10 +100,13 @@ export interface VariantMetaData {
 }
 
 export interface ProductVariantDetails {
+  id: string;
   description: string;
   metadata: Record<string, any>;
   name: string;
   variants: ProductVariant[];
+  tag?: string;
+  is_blackout?: boolean;
 }
 
 export interface CartItems {
@@ -126,6 +129,7 @@ export interface ViewCartResponse {
 export interface OrderItem {
   id: string;
   name: string;
+  color: string;
   product_variant_id: string;
   quantity: number;
   price: number;
@@ -134,6 +138,7 @@ export interface OrderItem {
   type: string;
   product_id: string;
   slug: string;
+  metadata?: any;
 }
 
 export interface TrackingStatus {

@@ -35,6 +35,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     window_size: string;
     sold_as: string;
     show_on_home: boolean;
+    is_customizable: boolean;
   }
 
   // Base Product Data
@@ -58,6 +59,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     window_size: "5ft × 4ft (152cm × 120cm)",
     sold_as: "1 panel",
     show_on_home: false,
+    is_customizable: false,
   });
 
   // Variant Data Context (Shared for a Color Group)
@@ -97,12 +99,22 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
   // useMemo prevents a new array reference on every render, which was
   // causing the variant useEffect to re-fire and wipe user input.
   const availableTypes = useMemo<string[]>(() => {
+    // Default sizes for ALL products
+    const defaults = ["Window", "Door"];
+    
+    // Add "Custom" if enabled
+    if (baseForm.is_customizable) {
+      // For customizable products, we only really CARE about Custom as the source of truth,
+      // but we need Window and Door too. We'll show Custom first.
+      return ["Custom", "Window", "Door"];
+    }
+
     const fromBase = baseForm.sizes.split(",").map(s => s.trim()).filter(Boolean);
     const fromVariants = _.uniq(variants.map((v: any) => v.type).filter(Boolean));
     const merged = _.uniq([...fromBase, ...fromVariants]);
-    if (merged.length === 0) return ["Window", "Door", "Long Door"];
-    return merged as string[];
-  }, [baseForm.sizes, variants]);
+    
+    return _.uniq([...defaults, ...merged]) as string[];
+  }, [baseForm.sizes, variants, baseForm.is_customizable]);
 
   useEffect(() => {
     if (editProduct) {
@@ -131,6 +143,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
         sold_as: meta.sold_as || "1 panel",
         show_on_home: meta.show_on_home || false,
+        is_customizable: meta.is_customizable || false,
       });
     }
   }, [editProduct]);
@@ -160,6 +173,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           window_size: meta.size_guide?.window || "5ft × 4ft (152cm × 120cm)",
           sold_as: meta.sold_as || "1 panel",
           show_on_home: meta.show_on_home || false,
+          is_customizable: meta.is_customizable || false,
         });
       }
     } else if (activeTab === "new_color") {
@@ -228,6 +242,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           },
           sold_as: baseForm.sold_as,
           show_on_home: baseForm.show_on_home,
+          is_customizable: baseForm.is_customizable,
         },
         is_discontinued: baseForm.is_discontinued,
         tag: baseForm.tag,
@@ -271,8 +286,29 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
       console.log(`[AdminEditor] Saving Variants for ${productId}`, { color: variantForm.color, types: Object.keys(variantForm.types) });
 
       // We need to loop over defined types and update/create them
-      const promises = Object.entries(variantForm.types).map(async ([type, data]) => {
-        if (!data.exists && (!data.price || !data.stock)) {
+      const basePrice = parseFloat(variantForm.types["Custom"]?.price || "0");
+      
+      const promises = availableTypes.map(async (type) => {
+        const data = variantForm.types[type] || { price: "", stock: "", exists: false };
+        
+        let finalPrice = parseFloat(data.price) || 0;
+        let finalStock = parseInt(data.stock, 10) || 0;
+
+        // Auto-calculate logic for customizable products
+        if (baseForm.is_customizable && basePrice > 0) {
+          finalStock = 99999;
+          if (type === "Window") {
+            finalPrice = Math.floor(((60 + 15) / 31) * basePrice);
+          } else if (type === "Door") {
+            finalPrice = Math.floor(((84 + 15) / 31) * basePrice);
+          } else if (type === "Custom") {
+            finalPrice = basePrice;
+          }
+        } else if (type === "Custom") {
+           finalStock = 99999;
+        }
+
+        if (!data.exists && finalPrice <= 0) {
           console.log(`[AdminEditor] Skipping inactive type: ${type}`);
           return;
         }
@@ -280,8 +316,8 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         const payload = {
           ...commonData,
           type,
-          price: parseFloat(data.price) || 0,
-          stock: parseInt(data.stock, 10) || 0,
+          price: finalPrice,
+          stock: finalStock,
         };
 
         if (data.id) {
@@ -470,6 +506,19 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                           {baseForm.show_on_home ? "FEATURED (HOME PAGE)" : "NOT FEATURED"}
                         </label>
                       </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 1rem", background: baseForm.is_customizable ? "#f9f0ff" : "#f5f5f5", borderRadius: "8px", border: "1px solid", borderColor: baseForm.is_customizable ? "#d3adf7" : "#d9d9d9" }}>
+                        <input 
+                          type="checkbox" 
+                          id="is_customizable"
+                          checked={baseForm.is_customizable} 
+                          onChange={e => setBaseForm({...baseForm, is_customizable: e.target.checked})} 
+                          style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                        />
+                        <label htmlFor="is_customizable" style={{ margin: 0, cursor: "pointer", color: baseForm.is_customizable ? "#722ed1" : "#595959", fontWeight: "bold", fontSize: "0.85rem" }}>
+                          {baseForm.is_customizable ? "CUSTOM SIZING ENABLED" : "CUSTOM SIZING DISABLED"}
+                        </label>
+                      </div>
                     </div>
                   </S.FormGroup>
                 </S.FormGrid>
@@ -574,13 +623,32 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                   {availableTypes.map(type => {
                     const data = variantForm.types[type] || { price: "", stock: "", exists: false };
+                    
+                    // If customizable, only Custom is editable. Others are auto-calculated.
+                    const isAutoCalc = baseForm.is_customizable && (type === "Window" || type === "Door");
+                    
+                    if (isAutoCalc && !variantForm.types["Custom"]?.price) return null;
+
                     return (
-                      <div key={type} style={{ display: "grid", gridTemplateColumns: "150px 1fr 1fr 100px", gap: "1rem", alignItems: "center", padding: "1rem", background: data.exists ? "#f0fdf4" : "#f8fafc", borderRadius: "12px", border: "1px solid", borderColor: data.exists ? "#bbf7d0" : "#e2e8f0" }}>
-                        <div style={{ fontWeight: 600 }}>{type}</div>
+                      <div key={type} style={{ display: "grid", gridTemplateColumns: "150px 1fr 1fr 100px", gap: "1rem", alignItems: "center", padding: "1rem", background: data.exists ? (type === "Custom" ? "#f9f0ff" : "#f0fdf4") : "#f8fafc", borderRadius: "12px", border: "1px solid", borderColor: data.exists ? (type === "Custom" ? "#d3adf7" : "#bbf7d0") : "#e2e8f0" }}>
+                        <div style={{ fontWeight: 600, display: "flex", flexDirection: "column" }}>
+                          {type}
+                          {type === "Custom" && (
+                            <span style={{ fontSize: "0.65rem", color: "#722ed1", fontWeight: "normal", marginTop: "4px" }}>
+                              Used as Base Price for formula
+                            </span>
+                          )}
+                          {isAutoCalc && (
+                            <span style={{ fontSize: "0.65rem", color: "#64748b", fontWeight: "normal", marginTop: "4px" }}>
+                              Calculated automatically
+                            </span>
+                          )}
+                        </div>
                         <S.FormGroup style={{ gap: "2px" }}>
-                          <label style={{ fontSize: "0.7rem" }}>Price (₹)</label>
+                          <label style={{ fontSize: "0.7rem" }}>{type === "Custom" ? "Base Price (₹)" : "Price (₹)"}</label>
                           <input 
-                            value={data.price} 
+                            value={isAutoCalc ? Math.floor(((type === "Window" ? 60 : 84) + 15) / 31 * parseFloat(variantForm.types["Custom"]?.price || "0")) : data.price} 
+                            disabled={isAutoCalc}
                             onChange={e => setVariantForm({
                               ...variantForm, 
                             types: { ...variantForm.types, [type as string]: { ...data, price: e.target.value } }
@@ -588,19 +656,25 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                             type="number" 
                           />
                         </S.FormGroup>
-                        <S.FormGroup style={{ gap: "2px" }}>
-                          <label style={{ fontSize: "0.7rem" }}>Stock</label>
-                          <input 
-                            value={data.stock} 
-                            onChange={e => setVariantForm({
-                              ...variantForm, 
-                            types: { ...variantForm.types, [type as string]: { ...data, stock: e.target.value } }
-                            })} 
-                            type="number" 
-                          />
-                        </S.FormGroup>
+                        {baseForm.is_customizable || type === "Custom" ? (
+                          <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600", padding: "0.5rem" }}>
+                            ∞ Always in Stock
+                          </div>
+                        ) : (
+                          <S.FormGroup style={{ gap: "2px" }}>
+                            <label style={{ fontSize: "0.7rem" }}>Stock</label>
+                            <input 
+                              value={data.stock} 
+                              onChange={e => setVariantForm({
+                                ...variantForm, 
+                              types: { ...variantForm.types, [type as string]: { ...data, stock: e.target.value } }
+                              })} 
+                              type="number" 
+                            />
+                          </S.FormGroup>
+                        )}
                         <div style={{ fontSize: "0.8rem", textAlign: "center" }}>
-                          {data.exists ? <span style={{ color: "green" }}>● Active</span> : <span style={{ color: "#94a3b8" }}>○ Inactive</span>}
+                          {data.exists ? <span style={{ color: type === "Custom" ? "#722ed1" : "green" }}>● Active</span> : <span style={{ color: "#94a3b8" }}>○ Inactive</span>}
                         </div>
                       </div>
                     );
