@@ -18,11 +18,13 @@ export const ProductPageWrapper = styled.div`
     padding: 0; /* Zero wrapper padding so sticky elements can form a solid edge-to-edge block */
   }
 
+  /* 
   &::after {
-    content: ""; /* Space for mobile sticky button */
+    content: "";
     display: block;
     height: 140px; 
   }
+  */
 `;
 
 export const HeroSection = styled.div`
@@ -525,14 +527,14 @@ export const MainImage = styled.div`
   box-sizing: border-box;
 
   @media (max-width: 768px) {
-    height: 280px;
+    height: 320px;
     max-height: none;
     position: sticky;
     top: 0px; 
     border-radius: 0; 
     margin: 0; 
     background: ${COLORS.primary}; /* Solid outer background masks scrolling content */
-    padding: 0.5rem; /* Creates minimal gap visually between screen edges and image */
+    padding: 15px; /* Added breathable padding */
     box-shadow: none;
   }
 

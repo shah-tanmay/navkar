@@ -9,8 +9,20 @@ export const ProductContainer = styled.div`
 
 
 export const ProductTitle = styled.h1`
-  font-size: 2rem;
-  color: #333;
+  font-family: "Outfit", sans-serif;
+  font-size: 2.5rem;
+  color: #2a3d4f;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+  font-weight: 700;
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+  }
 `;
 
 export const ProductsWrapper = styled.div`
@@ -33,9 +45,10 @@ export const ProductsWrapper = styled.div`
   }
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin: 15px 0;
-    padding: 0 5px;
+    grid-template-columns: 1fr; /* Single column for much bigger images */
+    gap: 25px;
+    margin: 15px auto 40px;
+    padding: 0 16px;
+    max-width: 450px;
   }
 `;
