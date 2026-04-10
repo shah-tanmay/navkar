@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import {
+  deleteAddress,
   getAddresses,
   postAddress,
   updateAddress,
@@ -14,12 +15,16 @@ import {
   AddressSelectorContainer,
   AddressSubtext,
   AddressText,
+  DeleteButton,
   EditButton,
   NewAddressCard,
   SelectIndicator,
+  ActionButtons,
 } from "./styles";
 import _ from "lodash";
 import { toast } from "react-toastify";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { ConfirmationModal } from "../ConfirmationModal";
 
 interface AddressSelectorProps {
   addresses: Address[];
@@ -38,6 +43,7 @@ export const AddressSelector = ({
   const [showNewForm, setShowNewForm] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<"new" | "edit">();
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
 
   const handleSelect = (address: Address) => {
     setSelectedAddress(address.id);
@@ -98,6 +104,28 @@ export const AddressSelector = ({
     }
   };
 
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      const success = await deleteAddress(addressId);
+      if (success) {
+        toast.success("Address deleted successfully");
+        const updatedAddresses = await getAddresses();
+        setAddresses(updatedAddresses);
+        if (selectedAddress === addressId) {
+          setSelectedAddress(null);
+          onSelect(null);
+        }
+      } else {
+        toast.error("Failed to delete address");
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "An error occurred while deleting the address";
+      toast.error(message);
+    } finally {
+      setAddressToDelete(null);
+    }
+  };
+
   return (
     <AddressSelectorContainer>
       <AddressGrid>
@@ -119,16 +147,27 @@ export const AddressSelector = ({
             <SelectIndicator selected={selectedAddress === address.id}>
               ✓
             </SelectIndicator>
-            <EditButton
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setSelectedAddress(address.id);
-                setIsModalOpen(true);
-                setModalType("edit");
-              }}
-            >
-              Edit
-            </EditButton>
+            <ActionButtons>
+              <EditButton
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setSelectedAddress(address.id);
+                  setIsModalOpen(true);
+                  setModalType("edit");
+                }}
+              >
+                Edit
+              </EditButton>
+              <DeleteButton
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setAddressToDelete(address.id);
+                }}
+                title="Delete Address"
+              >
+                <RiDeleteBinLine />
+              </DeleteButton>
+            </ActionButtons>
           </AddressCard>
         ))}
 
@@ -152,6 +191,15 @@ export const AddressSelector = ({
         buttonText={modalType === "new" ? "Add" : "Update Address"}
         onButtonClick={modalType === "new" ? addNewAddress : update}
         defaultValues={getDefaultValues()}
+      />
+      <ConfirmationModal
+        isOpen={!!addressToDelete}
+        onClose={() => setAddressToDelete(null)}
+        onConfirm={() => addressToDelete && handleDeleteAddress(addressToDelete)}
+        title="Delete Address"
+        message="Are you sure you want to delete this address? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
       />
     </AddressSelectorContainer>
   );

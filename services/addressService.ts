@@ -81,3 +81,9 @@ export const postAddress = async ({
   const addressResponse: Address = response?.data.address as Address;
   return addressResponse;
 };
+export const deleteAddress = async (addressId: string): Promise<boolean> => {
+  const response = await apiRequest(() =>
+    api.delete(`${BASE_ADDRESS_URL}/${addressId}`)
+  );
+  return response?.status === 200 || response?.status === 204;
+};

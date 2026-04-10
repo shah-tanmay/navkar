@@ -27,9 +27,9 @@ export const addressSchema = z.object({
   state: z.string().min(1, "State is required"),
   city: z.string().min(2, "City must be at least 2 characters"),
   zip: z.string().regex(/^\d{6}$/, "Zipcode must be a 6-digit number"),
-  type: z.enum(["Home", "Work", "Other"], {
+  type: z.enum(["Home", "Work", "Other", "home", "work", "other"], {
     errorMap: () => ({
-      message: "Invalid address type. Must be 'home', 'work', or 'other'.",
+      message: "Invalid address type. Must be 'Home', 'Work', or 'Other'.",
     }),
   }),
 });

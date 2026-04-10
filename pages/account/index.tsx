@@ -15,10 +15,11 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import * as S from "../../styles/pages/account/styles";
 import { getAllUserOrders } from "../../services/orderService";
-import { getAddresses, postAddress, updateAddress } from "../../services/addressService";
+import { deleteAddress, getAddresses, postAddress, updateAddress } from "../../services/addressService";
 import { updateProfile } from "../../services/authService";
 import { OrderResponse, Address } from "../../types/api";
 import { AddressModal } from "../../components/AddressModal";
+import { ConfirmationModal } from "../../components/ConfirmationModal";
 import Link from "next/link";
 import _ from "lodash";
 
@@ -39,6 +40,7 @@ const AccountPage = () => {
   // Address Modal State
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -96,6 +98,23 @@ const AccountPage = () => {
       fetchData();
     } catch (error) {
       toast.error("Failed to save address.");
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      const success = await deleteAddress(addressId);
+      if (success) {
+        toast.success("Address deleted.");
+        fetchData();
+      } else {
+        toast.error("Failed to delete address.");
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "An error occurred.";
+      toast.error(message);
+    } finally {
+      setAddressToDelete(null);
     }
   };
 
@@ -241,6 +260,7 @@ const AccountPage = () => {
                         <S.AddressText>{address.street.replace("::", ", ")}, {address.city}, {address.state} - {address.postal_code}</S.AddressText>
                         <S.AddressActions>
                           <S.EditButton onClick={() => { setEditingAddress(address); setShowAddressModal(true); }}>Edit</S.EditButton>
+                          <S.RemoveButton onClick={() => setAddressToDelete(address.id)}>Delete</S.RemoveButton>
                         </S.AddressActions>
                       </S.AddressCard>
                     ))}
@@ -306,6 +326,15 @@ const AccountPage = () => {
         />
       )}
 
+      <ConfirmationModal
+        isOpen={!!addressToDelete}
+        onClose={() => setAddressToDelete(null)}
+        onConfirm={() => addressToDelete && handleDeleteAddress(addressToDelete)}
+        title="Delete Address"
+        message="Are you sure you want to delete this address? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </S.ContentWrapper>
   );
 };

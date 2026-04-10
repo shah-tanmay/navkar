@@ -129,12 +129,18 @@ export const SelectIndicator = styled.div<{ selected: boolean }>`
   }
 `;
 
+export const ActionButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+`;
+
 export const EditButton = styled.button`
   background: ${COLORS.gold};
   color: ${COLORS.primary};
   border: none;
   height: 40px;
-  padding: 0 1.25rem;
+  flex: 1;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -143,5 +149,24 @@ export const EditButton = styled.button`
 
   &:hover {
     background: ${COLORS.bronze};
+  }
+`;
+
+export const DeleteButton = styled.button`
+  background: white;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  height: 40px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #fef2f2;
   }
 `;

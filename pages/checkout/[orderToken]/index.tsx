@@ -17,7 +17,6 @@ import {
   updateOrder,
 } from "../../../services/orderService";
 import { OrderItem } from "../../../types/api";
-import { CheckoutFormType } from "../../../types/type";
 import { FormData, schema } from "../../../types/zodSchema";
 import * as S from "../../../styles/pages/checkout/token-styles";
 import InvalidCheckout from "../../../components/InvalidCheckout";
@@ -49,22 +48,6 @@ const CheckoutPage = () => {
   const [couponError, setCouponError] = useState("");
   const [orderMetadata, setOrderMetadata] = useState<any>({});
 
-  const [formData, setFormData] = useState<CheckoutFormType>({
-    contact: {
-      firstName: _.first(name) || "",
-      lastName: _.join(_.tail(name), " ") || "",
-      phoneNumber: session?.user?.phone || "",
-    },
-    shipping: {
-      flatHouseNo: "",
-      street: "",
-      landmark: "",
-      city: "",
-      state: "",
-      zip: "",
-      type: "home",
-    },
-  });
 
   const { isActive, releaseReservations } = useReservations({
     orderToken,
@@ -94,20 +77,15 @@ const CheckoutPage = () => {
       state: z.string().min(1, "State is required"),
       city: z.string().min(2, "City must be at least 2 characters"),
       zip: z.string().regex(/^\d{6}$/, "Zipcode must be a 6-digit number"),
-      type: z.enum(["home", "work", "other"], {
+      type: z.enum(["Home", "Work", "Other", "home", "work", "other"], {
         errorMap: () => ({
-          message: "Invalid address type. Must be 'home', 'work', or 'other'.",
+          message: "Invalid address type. Must be 'Home', 'Work', or 'Other'.",
         }),
       }),
     }),
   });
 
-  const handleInputChange = (field: string, value: string, section: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: { ...prev[section as keyof typeof prev], [field]: value },
-    }));
-  };
+  // Remove handleInputChange as it's not being updated by AddressForm/ContactDetails components
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -132,10 +110,6 @@ const CheckoutPage = () => {
           methods.reset({
             contact: orderDetails.metadata.contact
           });
-          setFormData(prev => ({
-            ...prev,
-            contact: orderDetails.metadata.contact
-          }));
         }
         
         if (initialAddressId) {
@@ -152,9 +126,11 @@ const CheckoutPage = () => {
           value: orderTotal
         }));
 
-        // Calculate Smart Skip
+        // Calculate Smart Skip - check validity silently to avoid premature UI errors
         setTimeout(async () => {
-          const isContactValid = await methods.trigger("contact");
+          const values = methods.getValues();
+          const isContactValid = formSchema.shape.contact.safeParse(values.contact).success;
+          
           if (isContactValid) {
             if (initialAddressId) {
               setStartStep(2); // Skip both to Payment
@@ -243,9 +219,10 @@ const CheckoutPage = () => {
                       Component: <ContactDetailsStepComponent />,
                       validate: () => methods.trigger("contact"),
                       beforeNextStep: async () => {
-                        const contactInfo = methods.getValues().contact;
+                        const values = methods.getValues();
+                        const contactInfo = values.contact;
                         await updateOrder(orderToken, {
-                          metadata: { ...formData, contact: contactInfo }
+                          metadata: { ...orderMetadata, contact: contactInfo }
                         });
                       },
                       header: "Information",
@@ -261,13 +238,20 @@ const CheckoutPage = () => {
                       ),
                       validate: async () => {
                         if (selectedAddress) return true;
-                        const result = formSchema.shape.shipping.safeParse(
-                          formData.shipping
-                        );
-                        if (!result.success) {
-                          return false;
-                        }
-                        return true;
+                        
+                        const values = methods.getValues() as any;
+                        const shippingData = {
+                          flatHouseNo: values.flatHouseNo,
+                          street: values.street,
+                          landmark: values.landmark,
+                          state: values.state,
+                          city: values.city,
+                          zip: values.zip,
+                          type: values.type,
+                        };
+
+                        const result = formSchema.shape.shipping.safeParse(shippingData);
+                        return result.success;
                       },
                       beforeNextStep: async () => {
                         if (selectedAddress) {
@@ -277,9 +261,20 @@ const CheckoutPage = () => {
                           );
                         }
                         if (!isAddressSaved && !selectedAddress) {
+                          const values = methods.getValues() as any;
+                          const shippingData = {
+                            flatHouseNo: values.flatHouseNo,
+                            street: values.street,
+                            landmark: values.landmark,
+                            state: values.state,
+                            city: values.city,
+                            zip: values.zip,
+                            type: values.type,
+                          };
+
                           const response = await postAddress({
-                            ...formData.shipping,
-                            phone: formData.contact.phoneNumber,
+                            ...shippingData,
+                            phone: values.contact.phoneNumber,
                           });
                           if (response) {
                             setIsAddressSaved(true);
@@ -303,13 +298,21 @@ const CheckoutPage = () => {
                         />
                       ),
                       validate: async () => {
-                        const result = formSchema.shape.shipping.safeParse(
-                          formData.shipping
-                        );
-                        if (!result.success) {
-                          return false;
-                        }
-                        return true;
+                        if (selectedAddress) return true;
+                        
+                        const values = methods.getValues() as any;
+                        const shippingData = {
+                          flatHouseNo: values.flatHouseNo,
+                          street: values.street,
+                          landmark: values.landmark,
+                          state: values.state,
+                          city: values.city,
+                          zip: values.zip,
+                          type: values.type,
+                        };
+
+                        const result = formSchema.shape.shipping.safeParse(shippingData);
+                        return result.success;
                       },
                       header: "Payment",
                       hideBackButton: true,
