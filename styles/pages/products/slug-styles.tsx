@@ -424,6 +424,7 @@ export const Thumbnail = styled.div`
   border: 2px solid transparent;
   background: #fff;
   padding: 0px;
+  position: relative;
 
   &:hover {
     transform: translateY(-5px);
@@ -673,6 +674,7 @@ export const RecommendationCard = styled.div`
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 1rem;
+    position: relative;
     img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
   }
 

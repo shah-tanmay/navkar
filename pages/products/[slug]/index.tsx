@@ -6,6 +6,8 @@ import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
 import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock } from "react-icons/fa";
 import Head from "next/head";
+import Image from "next/image";
+import { cloudinaryLoader } from "../../../utils/imageLoader";
 import {
   CartItems,
   ProductVariant,
@@ -207,7 +209,17 @@ const ProductPage: React.FC<ProductPageProps> = ({
         <HeroSection>
           <ImageGallery>
             <MainImage>
-              <img src={activeImage} alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`} />
+              {activeImage && (
+                <Image
+                  loader={cloudinaryLoader}
+                  src={activeImage}
+                  alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 650px"
+                  style={{ objectFit: "cover", borderRadius: "12px" }}
+                />
+              )}
               <WarrantyBadge>Grade Quality Curtain</WarrantyBadge>
             </MainImage>
             <ThumbnailGrid>
@@ -220,7 +232,15 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   className={activeImage === img ? "active" : ""}
                   onClick={() => setActiveImage(img)}
                 >
-                  <img src={img} alt={`Gallery Preview ${index + 1}`} />
+                  <Image
+                    loader={cloudinaryLoader}
+                    src={img}
+                    alt={`Gallery Preview ${index + 1}`}
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 768px) 25vw, 160px"
+                    style={{ objectFit: "cover" }}
+                  />
                 </Thumbnail>
               ))}
             </ThumbnailGrid>
@@ -445,7 +465,17 @@ const ProductPage: React.FC<ProductPageProps> = ({
               {variants.filter(v => v.id !== selectedVariant?.id).slice(0, 4).map((v) => (
                 <RecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
                   <div className="img-wrapper">
-                    <img src={v.image_url} alt={`${v.name} Variant Preview`} />
+                    {v.image_url && (
+                      <Image
+                        loader={cloudinaryLoader}
+                        src={v.image_url}
+                        alt={`${v.name} Variant Preview`}
+                        fill
+                        loading="lazy"
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        style={{ objectFit: "cover", transition: "transform 0.5s" }}
+                      />
+                    )}
                   </div>
                   <h3>{productDetails?.name}</h3>
                   <p>{v.name} Edition • ₹{v.price}</p>
