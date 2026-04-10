@@ -4,6 +4,7 @@ import COLORS from "../constants/color";
 import { FiArrowLeft, FiPlus, FiMinus, FiHelpCircle } from "react-icons/fi";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import SEO from "../components/SEO";
 
 const Container = styled.div`
   max-width: 900px;
@@ -137,6 +138,10 @@ const FaqPage = () => {
 
   return (
     <Container>
+      <SEO 
+        title="FAQ - Curtains Guidance & Care"
+        description="Find answers to all your questions about Navkar curtains: measuring guides, custom tailoring options, blackout vs light-filtering fabric, and shipping timelines."
+      />
       <BackButton onClick={() => router.back()}>
         <FiArrowLeft /> Back
       </BackButton>

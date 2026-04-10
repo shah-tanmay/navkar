@@ -4,6 +4,7 @@ import COLORS from "../constants/color";
 import { FiArrowLeft, FiRefreshCw, FiTruck, FiShield } from "react-icons/fi";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import SEO from "../components/SEO";
 
 const Container = styled.div`
   max-width: 900px;
@@ -94,6 +95,10 @@ const ReturnsPage = () => {
 
   return (
     <Container>
+      <SEO 
+        title="Returns & Exchange Policy"
+        description="Learn about our 7-day easy returns and exchange policy. We take pride in our artisanal craftsmanship and offer customer-friendly reverse logistics for your curtains."
+      />
       <BackButton onClick={() => router.back()}>
         <FiArrowLeft /> Back
       </BackButton>

@@ -4,6 +4,7 @@ import COLORS from "../constants/color";
 import { FREE_SHIPPING_THRESHOLD } from "../constants";
 import { FiArrowLeft, FiTruck, FiMapPin, FiClock } from "react-icons/fi";
 import { useRouter } from "next/router";
+import SEO from "../components/SEO";
 
 const Container = styled.div`
   max-width: 900px;
@@ -89,6 +90,10 @@ const ShippingPage = () => {
 
   return (
     <Container>
+      <SEO 
+        title="Shipping & Payment Methods"
+        description="Detailed information about our delivery timelines, shipping charges, and secure payment methods for your handcrafted curtains and drapes across India."
+      />
       <BackButton onClick={() => router.back()}>
         <FiArrowLeft /> Back
       </BackButton>

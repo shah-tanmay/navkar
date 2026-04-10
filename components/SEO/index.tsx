@@ -26,7 +26,23 @@ const SEO: React.FC<SEOProps> = ({
 
   // Fallback logic
   const seoTitle = (title && title.trim().length > 0) ? `${title} | ${siteName}` : defaultTitle;
-  const seoDescription = (description && description.trim().length > 0) ? description : defaultDescription;
+  
+  const enforceDescriptionLimit = (desc: string) => {
+    let d = desc.trim();
+    // 1. Truncate if over 160
+    if (d.length > 160) {
+      d = d.substring(0, 157).trim() + "...";
+    }
+    // 2. Pad if under 110
+    if (d.length < 110) {
+      const suffix = " Experience premium, handcrafted curtains and bespoke drapes by Navkar, designed for elegance and superior quality in every home.";
+      d = (d + suffix).substring(0, 160).trim();
+      if (d.length > 157) d = d.substring(0, 157).trim() + "...";
+    }
+    return d;
+  };
+
+  const seoDescription = enforceDescriptionLimit(description && description.trim().length > 0 ? description : defaultDescription);
   
   // Robust image fallback
   let seoImage = defaultImage;

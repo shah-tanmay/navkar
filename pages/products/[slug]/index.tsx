@@ -191,10 +191,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   ];
   const features = (meta.features && meta.features.length > 0) ? meta.features : defaultFeatures;
 
-  const dynamicDescription = selectedVariant?.metadata?.variant_description || productDetails?.description;
-  const seoDescription = dynamicDescription && dynamicDescription.length > 110 
-    ? dynamicDescription.slice(0, 157) + "..."
-    : `Discover the premium ${selectedVariant?.name} ${productDetails?.name} at Navkar. Our handcrafted curtains offer refined style and superior quality for any room. Shop the range today.`;
+  const seoDescription = selectedVariant?.metadata?.variant_description || productDetails?.description || "";
 
   return (
     <LoaderWrapper loading={loading}>
