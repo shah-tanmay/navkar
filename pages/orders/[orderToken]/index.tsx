@@ -134,7 +134,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                 </div>
                 <div className="content">
                   <h3>Payment Successful! 🎉</h3>
-                  <p>Your order has been placed and we're getting it ready.</p>
+                  <p>Your order has been placed and we&apos;re getting it ready.</p>
                 </div>
               </S.SuccessBanner>
             )}

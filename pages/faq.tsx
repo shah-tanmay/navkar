@@ -96,7 +96,7 @@ const FaqPage = () => {
       q: "How do I measure for the right curtain size?",
       a: (
         <>
-          For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a 'full' gathered look. Detailed guides are available on each <Link href="/products">product page</Link>.
+          For height, measure from the rod/track to where you want the curtain to end. For width, we recommend 2x the width of your rod for a &apos;full&apos; gathered look. Detailed guides are available on each <Link href="/products">product page</Link>.
         </>
       )
     },
@@ -125,7 +125,7 @@ const FaqPage = () => {
       q: "How do I track my order?",
       a: (
         <>
-          <Link href="/account">Log in to your account</Link>, go to the 'Orders' section, and click on 'Track'. You'll see a real-time status line for every step of the delivery.
+          <Link href="/account">Log in to your account</Link>, go to the &apos;Orders&apos; section, and click on &apos;Track&apos;. You&apos;ll see a real-time status line for every step of the delivery.
         </>
       )
     },
