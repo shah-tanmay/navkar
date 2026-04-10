@@ -105,7 +105,7 @@ const FaqPage = () => {
       a: (
         <>
           Yes! While our standard sizes cover most windows and doors, we do offer custom tailoring for bulk orders. Please {" "}
-          <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noreferrer">reach out to our support via WhatsApp</a> for custom height requests.
+          <a href="https://wa.me/91916834423" target="_blank" rel="noreferrer">reach out to our support via WhatsApp</a> for custom height requests.
         </>
       )
     },
@@ -162,7 +162,7 @@ const FaqPage = () => {
         <h3>Still have questions?</h3>
         <p>Our curtain experts are ready to help you style your home.</p>
         <button 
-          onClick={() => window.open('https://wa.me/91XXXXXXXXXX', '_blank')}
+          onClick={() => window.open('https://wa.me/91916834423', '_blank')}
           style={{ 
             marginTop: "1rem", backgroundColor: COLORS.gold, color: COLORS.primary, 
             padding: "1rem 2.5rem", borderRadius: "30px", border: "none", 

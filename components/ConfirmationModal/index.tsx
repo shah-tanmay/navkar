@@ -127,20 +127,23 @@ export const ConfirmationModal = ({
       ariaHideApp={false}
       style={{
         overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
           zIndex: 1000,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          padding: "1rem",
         },
         content: {
-          position: "static",
+          position: "relative",
+          margin: "auto",
           border: "none",
           background: "none",
           padding: 0,
           width: "auto",
           height: "auto",
           inset: "auto",
+          overflow: "visible",
         },
       }}
     >

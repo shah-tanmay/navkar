@@ -228,13 +228,14 @@ const ProductPage: React.FC<ProductPageProps> = ({
             <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
             <PriceTag>₹{selectedVariant?.price} <span>₹{Math.floor(Number(selectedVariant?.price || 0) * 1.3)}</span></PriceTag>
             
-            <div style={{ padding: "4px 12px", background: "#f8f9fa", borderRadius: "4px", fontSize: "0.85rem", color: "#666", display: "inline-block", marginBottom: "1rem" }}>
-              {Number(selectedVariant?.price) >= 2000 ? (
-                <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Eligible for FREE Delivery</span>
+            <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
+              <FaTruck style={{ color: "#ba8160" }} /> 
+              {Number(selectedVariant?.price) >= FREE_SHIPPING_THRESHOLD ? (
+                <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Your order qualifies for FREE Delivery</span>
               ) : (
-                <span>Free delivery on orders above ₹2000</span>
+                <span>FREE Delivery on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}</span>
               )}
-            </div>
+            </ShippingPromoBadge>
             
             <SoldAsLine>
               <strong>Sold as: {soldAs}</strong>
@@ -328,9 +329,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
               />
             </QuantitySelectorContainer>
 
-            <ShippingPromoBadge>
-              <FaGift /> Free shipping on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}
-            </ShippingPromoBadge>
 
             <PurchaseCard $hideOnMobile>
               <BuyNow onClick={handleBuyNow} />

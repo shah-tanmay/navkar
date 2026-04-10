@@ -88,14 +88,33 @@ export const FooterLinkItem = styled.span`
 
 export const FooterRights = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   color: #794328;
   text-align: center;
   font-family: "Outfit";
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
-  line-height: 20px; /* 142.857% */
+  line-height: 20px;
+
+  .ssl {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  @media screen and (max-width: 425px) {
+    gap: 4px;
+    padding-bottom: 20px;
+    
+    .rights {
+      order: 2;
+    }
+    .ssl {
+      order: 1;
+    }
+  }
 `;
 
 export const SocialAnchor = styled.a``;

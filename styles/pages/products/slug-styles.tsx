@@ -123,7 +123,7 @@ export const PriceTag = styled.div`
   font-size: 2rem;
   color: ${COLORS.secondary};
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
@@ -335,16 +335,23 @@ export const MobileStickyActions = styled.div<{ $visible: boolean }>`
 export const ShippingPromoBadge = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: #fff;
-  border: 1px dashed ${COLORS.gold};
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  gap: 0.6rem;
+  padding: 0.8rem 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: ${COLORS.secondary};
+  width: fit-content;
   
-  svg { color: ${COLORS.gold}; }
+  svg { 
+    color: ${COLORS.gold}; 
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+  }
 `;
 
 export const DeliveryTimeline = styled.div`

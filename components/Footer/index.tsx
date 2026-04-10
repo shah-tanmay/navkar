@@ -55,9 +55,8 @@ const Footer = () => {
         <Link href="/faq" style={{ textDecoration: "none" }}><FooterLinkItem>FAQs</FooterLinkItem></Link>
       </FooterLinksRow>
       <FooterRights>
-        © {new Date().getFullYear()} Navkar - All Rights Reserved. 
-        <br />
-        <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>🛡️ SSL Certified & Secure Payments</span>
+        <span className="ssl">🛡️ SSL Certified & Secure Payments</span>
+        <span className="rights">© {new Date().getFullYear()} Navkar - All Rights Reserved.</span>
       </FooterRights>
     </FooterWrapper>
   );
