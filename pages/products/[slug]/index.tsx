@@ -208,6 +208,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
   };
 
   const handleBuyNow = async (overrideQuantity?: number) => {
+    // Check if user is logged in
+    if (!session || !session.user) {
+      toast.info("Please login to proceed with your order.");
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
     if (!selectedVariant) return;
 
     if (selectedVariant.type?.toLowerCase() === "custom") {

@@ -96,7 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQuantity = useCallback(
     (cartItemId: string, newQuantity: number) => {
-      if (!authCheck()) return;
+      if (!authCheck()) return; 
       setCartItems((prev) =>
         prev.map((item) =>
           item.cart_id === cartItemId
@@ -114,7 +114,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Add to cart with optimistic UI
   const addToCart = useCallback(
     async (variantId: string, quantity: number, metadata?: any) => {
-      if (!authCheck()) return;
+      if (!(await authCheck())) return;
       const previousItems = [...cartItems];
 
       try {
