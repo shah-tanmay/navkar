@@ -436,9 +436,33 @@ export const ProductName = styled.h3`
 
 export const ProductMeta = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.4rem;
   color: ${COLORS.slate};
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    
+    b {
+      color: ${COLORS.secondary};
+      font-weight: 600;
+    }
+  }
+
+  .price-tag {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: ${COLORS.secondary};
+    text-align: right;
+    border-top: 1px solid ${COLORS.accent};
+    padding-top: 0.5rem;
+  }
 `;
 
 export const SuccessBanner = styled.div`

@@ -39,7 +39,7 @@ const AdminOrdersComprehensive: NextPage = () => {
   const handleDelete = async (orderId: string) => {
     if (!window.confirm("Are you sure you want to PERMANENTLY DELETE this order? This action cannot be undone.")) return;
     try {
-      await axios.delete(`/admin/orders/${orderId}`);
+      await axios.delete(`/orders/admin/${orderId}`);
       toast.success("Order deleted");
       fetchOrders();
     } catch (e) {

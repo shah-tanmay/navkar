@@ -215,21 +215,32 @@ const OrderTracking: FC<OrderResponse> = () => {
                         key={item.id}
                         onClick={() => router.push(`/products/${item.slug}`)}
                       >
-                        <S.ProductImage src={item.image_url} alt={item.name} />
+                        <S.ProductImage src={item.image_url} alt={item.product_name} />
                         <S.ProductDetails>
                           <S.ProductName>
-                            {item.product_name}- {item.name}
+                            {item.product_name} – {item.color || item.variant_name}
                           </S.ProductName>
                           <S.ProductMeta>
-                            <span>Qty: {item.quantity}</span>
-                            <span>{_.capitalize(item.type)} Curtain</span>
-                            {item.metadata?.hangingStyle && <span>Hanging: {item.metadata.hangingStyle}</span>}
-                            {(item.metadata?.width_ft || item.metadata?.length_ft) && (
-                              <span style={{ color: '#ba8160', fontWeight: '600' }}>
-                                Dim: {item.metadata.width_ft}x{item.metadata.length_ft} ft
-                              </span>
+                            <div className="meta-row">
+                              <span>Qty: <b>{item.quantity}</b></span>
+                              <span>{_.capitalize(item.type)} Curtain</span>
+                            </div>
+                            
+                            {item.metadata?.hangingStyle && (
+                              <div className="meta-row">
+                                <span>Hanging Type:</span>
+                                <b>{item.metadata.hangingStyle}</b>
+                              </div>
                             )}
-                            <span style={{ fontWeight: '600', color: '#111827' }}>₹{item.price}</span>
+
+                            {(item.metadata?.width_ft || item.metadata?.length_ft) && (
+                              <div className="meta-row" style={{ color: '#ba8160' }}>
+                                <span>Dimensions:</span>
+                                <b>{item.metadata.width_ft} × {item.metadata.length_ft} ft</b>
+                              </div>
+                            )}
+
+                            <div className="price-tag">₹{item.price}</div>
                           </S.ProductMeta>
                         </S.ProductDetails>
                       </S.ProductCard>
