@@ -4,9 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
-import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock, FaRulerCombined, FaShareAlt } from "react-icons/fa";
-import Head from "next/head";
 import Image from "next/image";
+import { FaShareAlt, FaChevronDown, FaTruck } from "react-icons/fa";
 import { cloudinaryLoader } from "../../../utils/imageLoader";
 import {
   CartItems,
@@ -110,7 +109,64 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle URL state sync
+  useEffect(() => {
+    if (router.isReady && variants && variants.length > 0) {
+      const { type, q, h, w, u, hs } = router.query;
+      
+      if (type || q || h || w || u || hs) {
+        if (q) setQuantity(parseInt(q as string) || 1);
+        if (h) setCustomLength(h as string);
+        if (w) setCustomWidth(w as string);
+        if (u) setCustomUnit(u as string);
+        if (hs) setHangingStyle(hs as string);
+
+        if (type) {
+          const matchingVariant = _.find(variants, v => 
+            v.type?.toLowerCase() === (type as string).toLowerCase() && 
+            v.color_hex_code?.toLowerCase() === selectedVariant?.color_hex_code?.toLowerCase()
+          );
+          if (matchingVariant) {
+            setSelectedVariant(matchingVariant);
+            setActiveImage(matchingVariant.image_url);
+          }
+        }
+      }
+    }
+  }, [router.isReady, variants.length]);
+
+  // Update URL as state changes
+  useEffect(() => {
+    if (!router.isReady || !selectedVariant) return;
+    
+    const query = { ...router.query };
+    const nextQuery: any = { 
+      slug: query.slug,
+      type: selectedVariant.type,
+      q: quantity > 1 ? quantity : undefined,
+      hs: hangingStyle !== 'Eyelets' ? hangingStyle : undefined
+    };
+
+    if (selectedVariant.type?.toLowerCase() === 'custom') {
+      if (customLength) nextQuery.h = customLength;
+      if (customWidth) nextQuery.w = customWidth;
+      if (customUnit !== 'in') nextQuery.u = customUnit;
+    }
+
+    router.replace({ 
+      pathname: router.pathname, 
+      query: _.omitBy(nextQuery, _.isUndefined) 
+    }, undefined, { shallow: true });
+  }, [selectedVariant?.id, quantity, customLength, customWidth, customUnit, hangingStyle]);
 
   useEffect(() => {
     const checkVisibility = () => {
@@ -384,6 +440,38 @@ const ProductPage: React.FC<ProductPageProps> = ({
               ₹{(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))} 
               <span>₹{Math.floor(Number((selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))) * 1.3)}</span>
             </PriceTag>
+
+            {isMobile && (
+              <div 
+                onClick={() => {
+                  const el = document.getElementById('color-selector');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.85rem',
+                  color: '#ba8160',
+                  fontWeight: '600',
+                  background: '#fffaf5',
+                  padding: '8px 14px',
+                  borderRadius: '50px',
+                  border: '1px solid #fae7d9',
+                  margin: '8px 0 16px 0',
+                  cursor: 'pointer',
+                  width: 'fit-content'
+                }}
+              >
+                <div style={{ display: 'flex', gap: '2px' }}>
+                  {_.uniqBy(variants, "color_hex_code").slice(0, 3).map((v: any, i: number) => (
+                    <div key={i} style={{ width: '10px', height: '10px', borderRadius: '50%', background: v.color_hex_code, border: '0.5px solid rgba(0,0,0,0.1)' }} />
+                  ))}
+                </div>
+                <span>{_.uniqBy(variants, "color_hex_code").length} Colors Available</span>
+                <FaChevronDown style={{ fontSize: '0.6rem' }} />
+              </div>
+            )}
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
               <FaTruck style={{ color: "#ba8160" }} /> 
@@ -499,7 +587,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </RecommendationBody>
             </RecommendationCard>
 
-            <SelectorRow>
+            <SelectorRow id="color-selector">
               <ColorOptions>
                 <h3>Select Color</h3>
                 <div className="swatches">
