@@ -37,6 +37,18 @@ const OrderTracking: FC<OrderResponse> = () => {
         return;
       }
       if (order) {
+        // Robust Metadata Parsing to handle JSON returned as string
+        order.order_items = (order.order_items || []).map(item => {
+          if (typeof item.metadata === 'string') {
+            try {
+              item.metadata = JSON.parse(item.metadata);
+            } catch (e) {
+              console.error("Failed to parse item metadata", e);
+            }
+          }
+          return item;
+        });
+
         order.order_tracking_statuses = _.orderBy(
           order?.order_tracking_statuses,
           (order) => STATUS_FLOW.indexOf(order.status)
@@ -210,7 +222,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                           </S.ProductName>
                           <S.ProductMeta>
                             <span>Qty: {item.quantity}</span>
-                            <span>{_.capitalize(item.type)} {item.catalogue_name ? `(${item.catalogue_name})` : ''}</span>
+                            <span>{_.capitalize(item.type)} Curtain</span>
                             {item.metadata?.hangingStyle && <span>Hanging: {item.metadata.hangingStyle}</span>}
                             {(item.metadata?.width_ft || item.metadata?.length_ft) && (
                               <span style={{ color: '#ba8160', fontWeight: '600' }}>
