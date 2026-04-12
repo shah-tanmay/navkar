@@ -218,7 +218,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                         <S.ProductImage src={item.image_url} alt={item.product_name} />
                         <S.ProductDetails>
                           <S.ProductName>
-                            {item.product_name} – {item.color || item.variant_name}
+                            {item.product_name} – {item.color}
                           </S.ProductName>
                           <S.ProductMeta>
                             <div className="meta-row">
