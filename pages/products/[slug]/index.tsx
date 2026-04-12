@@ -123,55 +123,76 @@ const ProductPage: React.FC<ProductPageProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle URL state sync
+  // Robust Bidirectional State-URL Synchronization
+  // 1. URL -> State Sync (Source of Truth)
   useEffect(() => {
-    if (router.isReady && variants && variants.length > 0) {
-      const { type, q, h, w, u, hs } = router.query;
-      
-      if (type || q || h || w || u || hs) {
-        if (q) setQuantity(parseInt(q as string) || 1);
-        if (h) setCustomLength(h as string);
-        if (w) setCustomWidth(w as string);
-        if (u) setCustomUnit(u as string);
-        if (hs) setHangingStyle(hs as string);
+    if (!router.isReady || !variants || variants.length === 0) return;
 
-        if (type) {
-          const matchingVariant = _.find(variants, v => 
-            v.type?.toLowerCase() === (type as string).toLowerCase() && 
-            v.color_hex_code?.toLowerCase() === selectedVariant?.color_hex_code?.toLowerCase()
-          );
-          if (matchingVariant) {
-            setSelectedVariant(matchingVariant);
-            setActiveImage(matchingVariant.image_url);
-          }
-        }
+    const { slug, type, q, h, w, u, hs } = router.query;
+
+    // Sync Variant (Slug)
+    const urlSlug = Array.isArray(slug) ? slug[0] : slug;
+    if (urlSlug && urlSlug !== selectedVariant?.slug) {
+      const variant = variants.find(v => v.slug === urlSlug);
+      if (variant) {
+        setSelectedVariant(variant);
       }
     }
-  }, [router.isReady, variants.length]);
 
-  // Update URL as state changes
+    // Sync Secondary Params with current values in state to avoid redundant updates
+    const urlQ = parseInt(q as string);
+    if (!isNaN(urlQ) && urlQ !== quantity) setQuantity(urlQ);
+    
+    if (h && h !== customLength) setCustomLength(h as string);
+    if (w && w !== customWidth) setCustomWidth(w as string);
+    if (u && u !== customUnit) setCustomUnit(u as string);
+    if (hs && hs !== hangingStyle) setHangingStyle(hs as string);
+
+    // If type is provided but no slug is matched yet, or we want to refine by type
+    if (type && !slug) {
+       const matchingVariant = _.find(variants, v => 
+        v.type?.toLowerCase() === (type as string).toLowerCase() && 
+        v.color_hex_code?.toLowerCase() === selectedVariant?.color_hex_code?.toLowerCase()
+      );
+      if (matchingVariant) {
+        setSelectedVariant(matchingVariant);
+      }
+    }
+  }, [router.isReady, router.query, variants]);
+
+  // 2. State -> URL Sync (Only for secondary params)
   useEffect(() => {
     if (!router.isReady || !selectedVariant) return;
-    
-    const query = { ...router.query };
-    const nextQuery: any = { 
-      slug: query.slug,
-      type: selectedVariant.type,
+
+    const currentQuery = { ...router.query };
+    const nextQuery: any = {
+      ...currentQuery,
+      slug: selectedVariant.slug, // Explicitly keep current variant slug
       q: quantity > 1 ? quantity : undefined,
       hs: hangingStyle !== 'Eyelets' ? hangingStyle : undefined
     };
 
     if (selectedVariant.type?.toLowerCase() === 'custom') {
-      if (customLength) nextQuery.h = customLength;
-      if (customWidth) nextQuery.w = customWidth;
-      if (customUnit !== 'in') nextQuery.u = customUnit;
+      nextQuery.h = customLength || undefined;
+      nextQuery.w = customWidth || undefined;
+      nextQuery.u = customUnit !== 'in' ? customUnit : undefined;
+    } else {
+      // Clear custom params if not in custom mode
+      nextQuery.h = undefined;
+      nextQuery.w = undefined;
+      nextQuery.u = undefined;
     }
 
-    router.replace({ 
-      pathname: router.pathname, 
-      query: _.omitBy(nextQuery, _.isUndefined) 
-    }, undefined, { shallow: true });
-  }, [selectedVariant?.id, quantity, customLength, customWidth, customUnit, hangingStyle]);
+    const cleanNextQuery = _.omitBy(nextQuery, _.isUndefined);
+
+    // Only update if something actually changed to avoid infinite loops/flicker
+    if (!_.isEqual(currentQuery, cleanNextQuery)) {
+      router.replace({
+        pathname: router.pathname,
+        query: cleanNextQuery
+      }, undefined, { shallow: true });
+    }
+  }, [quantity, customLength, customWidth, customUnit, hangingStyle, selectedVariant?.type]);
 
   useEffect(() => {
     const checkVisibility = () => {
@@ -254,15 +275,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
     return Math.ceil(widthInInches / effectiveWidth);
   })();
 
-  // Sync state with URL if it changes (e.g. back/forward buttons)
-  useEffect(() => {
-    if (router.query.slug && router.query.slug !== selectedVariant?.slug) {
-      const variant = variants.find(v => v.slug === router.query.slug);
-      if (variant) {
-        setSelectedVariant(variant);
-      }
-    }
-  }, [router.query.slug, variants, selectedVariant?.slug]);
 
   const updateQuantity = (newQuantity: number) => {
     setQuantity(newQuantity);
@@ -627,8 +639,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                           if (!nextV) nextV = _.find(variants, (next: any) => next.color_hex_code === v.color_hex_code);
                           
                           if (nextV) {
-                            setSelectedVariant(nextV);
-                            router.push(`/products/${nextV.slug}`, undefined, { shallow: false });
+                            const { slug, ...restQuery } = router.query;
+                            router.push({
+                              pathname: `/products/${nextV.slug}`,
+                              query: restQuery
+                            }, undefined, { shallow: false });
                           }
                         }}
                         title={v.name}
@@ -702,8 +717,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                               selectedVariant?.color_hex_code
                         );
                         if (newVariant) {
-                          setSelectedVariant(newVariant);
-                          router.push(`/products/${newVariant.slug}`, undefined, { shallow: true });
+                          const { slug, ...restQuery } = router.query;
+                          router.push({
+                            pathname: `/products/${newVariant.slug}`,
+                            query: restQuery
+                          }, undefined, { shallow: true });
                         }
                       }}
                     >
@@ -796,7 +814,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   ), 'product_name')
                   .slice(0, 4)
                   .map((v: any) => (
-                    <ProductRecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
+                    <ProductRecommendationCard key={v.id} onClick={() => {
+                      const { slug, ...restQuery } = router.query;
+                      router.push({
+                        pathname: `/products/${v.slug}`,
+                        query: restQuery
+                      });
+                    }}>
                       <div className="img-wrapper">
                         {v.image_url && (
                           <Image
