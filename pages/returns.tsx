@@ -115,7 +115,7 @@ const ReturnsPage = () => {
         <Card>
           <FiShield size={32} style={{ color: COLORS.gold, marginBottom: "1rem" }} />
           <h3>Return Handling</h3>
-          <p>A return handling fee of ₹500 will be deducted from your refund. This helps us cover reverse shipping and restocking.</p>
+          <p>A return handling fee of ₹500 per panel will be deducted from your refund. This helps us cover reverse shipping and restocking.</p>
         </Card>
         <Card>
           <FiTruck size={32} style={{ color: COLORS.gold, marginBottom: "1rem" }} />
@@ -127,7 +127,7 @@ const ReturnsPage = () => {
       <Section>
         <SectionTitle>Why a return fee?</SectionTitle>
         <p>
-          We&apos;re a small business that takes pride in quality. The ₹500 fee helps us cover reverse logistics costs and 
+          We&apos;re a small business that takes pride in quality. The ₹500 per panel fee helps us cover reverse logistics costs and 
           ensures we can keep offering you the best pricing possible. We deeply appreciate your understanding and support!
         </p>
       </Section>

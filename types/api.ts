@@ -55,6 +55,9 @@ export interface ProductResponse {
   is_blackout?: boolean;
   show_on_home?: boolean;
   metadata?: Record<string, any>;
+  fixed_width?: number;
+  catalogue_name?: string;
+  serial_number?: string;
 }
 
 export interface Product {
@@ -73,6 +76,9 @@ export interface Product {
   tag?: string;
   is_blackout?: boolean;
   show_on_home?: boolean;
+  fixed_width?: number;
+  catalogue_name?: string;
+  serial_number?: string;
 }
 
 export interface Variant {
@@ -107,6 +113,9 @@ export interface ProductVariantDetails {
   variants: ProductVariant[];
   tag?: string;
   is_blackout?: boolean;
+  fixed_width?: number;
+  catalogue_name?: string;
+  serial_number?: string;
 }
 
 export interface CartItems {

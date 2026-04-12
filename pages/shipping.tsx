@@ -101,7 +101,7 @@ const ShippingPage = () => {
       <Title>Payment & Shipping</Title>
       
       <SectionTitle><FiClock /> Payment Methods</SectionTitle>
-      <p>We accept online payments only (UPI, Cards, Net Banking). Cash on Delivery is not available.</p>
+      <p>We offer a secure, contactless payment experience and accept all forms of online payments including UPI, Cards, and Net Banking across all our products.</p>
       
       <SectionTitle><FiClock /> Delivery Timelines</SectionTitle>
       <Timelines>

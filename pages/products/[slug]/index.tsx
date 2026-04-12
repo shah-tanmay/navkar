@@ -23,7 +23,7 @@ import {
   AccordionContainer, AccordionHeader, AccordionContent, ScarcityLabel, SocialProof,
   FeatureList, FeatureListItem, SoldAsLine, ShippingPromoBadge, DeliveryTimeline,
   PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard,
-  MobileStickyActions, CustomSizeContainer, BadgeContainer
+  MobileStickyActions, CustomSizeContainer, BadgeContainer, DyeLotDisclaimer
 } from "../../../styles/pages/products/slug-styles";
 import { useCart } from "../../../context/CartContext";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
@@ -52,11 +52,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const variants = _.get(details, "variants", []);
   const initialVariant = _.find(variants, (v) => v.slug === slug) || variants[0];
 
+  let initialStitchingFee = 100;
+  try {
+    const configRes = await api.get("/config/stitching-fee");
+    initialStitchingFee = configRes.data.stitching_fee;
+  } catch (e) {
+    console.error("Failed to fetch stitching fee", e);
+  }
+
   return {
     props: {
       initialProductDetails: details,
       initialVariants: variants,
       initialSelectedVariant: initialVariant,
+      initialStitchingFee,
     },
   };
 };
@@ -65,12 +74,14 @@ interface ProductPageProps {
   initialProductDetails: ProductVariantDetails;
   initialVariants: ProductVariant[];
   initialSelectedVariant: ProductVariant;
+  initialStitchingFee: number;
 }
 
 const ProductPage: React.FC<ProductPageProps> = ({
   initialProductDetails,
   initialVariants,
   initialSelectedVariant,
+  initialStitchingFee,
 }) => {
   const router = useRouter();
   const { cartItems } = useCart();
@@ -80,9 +91,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
   const [quantity, setQuantity] = useState<number>(1);
 
-  const [customWidth, setCustomWidth] = useState<string>("");
+  const fixedWidthValue = (productDetails as any)?.fixed_width || 48;
+  const [customWidth, setCustomWidth] = useState<string>(fixedWidthValue.toString());
   const [customLength, setCustomLength] = useState<string>("");
-  const [customUnit, setCustomUnit] = useState<string>("ft");
+  const [customUnit, setCustomUnit] = useState<string>("in");
   const [customPrice, setCustomPrice] = useState<number>(0);
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
@@ -91,6 +103,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const checkVisibility = () => {
@@ -140,26 +153,22 @@ const ProductPage: React.FC<ProductPageProps> = ({
         return v;
       };
 
-      if (!customWidth || !customLength) {
+      if (!customLength) {
         setCustomPrice(0);
         return;
       }
 
       const lengthInInches = toInches(customLength, customUnit);
-      const widthInInches = toInches(customWidth, customUnit);
-      const longerSide = Math.max(lengthInInches, widthInInches);
       const basePrice = parseFloat(selectedVariant.price);
       
-      if (longerSide > 0) {
-        // Lower bound: Window curtain size (60 inches)
-        const effectiveLongerSide = Math.max(longerSide, 60);
-        const calculated = Math.floor(((effectiveLongerSide + 15) / 31) * basePrice);
+      if (lengthInInches > 0) {
+        const calculated = Math.floor(((lengthInInches + 15) / 39) * basePrice) + initialStitchingFee;
         setCustomPrice(calculated);
       } else {
         setCustomPrice(0);
       }
     }
-  }, [selectedVariant, customWidth, customLength, customUnit]);
+  }, [selectedVariant, customLength, customUnit, initialStitchingFee]);
 
   // Sync state with URL if it changes (e.g. back/forward buttons)
   useEffect(() => {
@@ -205,8 +214,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
         return v;
       };
 
+      const displayWidth = customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2);
       metadata = {
-        width: customWidth,
+        width: displayWidth,
         length: customLength,
         unit: customUnit,
         width_ft: toFeet(customWidth, customUnit).toFixed(1),
@@ -311,8 +321,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
           <ProductDetails>
             <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
             <PriceTag>
-              ₹{selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : selectedVariant?.price} 
-              <span>₹{Math.floor(Number(selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (selectedVariant?.price || 0)) * 1.3)}</span>
+              ₹{selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (Number(selectedVariant?.price) + initialStitchingFee)} 
+              <span>₹{Math.floor(Number(selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (Number(selectedVariant?.price || 0) + initialStitchingFee)) * 1.3)}</span>
             </PriceTag>
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
@@ -369,6 +379,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     />
                   ))}
                 </div>
+                <DyeLotDisclaimer>* Color may vary between dye lot to dye lot</DyeLotDisclaimer>
               </ColorOptions>
             </SelectorRow>
 
@@ -428,12 +439,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 
                 <div className="inputs">
                   <div className="field">
-                    <label>Width ({customUnit})</label>
+                    <label>Width (Fixed)</label>
                     <input 
-                      type="number" 
-                      placeholder={`Width (${customUnit})`}
-                      value={customWidth} 
-                      onChange={(e) => setCustomWidth(e.target.value)} 
+                      disabled
+                      value={`${customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2)} ${customUnit}`} 
+                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
                     />
                   </div>
 
@@ -496,8 +506,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     if (unit === "m") return v * 39.3701;
                     return v;
                   };
+                  const displayWidth = customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2);
                   return {
-                    width: customWidth, 
+                    width: displayWidth, 
                     length: customLength, 
                     unit: customUnit,
                     width_ft: toFeet(customWidth, customUnit).toFixed(1),

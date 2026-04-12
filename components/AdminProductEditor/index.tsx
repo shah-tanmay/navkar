@@ -10,6 +10,64 @@ interface AdminProductEditorProps {
   editProduct?: Product | null;
 }
 
+const ImageUploadField: React.FC<{
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  fullWidth?: boolean;
+}> = ({ label, value, onChange, fullWidth }) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.post("/admin/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      onChange(res.data.url);
+      toast.success("Image uploaded!");
+    } catch (err) {
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <S.FormGroup $fullWidth={fullWidth}>
+      <label>{label}</label>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleFileChange} 
+          disabled={uploading}
+          style={{ flex: 1, padding: '0.4rem', border: '1px dashed #ccc', borderRadius: '8px' }}
+        />
+        {uploading && <span style={{ fontSize: "0.8rem", color: "#666" }}>Uploading...</span>}
+      </div>
+      {value && (
+        <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+          <img src={value} alt="Preview" style={{ width: "60px", height: "60px", borderRadius: "8px", objectFit: "cover", border: "1px solid #ddd" }} />
+          <button 
+            type="button" 
+            onClick={() => onChange("")}
+            style={{ padding: "0.25rem 0.5rem", fontSize: "0.7rem", color: "red", border: "1px solid red", background: "none", borderRadius: "4px", cursor: "pointer" }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+    </S.FormGroup>
+  );
+};
+
 export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProduct }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -36,6 +94,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     sold_as: string;
     show_on_home: boolean;
     is_customizable: boolean;
+    fixed_width: string;
+    catalogue_name: string;
+    serial_number: string;
   }
 
   // Base Product Data
@@ -60,6 +121,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     sold_as: "1 panel",
     show_on_home: false,
     is_customizable: false,
+    fixed_width: "48",
+    catalogue_name: "",
+    serial_number: "",
   });
 
   // Variant Data Context (Shared for a Color Group)
@@ -71,6 +135,8 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
     image_g2: "",
     image_g3: "",
     variant_description: "",
+    catalogue_name: "",
+    serial_number: "",
     // Map of type -> { price, stock, id }
     types: {} as Record<string, { id?: string; price: string; stock: string; exists: boolean }>,
   });
@@ -144,6 +210,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         sold_as: meta.sold_as || "1 panel",
         show_on_home: meta.show_on_home || false,
         is_customizable: meta.is_customizable || false,
+        fixed_width: (p.fixed_width || 48).toString(),
+        catalogue_name: p.catalogue_name || "",
+        serial_number: p.serial_number || "",
       });
     }
   }, [editProduct]);
@@ -174,6 +243,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           sold_as: meta.sold_as || "1 panel",
           show_on_home: meta.show_on_home || false,
           is_customizable: meta.is_customizable || false,
+          fixed_width: (productData.fixed_width || 48).toString(),
+          catalogue_name: productData.catalogue_name || "",
+          serial_number: productData.serial_number || "",
         });
       }
     } else if (activeTab === "new_color") {
@@ -181,6 +253,8 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         color: "", color_hex_code: "", 
         image_main: "", image_g1: "", image_g2: "", image_g3: "",
         variant_description: "",
+        catalogue_name: "",
+        serial_number: "",
         types: availableTypes.reduce((acc: Record<string, { id?: string; price: string; stock: string; exists: boolean }>, t: string) => ({ ...acc, [t]: { price: "", stock: "", exists: false } }), {})
       });
     } else {
@@ -208,6 +282,8 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           image_g2: gallery[1] || "",
           image_g3: gallery[2] || "",
           variant_description: meta.variant_description || "",
+          catalogue_name: first.catalogue_name || "",
+          serial_number: first.serial_number || "",
           types: typeMap
         });
       }
@@ -247,6 +323,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         is_discontinued: baseForm.is_discontinued,
         tag: baseForm.tag,
         is_blackout: baseForm.is_blackout,
+        fixed_width: parseInt(baseForm.fixed_width, 10) || 48,
+        catalogue_name: baseForm.catalogue_name,
+        serial_number: baseForm.serial_number,
       };
 
       if (editProduct && productId) {
@@ -269,6 +348,13 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
 
   const handleVariantSave = async () => {
     if (!editProduct) return;
+
+    // Validation: Require Catalogue Name if the product is customizable (formula-based)
+    if (baseForm.is_customizable && !variantForm.catalogue_name) {
+      toast.error("Catalogue Name is REQUIRED for customizable products to ensure internal tracking.");
+      return;
+    }
+
     setLoading(true);
     try {
       const galleryArray = [variantForm.image_g1, variantForm.image_g2, variantForm.image_g3].filter(Boolean);
@@ -281,6 +367,8 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
           gallery_images: galleryArray,
           variant_description: variantForm.variant_description,
         },
+        catalogue_name: variantForm.catalogue_name,
+        serial_number: variantForm.serial_number,
       };
 
       console.log(`[AdminEditor] Saving Variants for ${productId}`, { color: variantForm.color, types: Object.keys(variantForm.types) });
@@ -298,9 +386,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
         if (baseForm.is_customizable && basePrice > 0) {
           finalStock = 99999;
           if (type === "Window") {
-            finalPrice = Math.floor(((60 + 15) / 31) * basePrice);
+            finalPrice = Math.floor(((60 + 15) / 39) * basePrice);
           } else if (type === "Door") {
-            finalPrice = Math.floor(((84 + 15) / 31) * basePrice);
+            finalPrice = Math.floor(((84 + 15) / 39) * basePrice);
           } else if (type === "Custom") {
             finalPrice = basePrice;
           }
@@ -530,6 +618,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                   <S.FormGroup><label>Door Size Label</label><input value={baseForm.door_size} onChange={e => setBaseForm({...baseForm, door_size: e.target.value})} placeholder="e.g. 7ft × 4ft (214cm × 120cm)" /></S.FormGroup>
                   <S.FormGroup><label>Window Size Label</label><input value={baseForm.window_size} onChange={e => setBaseForm({...baseForm, window_size: e.target.value})} placeholder="e.g. 5ft × 4ft (152cm × 120cm)" /></S.FormGroup>
                   <S.FormGroup><label>Sold As</label><input value={baseForm.sold_as} onChange={e => setBaseForm({...baseForm, sold_as: e.target.value})} placeholder="e.g. 1 panel" /></S.FormGroup>
+                  <S.FormGroup><label>Fixed Cloth Width (Inches)</label><input type="number" value={baseForm.fixed_width} onChange={e => setBaseForm({...baseForm, fixed_width: e.target.value})} placeholder="e.g. 48" /></S.FormGroup>
+                  <S.FormGroup><label>Catalogue Name (Internal)</label><input value={baseForm.catalogue_name} onChange={e => setBaseForm({...baseForm, catalogue_name: e.target.value})} placeholder="e.g. Premium Silk Vol 2" /></S.FormGroup>
+                  <S.FormGroup><label>Serial Number (Internal)</label><input value={baseForm.serial_number} onChange={e => setBaseForm({...baseForm, serial_number: e.target.value})} placeholder="e.g. NV-504" /></S.FormGroup>
                 </S.FormGrid>
               </S.Card>
 
@@ -586,13 +677,11 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
 
               <S.Card>
                 <S.SectionTitle>Media (Global Fallback)</S.SectionTitle>
-                <S.FormGroup>
-                  <label>Main Fallback Image URL</label>
-                  <input value={baseForm.image_main} onChange={e => setBaseForm({...baseForm, image_main: e.target.value})} />
-                </S.FormGroup>
-                <S.ImagePreview>
-                  {baseForm.image_main ? <img src={baseForm.image_main} alt="Preview" /> : <div className="placeholder">Paste image URL to preview</div>}
-                </S.ImagePreview>
+                <ImageUploadField 
+                  label="Main Fallback Image" 
+                  value={baseForm.image_main} 
+                  onChange={(url) => setBaseForm({ ...baseForm, image_main: url })} 
+                />
               </S.Card>
             </>
           ) : (
@@ -614,6 +703,28 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                   <S.FormGroup $fullWidth>
                     <label>Shared Description for this Color</label>
                     <textarea value={variantForm.variant_description} onChange={e => setVariantForm({...variantForm, variant_description: e.target.value})} />
+                  </S.FormGroup>
+                </S.FormGrid>
+              </S.Card>
+
+              <S.Card style={{ borderLeft: "6px solid #ba8160", background: "#f8fafc" }}>
+                <S.SectionTitle style={{ color: "#ba8160" }}>Internal Identifiers (Color Specific)</S.SectionTitle>
+                <S.FormGrid>
+                  <S.FormGroup>
+                    <label>Catalogue Name {baseForm.is_customizable && <span style={{ color: 'red' }}>*</span>}</label>
+                    <input 
+                      value={variantForm.catalogue_name} 
+                      onChange={e => setVariantForm({...variantForm, catalogue_name: e.target.value})} 
+                      placeholder="e.g. Premium Silk Collection" 
+                    />
+                  </S.FormGroup>
+                  <S.FormGroup>
+                    <label>Serial Number</label>
+                    <input 
+                      value={variantForm.serial_number} 
+                      onChange={e => setVariantForm({...variantForm, serial_number: e.target.value})} 
+                      placeholder="e.g. PS-101" 
+                    />
                   </S.FormGroup>
                 </S.FormGrid>
               </S.Card>
@@ -647,7 +758,7 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                         <S.FormGroup style={{ gap: "2px" }}>
                           <label style={{ fontSize: "0.7rem" }}>{type === "Custom" ? "Base Price (₹)" : "Price (₹)"}</label>
                           <input 
-                            value={isAutoCalc ? Math.floor(((type === "Window" ? 60 : 84) + 15) / 31 * parseFloat(variantForm.types["Custom"]?.price || "0")) : data.price} 
+                            value={isAutoCalc ? Math.floor(((type === "Window" ? 60 : 84) + 15) / 39 * parseFloat(variantForm.types["Custom"]?.price || "0")) : data.price} 
                             disabled={isAutoCalc}
                             onChange={e => setVariantForm({
                               ...variantForm, 
@@ -685,13 +796,27 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
               <S.Card>
                 <S.SectionTitle>Gallery Management</S.SectionTitle>
                 <S.FormGrid>
-                  <S.FormGroup $fullWidth>
-                    <label>Variant Main Hero Image</label>
-                    <input value={variantForm.image_main} onChange={e => setVariantForm({...variantForm, image_main: e.target.value})} />
-                  </S.FormGroup>
-                  <S.FormGroup><label>Gallery Image 1</label><input value={variantForm.image_g1} onChange={e => setVariantForm({...variantForm, image_g1: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup><label>Gallery Image 2</label><input value={variantForm.image_g2} onChange={e => setVariantForm({...variantForm, image_g2: e.target.value})} /></S.FormGroup>
-                  <S.FormGroup><label>Gallery Image 3</label><input value={variantForm.image_g3} onChange={e => setVariantForm({...variantForm, image_g3: e.target.value})} /></S.FormGroup>
+                  <ImageUploadField 
+                    label="Variant Main Hero Image" 
+                    value={variantForm.image_main} 
+                    onChange={(url) => setVariantForm({ ...variantForm, image_main: url })} 
+                    fullWidth 
+                  />
+                  <ImageUploadField 
+                    label="Gallery Image 1" 
+                    value={variantForm.image_g1} 
+                    onChange={(url) => setVariantForm({ ...variantForm, image_g1: url })} 
+                  />
+                  <ImageUploadField 
+                    label="Gallery Image 2" 
+                    value={variantForm.image_g2} 
+                    onChange={(url) => setVariantForm({ ...variantForm, image_g2: url })} 
+                  />
+                  <ImageUploadField 
+                    label="Gallery Image 3" 
+                    value={variantForm.image_g3} 
+                    onChange={(url) => setVariantForm({ ...variantForm, image_g3: url })} 
+                  />
                 </S.FormGrid>
                 <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", overflowX: "auto", paddingBottom: "1rem" }}>
                   {[variantForm.image_main, variantForm.image_g1, variantForm.image_g2, variantForm.image_g3].filter(Boolean).map((url, i) => (

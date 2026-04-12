@@ -144,22 +144,29 @@ const AdminOrdersComprehensive: NextPage = () => {
                           {o.items.map((it: any, i: number) => (
                             <div key={i} style={{ fontSize: "0.85rem", display: "flex", flexDirection: "column", borderBottom: i < o.items.length - 1 ? "1px solid #f1f5f9" : "none", paddingBottom: "0.4rem" }}>
                               <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
-                                <span style={{ fontWeight: "600" }}>{it.quantity}x {it.product_name}</span>
+                                <span style={{ fontWeight: "600" }}>{it.quantity}x {it.product_name} <i>({it.color || 'No Color'})</i></span>
                                 <span style={{ color: "#94a3b8" }}>{it.type}</span>
                               </div>
                               {(() => {
                                 const m = it.metadata || {};
-                                if (m.width_ft || m.length_ft || m.width || m.length) {
-                                  const w = m.width_ft || (m.width ? (parseFloat(m.width) / 12).toFixed(1) : null);
-                                  const l = m.length_ft || (m.length ? (parseFloat(m.length) / 12).toFixed(1) : null);
+                                if (m.width || m.length) {
                                   return (
                                     <div style={{ fontSize: "0.8rem", color: "#722ed1", fontWeight: "700", marginTop: "0.2rem", background: "#f9f0ff", padding: "2px 6px", borderRadius: "4px", width: "fit-content" }}>
-                                      {w || "?"} ft × {l || "?"} ft
+                                      {m.width} {m.unit || 'in'} × {m.length} {m.unit || 'in'}
+                                    </div>
+                                  );
+                                } else if (m.width_ft || m.length_ft) {
+                                  return (
+                                    <div style={{ fontSize: "0.8rem", color: "#722ed1", fontWeight: "700", marginTop: "0.2rem", background: "#f9f0ff", padding: "2px 6px", borderRadius: "4px", width: "fit-content" }}>
+                                      {m.width_ft} ft × {m.length_ft} ft
                                     </div>
                                   );
                                 }
                                 return null;
                               })()}
+                              <div style={{ fontSize: "0.7rem", color: it.catalogue_name ? "#475569" : "#ef4444", marginTop: "0.3rem", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", width: "fit-content", fontWeight: "600", border: "1px solid #e2e8f0" }}>
+                                Catalogue: {it.catalogue_name || 'PENDING'} | Serial: {it.serial_number || 'PENDING'}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -233,7 +240,14 @@ const AdminOrdersComprehensive: NextPage = () => {
                               <p style={{ margin: "0.2rem 0", fontSize: "0.9rem" }}><strong>Full Address:</strong> {o.shipping_address?.street}, {o.shipping_address?.city}, {o.shipping_address?.state}</p>
                               <div style={{ marginTop: "1rem" }}>
                                 <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.9rem", color: "#1e293b" }}>Internal Details</h4>
-                                <span style={{ fontSize: "0.8rem", color: "#64748b" }}>PGID: {o.id} | Token: {o.order_token}</span>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+                                  <span style={{ fontSize: "0.8rem", color: "#64748b" }}>PGID: {o.id} | Token: {o.order_token}</span>
+                                  {o.items.map((it: any, i: number) => (
+                                    <div key={i} style={{ fontSize: "0.8rem", color: "#ba8160", fontWeight: "600" }}>
+                                      {it.product_name} ({it.color}): {it.catalogue_name || 'N/A'} | {it.serial_number || 'N/A'}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>

@@ -14,7 +14,8 @@ import { event as gaEvent } from "nextjs-google-analytics";
 
 
 const initializeSDK = async () => {
-  const cashfree = await load({ mode: "sandbox" });
+  const mode = process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox";
+  const cashfree = await load({ mode });
   return cashfree;
 };
 

@@ -118,7 +118,7 @@ const FaqPage = () => {
       q: "What is your return policy for custom items?",
       a: (
         <>
-          We offer easy 7-day returns from the date of delivery. A return handling fee of ₹500 will be deducted to cover reverse shipping. However, please note that custom length orders are non-returnable and non-refundable. Read our full <Link href="/returns">Return Policy</Link>.
+          We offer easy 7-day returns from the date of delivery. A return handling fee of ₹500 per panel will be deducted to cover reverse shipping. However, please note that custom length orders are non-returnable and non-refundable. Read our full <Link href="/returns">Return Policy</Link>.
         </>
       )
     },
@@ -132,7 +132,7 @@ const FaqPage = () => {
     },
     {
       q: "Do you offer Cash on Delivery (COD)?",
-      a: "No, currently we do not offer Cash on Delivery (COD) for any of our products."
+      a: "To provide a secure and contactless experience, we currently offer all forms of online payments including UPI, Cards, and Net Banking across all our orders."
     }
   ];
 

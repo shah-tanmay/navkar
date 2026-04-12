@@ -483,6 +483,16 @@ export const ColorOptions = styled.div`
   }
 `;
 
+export const DyeLotDisclaimer = styled.span`
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.75rem;
+  font-style: italic;
+  font-weight: 400;
+`;
+
+
 export const ColorSwatch = styled.div<{ color: string }>`
   width: 45px;
   height: 45px;

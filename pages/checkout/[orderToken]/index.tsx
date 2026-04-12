@@ -351,7 +351,7 @@ const CheckoutPage = () => {
                         <p>Size: {item.type}</p>
                         {item.type?.toLowerCase() === "custom" && item.metadata && (
                           <p style={{ color: '#D4AF37', fontWeight: '500' }}>
-                            {item.metadata.width_ft} ft × {item.metadata.length_ft} ft
+                            {item.metadata.width} {item.metadata.unit} × {item.metadata.length} {item.metadata.unit}
                           </p>
                         )}
                         <p>Quantity: {item.quantity}</p>

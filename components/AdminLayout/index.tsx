@@ -40,6 +40,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
     { label: "Discount Coupons", path: "/admin/coupons" },
     { label: "Pincode Service", path: "/admin/pincodes" },
     { label: "Ad Performance", path: "/admin/ad-performance" },
+    { label: "Site Settings", path: "/admin/settings" },
     { label: "Storefront Home", path: "/" },
   ];
 
