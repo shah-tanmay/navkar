@@ -167,6 +167,11 @@ const AdminOrdersComprehensive: NextPage = () => {
                               <div style={{ fontSize: "0.7rem", color: it.catalogue_name ? "#475569" : "#ef4444", marginTop: "0.3rem", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", width: "fit-content", fontWeight: "600", border: "1px solid #e2e8f0" }}>
                                 Catalogue: {it.catalogue_name || 'PENDING'} | Serial: {it.serial_number || 'PENDING'}
                               </div>
+                              {it.metadata?.hanging_style && (
+                                <div style={{ fontSize: "0.7rem", color: "#ba8160", marginTop: "0.2rem", fontWeight: "800", textTransform: "uppercase" }}>
+                                  Hanging: {it.metadata.hanging_style}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>

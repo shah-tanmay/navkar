@@ -619,7 +619,13 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                   <S.FormGroup><label>Window Size Label</label><input value={baseForm.window_size} onChange={e => setBaseForm({...baseForm, window_size: e.target.value})} placeholder="e.g. 5ft × 4ft (152cm × 120cm)" /></S.FormGroup>
                   <S.FormGroup><label>Sold As</label><input value={baseForm.sold_as} onChange={e => setBaseForm({...baseForm, sold_as: e.target.value})} placeholder="e.g. 1 panel" /></S.FormGroup>
                   <S.FormGroup><label>Fixed Cloth Width (Inches)</label><input type="number" value={baseForm.fixed_width} onChange={e => setBaseForm({...baseForm, fixed_width: e.target.value})} placeholder="e.g. 48" /></S.FormGroup>
-                  <S.FormGroup><label>Catalogue Name (Internal)</label><input value={baseForm.catalogue_name} onChange={e => setBaseForm({...baseForm, catalogue_name: e.target.value})} placeholder="e.g. Premium Silk Vol 2" /></S.FormGroup>
+                  <S.FormGroup>
+                    <label>Catalogue Name (Internal)</label>
+                    <input value={baseForm.catalogue_name} onChange={e => setBaseForm({...baseForm, catalogue_name: e.target.value})} placeholder="e.g. Premium Silk Vol 2" />
+                    <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+                      💡 Tip: Use the same Catalogue Name to &apos;connect&apos; different patterns (e.g. Weave, Grid) and show them as design options to customers.
+                    </span>
+                  </S.FormGroup>
                   <S.FormGroup><label>Serial Number (Internal)</label><input value={baseForm.serial_number} onChange={e => setBaseForm({...baseForm, serial_number: e.target.value})} placeholder="e.g. NV-504" /></S.FormGroup>
                 </S.FormGrid>
               </S.Card>
@@ -717,6 +723,9 @@ export const AdminProductEditor: React.FC<AdminProductEditorProps> = ({ editProd
                       onChange={e => setVariantForm({...variantForm, catalogue_name: e.target.value})} 
                       placeholder="e.g. Premium Silk Collection" 
                     />
+                    <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+                      💡 Tip: Use the same Catalogue Name to connect designs (e.g. Weave, Grid) across different products.
+                    </span>
                   </S.FormGroup>
                   <S.FormGroup>
                     <label>Serial Number</label>

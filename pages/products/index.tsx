@@ -53,11 +53,11 @@ const ProductPage: React.FC = () => {
         <ProductsWrapper>
           {products &&
             Children.toArray(
-              products.map(({ product_id, product_name, variants, tag }) => {
+              products.map(({ product_id, product_name, variants, tag, image_url }) => {
                 return (
                   <ProductCard
                     id={product_id}
-                    imageUrl={_.first(variants)?.image_url as string}
+                    imageUrl={(image_url || _.first(variants)?.image_url) as string}
                     name={product_name}
                     variants={variants}
                     tag={tag || "new"}

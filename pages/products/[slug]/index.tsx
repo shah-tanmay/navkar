@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
-import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock } from "react-icons/fa";
+import { FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock, FaRulerCombined, FaShareAlt } from "react-icons/fa";
 import Head from "next/head";
 import Image from "next/image";
 import { cloudinaryLoader } from "../../../utils/imageLoader";
@@ -23,7 +23,10 @@ import {
   AccordionContainer, AccordionHeader, AccordionContent, ScarcityLabel, SocialProof,
   FeatureList, FeatureListItem, SoldAsLine, ShippingPromoBadge, DeliveryTimeline,
   PincodeWrapper, FabricDetailsGrid, ReviewSection, RecommendationsContainer, RecommendationCard,
-  MobileStickyActions, CustomSizeContainer, BadgeContainer, DyeLotDisclaimer
+  ProductRecommendationCard,
+  RecommendationHeader, RecommendationBody,
+  MobileStickyActions, CustomSizeContainer, BadgeContainer, DyeLotDisclaimer,
+  HangingOptions, HangingGrid, HangingCard
 } from "../../../styles/pages/products/slug-styles";
 import { useCart } from "../../../context/CartContext";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
@@ -38,6 +41,7 @@ import { GetServerSideProps } from "next";
 
 import { toOgImage } from "../../../utils/seo";
 import { toast } from "react-toastify";
+import api from "../../../lib/axios";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.query as { slug: string };
@@ -96,10 +100,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [customLength, setCustomLength] = useState<string>("");
   const [customUnit, setCustomUnit] = useState<string>("in");
   const [customPrice, setCustomPrice] = useState<number>(0);
+  const [windowWidth, setWindowWidth] = useState<string>("");
+  const [windowUnit, setWindowUnit] = useState<string>("in");
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || "");
+  const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
+  const [hangingStyle, setHangingStyle] = useState<string>("Eyelets");
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
@@ -141,7 +148,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
   }, []);
 
   useEffect(() => {
-    setActiveImage(selectedVariant?.image_url || (productDetails as any)?.image_url || "");
+    const mainImg = selectedVariant?.image_url || (productDetails as any)?.image_url || "";
+    setActiveImage(mainImg);
   }, [selectedVariant, productDetails]);
 
   useEffect(() => {
@@ -170,6 +178,21 @@ const ProductPage: React.FC<ProductPageProps> = ({
     }
   }, [selectedVariant, customLength, customUnit, initialStitchingFee]);
 
+  const recommendedPanels = (() => {
+    if (!windowWidth) return 0;
+    const val = parseFloat(windowWidth);
+    if (isNaN(val) || val <= 0) return 0;
+    
+    let widthInInches = val;
+    if (windowUnit === "ft") widthInInches = val * 12;
+    if (windowUnit === "m") widthInInches = val * 39.3701;
+    
+    // Standard effective width after pleating (curtain fullness)
+    // American Pleats cover ~20", Eyelets cover ~22"
+    const effectiveWidth = hangingStyle === "American Pleats" ? 20 : 22; 
+    return Math.ceil(widthInInches / effectiveWidth);
+  })();
+
   // Sync state with URL if it changes (e.g. back/forward buttons)
   useEffect(() => {
     if (router.query.slug && router.query.slug !== selectedVariant?.slug) {
@@ -184,7 +207,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
     setQuantity(newQuantity);
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = async (overrideQuantity?: number) => {
     if (!selectedVariant) return;
 
     if (selectedVariant.type?.toLowerCase() === "custom") {
@@ -195,7 +218,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
     }
 
     const variantId = selectedVariant.id;
-    const variantQuantity = quantity;
+    const variantQuantity = overrideQuantity || quantity;
     const userId = (session?.user as any)?.id;
     
     let metadata = {};
@@ -223,7 +246,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
         length_ft: toFeet(customLength, customUnit).toFixed(1),
         width_in: toInches(customWidth, customUnit),
         length_in: toInches(customLength, customUnit),
-        custom_price: customPrice
+        custom_price: customPrice,
+        hanging_style: hangingStyle
+      };
+    } else {
+      metadata = {
+        hanging_style: hangingStyle
       };
     }
 
@@ -236,6 +264,25 @@ const ProductPage: React.FC<ProductPageProps> = ({
         itemSlug: selectedVariant?.slug,
       },
     });
+  };
+  
+  const [showAllColors, setShowAllColors] = useState(false);
+  
+  const handleShare = () => {
+    if (typeof window !== 'undefined') {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        toast.success("Link copied to clipboard! Share it with your friends.");
+      }).catch(() => {
+        toast.error("Failed to copy link.");
+      });
+    }
+  };
+
+  const handleApplyRecommendation = () => {
+    if (recommendedPanels <= 0) return;
+    setQuantity(recommendedPanels);
+    handleBuyNow(recommendedPanels);
   };
 
   const meta = (productDetails as any)?.metadata || {};
@@ -297,7 +344,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
             <ThumbnailGrid>
               {_.uniq([
                 selectedVariant?.image_url || (productDetails as any)?.image_url,
-                ...(((selectedVariant as any)?.metadata?.gallery_images || productDetails?.metadata?.gallery_images || []) as string[])
+                ...((selectedVariant?.metadata?.gallery_images && selectedVariant.metadata.gallery_images.length > 0)
+                  ? selectedVariant.metadata.gallery_images
+                  : (productDetails?.metadata?.gallery_images && productDetails.metadata.gallery_images.length > 0)
+                    ? productDetails.metadata.gallery_images
+                    : [])
               ].filter(Boolean)).slice(0, 4).map((img, index) => (
                 <Thumbnail
                   key={index}
@@ -319,10 +370,19 @@ const ProductPage: React.FC<ProductPageProps> = ({
           </ImageGallery>
 
           <ProductDetails>
-            <ProductTitle>{productDetails?.name} - {selectedVariant?.name}</ProductTitle>
+            <ProductTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span>{productDetails?.name} {selectedVariant?.name}</span>
+              <button 
+                onClick={handleShare}
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.25rem', padding: '10px' }}
+                title="Share Design"
+              >
+                <FaShareAlt />
+              </button>
+            </ProductTitle>
             <PriceTag>
-              ₹{selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (Number(selectedVariant?.price) + initialStitchingFee)} 
-              <span>₹{Math.floor(Number(selectedVariant?.type?.toLowerCase() === "custom" ? customPrice : (Number(selectedVariant?.price || 0) + initialStitchingFee)) * 1.3)}</span>
+              ₹{(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))} 
+              <span>₹{Math.floor(Number((selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))) * 1.3)}</span>
             </PriceTag>
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
@@ -342,7 +402,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             <BadgeContainer>
               {productDetails?.is_blackout && (
                 <ScarcityLabel $isBlackout>
-                  100% Blackout Fabric
+                  Blackout
                 </ScarcityLabel>
               )}
               {productDetails?.tag && (
@@ -352,36 +412,175 @@ const ProductPage: React.FC<ProductPageProps> = ({
               )}
             </BadgeContainer>
 
+            <HangingOptions style={{ marginTop: '0', marginBottom: '2rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#111827', marginBottom: '1rem' }}>Select Hanging Style (Pleaters)</h3>
+              <HangingGrid>
+                <HangingCard 
+                  $active={hangingStyle === "Eyelets"} 
+                  onClick={() => setHangingStyle("Eyelets")}
+                >
+                  <div className="img-wrapper">
+                    <Image 
+                      loader={cloudinaryLoader}
+                      src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776016703/static_assets/hanging_eyelets_final.png" 
+                      alt="Eyelets Style" 
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className="info">
+                    <span className="name">Eyelets</span>
+                    <span className="desc">Regular rings for easy sliding</span>
+                  </div>
+                </HangingCard>
+                <HangingCard 
+                  $active={hangingStyle === "American Pleats"} 
+                  onClick={() => setHangingStyle("American Pleats")}
+                >
+                  <div className="img-wrapper">
+                    <Image 
+                      loader={cloudinaryLoader}
+                      src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776020723/static_assets/american_pleats_v2.png" 
+                      alt="American Pleats Style" 
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className="info">
+                    <span className="name">American Pleats</span>
+                    <span className="desc">Premium tailored pleats with hooks</span>
+                  </div>
+                </HangingCard>
+              </HangingGrid>
+              <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#6b7280', fontStyle: 'italic', lineHeight: '1.4' }}>
+                * This color and design is just for illustration for hanging style. The actual product is the one you are seeing in the main image above.
+              </div>
+            </HangingOptions>
+
+             <RecommendationCard>
+              <RecommendationHeader>
+                <FaRulerCombined />
+                <h3>Perfect Fit Calculator</h3>
+              </RecommendationHeader>
+              <RecommendationBody>
+                <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #e0f2fe' }}>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#0369a1', lineHeight: '1.4' }}>
+                    <strong>Expert Tip:</strong> For perfect drapes and coverage, we&apos;ll calculate the exact panels required. You stay in control—we just handle the math for your space.
+                  </p>
+                </div>
+                <div className="input-section">
+                  <label>Enter your window or door width:</label>
+                  <div className="input-row">
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 48" 
+                      value={windowWidth}
+                      onChange={(e) => setWindowWidth(e.target.value)}
+                    />
+                    <select value={windowUnit} onChange={(e) => setWindowUnit(e.target.value)}>
+                      <option value="in">Inches</option>
+                      <option value="ft">Feet</option>
+                      <option value="m">Meters</option>
+                    </select>
+                  </div>
+                </div>
+
+                {recommendedPanels > 0 && (
+                  <div className="result-section">
+                    <div className="text">
+                      <p>For a perfect full drape look, we recommend:</p>
+                      <span className="count">{recommendedPanels} Panels</span>
+                    </div>
+                    <button onClick={handleApplyRecommendation}>
+                      Order {recommendedPanels} Panels
+                    </button>
+                  </div>
+                )}
+              </RecommendationBody>
+            </RecommendationCard>
+
             <SelectorRow>
               <ColorOptions>
                 <h3>Select Color</h3>
                 <div className="swatches">
-                  {_.uniq(
-                    _.map(variants, "color_hex_code")
-                  ).map((color: string, index: number) => (
-                    <ColorSwatch
-                      key={index}
-                      color={color}
-                      className={
-                        selectedVariant?.color_hex_code === color
-                          ? "selected"
-                          : ""
-                      }
-                      onClick={() => {
-                        let nextV = _.find(variants, v => v.color_hex_code === color && v.type === selectedVariant?.type);
-                        if (!nextV) nextV = _.find(variants, v => v.color_hex_code === color);
-                        if (nextV) {
-                          setSelectedVariant(nextV);
-                          router.push(`/products/${nextV.slug}`, undefined, { shallow: true });
+                  {_.uniqBy(variants, "color_hex_code")
+                    .slice(0, showAllColors ? undefined : 5)
+                    .map((v: any, index: number) => (
+                      <ColorSwatch
+                        key={index}
+                        color={v.color_hex_code}
+                        className={
+                          selectedVariant?.color_hex_code === v.color_hex_code
+                            ? "selected"
+                            : ""
                         }
+                        onClick={() => {
+                          // Find variant with SAME color AND SAME design name - crucial to keep user on same pattern (Fern/Grid/Weave)
+                          const currentDesignName = productDetails?.name;
+                          let nextV = _.find(variants, (next: any) => 
+                            next.color_hex_code === v.color_hex_code && 
+                            (next.product_name || next.name) === currentDesignName
+                          );
+                          
+                          // Fallback to ID matching if name matching fails
+                          if (!nextV) {
+                            nextV = _.find(variants, (next: any) => 
+                              next.color_hex_code === v.color_hex_code && 
+                              next.product_id?.toString() === (selectedVariant as any)?.product_id?.toString()
+                            );
+                          }
+
+                          // Final fallback - just grab first color match
+                          if (!nextV) nextV = _.find(variants, (next: any) => next.color_hex_code === v.color_hex_code);
+                          
+                          if (nextV) {
+                            setSelectedVariant(nextV);
+                            router.push(`/products/${nextV.slug}`, undefined, { shallow: false });
+                          }
+                        }}
+                        title={v.name}
+                      />
+                    ))}
+                  
+                  {_.uniqBy(variants, "color_hex_code").length > 5 && !showAllColors && (
+                    <button 
+                      onClick={() => setShowAllColors(true)}
+                      style={{ 
+                        background: '#fffaf5', 
+                        border: '1px solid #fae7d9', 
+                        color: '#ba8160', 
+                        fontWeight: '700', 
+                        fontSize: '0.75rem', 
+                        cursor: 'pointer', 
+                        padding: '0 1rem',
+                        borderRadius: '30px',
+                        height: '36px',
+                        alignSelf: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 2px 5px rgba(186, 129, 96, 0.05)',
+                        borderStyle: 'dashed'
                       }}
-                      title={color}
-                    />
-                  ))}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = '#ba8160';
+                        e.currentTarget.style.color = '#fff';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = '#fffaf5';
+                        e.currentTarget.style.color = '#ba8160';
+                      }}
+                    >
+                      +{_.uniqBy(variants, "color_hex_code").length - 5} more
+                    </button>
+                  )}
                 </div>
                 <DyeLotDisclaimer>* Color may vary between dye lot to dye lot</DyeLotDisclaimer>
               </ColorOptions>
             </SelectorRow>
+
+
 
             {_.uniq(_.map(variants, "type")).length > 1 && (
               <SizeOptions>
@@ -415,57 +614,67 @@ const ProductPage: React.FC<ProductPageProps> = ({
                         }
                       }}
                     >
-                      {type}
+                      {type === "Window" ? "Window (5ft Length)" : 
+                       type === "Door" ? "Door (7ft Length)" : 
+                       type === "Custom" ? "Custom Size (Made to Order)" : type}
                     </SizeButton>
                   ))}
                 </div>
+                <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                  * Width is fixed per catalogue: {(productDetails as any)?.fixed_width || 48} inches (4ft)
+                </p>
+
+                {selectedVariant?.type?.toLowerCase() === "custom" && (
+                  <CustomSizeContainer style={{ marginTop: '1rem', padding: '1.25rem' }}>
+                    <h3>Custom size measurement</h3>
+                    
+                    <div className="inputs">
+                      <div className="field">
+                        <label>Cloth Width (Standard)</label>
+                        <input 
+                          disabled
+                          value={`${customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2)} ${customUnit}`} 
+                          style={{ background: '#f3f4f6', cursor: 'not-allowed', color: '#999' }}
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label>Curtain Length / Height ({customUnit})</label>
+                        <input 
+                          type="number" 
+                          placeholder={`Enter Height`}
+                          value={customLength} 
+                          onChange={(e) => setCustomLength(e.target.value)} 
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.8rem', color: '#666', fontWeight: '500' }}>Unit:</span>
+                          <select 
+                            value={customUnit} 
+                            onChange={(e) => setCustomUnit(e.target.value)}
+                            style={{ padding: '0.4rem 0.6rem', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.8rem', outline: 'none' }}
+                          >
+                            <option value="in">Inches</option>
+                            <option value="ft">Feet</option>
+                            <option value="m">Meters</option>
+                          </select>
+                      </div>
+                    </div>
+
+                    {customPrice > 0 && customWidth && customLength && (
+                      <div style={{ marginTop: '1.25rem', padding: '1rem', background: 'linear-gradient(to right, #ffffff, #fdfdfd)', borderRadius: '12px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#4b5563', fontWeight: '500' }}>Price per panel:</span>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>₹{customPrice}</div>
+                      </div>
+                    )}
+                  </CustomSizeContainer>
+                )}
               </SizeOptions>
             )}
 
-            {selectedVariant?.type?.toLowerCase() === "custom" && (
-              <CustomSizeContainer>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', margin: 0, color: '#111827', fontWeight: '600' }}>Custom Size</h3>
-                  <select 
-                    value={customUnit} 
-                    onChange={(e) => setCustomUnit(e.target.value)}
-                    style={{ background: '#f9fafb', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.4rem 0.8rem', outline: 'none', fontSize: '0.85rem', cursor: 'pointer' }}
-                  >
-                    <option value="in">Inches (in)</option>
-                    <option value="ft">Feet (ft)</option>
-                    <option value="m">Meters (m)</option>
-                  </select>
-                </div>
-                
-                <div className="inputs">
-                  <div className="field">
-                    <label>Width (Fixed)</label>
-                    <input 
-                      disabled
-                      value={`${customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2)} ${customUnit}`} 
-                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label>Length / Height ({customUnit})</label>
-                    <input 
-                      type="number" 
-                      placeholder={`Length (${customUnit})`}
-                      value={customLength} 
-                      onChange={(e) => setCustomLength(e.target.value)} 
-                    />
-                  </div>
-                </div>
-
-                {customPrice > 0 && customWidth && customLength && (
-                  <div style={{ marginTop: '1.5rem', padding: '1.25rem', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                    <span style={{ fontSize: '0.9rem', color: '#4b5563', fontWeight: '500' }}>Estimated Price (per panel):</span>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#111827', marginTop: '0.25rem' }}>₹{customPrice}</div>
-                  </div>
-                )}
-              </CustomSizeContainer>
-            )}
 
             <QuantitySelectorContainer>
               <QuantitySelectorText>Quantity</QuantitySelectorText>
@@ -477,9 +686,47 @@ const ProductPage: React.FC<ProductPageProps> = ({
               />
             </QuantitySelectorContainer>
 
+            {/* More designs in same color Discovery */}
+            {variants && (variants as any[]).filter((v: any) => 
+              v.color_hex_code?.toLowerCase() === selectedVariant?.color_hex_code?.toLowerCase() && 
+              (v.product_name || v.name) !== productDetails?.name
+            ).length > 0 && (
+              <RecommendationsContainer>
+                <h2>
+                  <FaGift /> 
+                  More designs in same color
+                </h2>
+                <div className="grid">
+                  {_.uniqBy((variants as any[]).filter((v: any) => 
+                    v.color_hex_code?.toLowerCase() === selectedVariant?.color_hex_code?.toLowerCase() && 
+                    (v.product_name || v.name) !== productDetails?.name
+                  ), 'product_name')
+                  .slice(0, 4)
+                  .map((v: any) => (
+                    <ProductRecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
+                      <div className="img-wrapper">
+                        {v.image_url && (
+                          <Image
+                            loader={cloudinaryLoader}
+                            src={v.image_url}
+                            alt={`${v.product_name || productDetails?.name} Preview`}
+                            fill
+                            sizes="120px"
+                          />
+                        )}
+                      </div>
+                      <h3>
+                        {(v.product_name || v.name)?.replace('Navkar ', '').replace('Premium ', '')}
+                      </h3>
+                    </ProductRecommendationCard>
+                  ))}
+                </div>
+              </RecommendationsContainer>
+            )}
+
 
             <PurchaseCard $hideOnMobile>
-              <BuyNow onClick={handleBuyNow} />
+              <BuyNow onClick={() => handleBuyNow()} />
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
@@ -493,31 +740,34 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   }
                   return true;
                 }}
-                metadata={selectedVariant?.type?.toLowerCase() === "custom" ? (() => {
-                  const toFeet = (val: string, unit: string) => {
-                    const v = parseFloat(val) || 0;
-                    if (unit === "in") return v / 12;
-                    if (unit === "m") return v * 3.28084;
-                    return v;
-                  };
-                  const toInches = (val: string, unit: string) => {
-                    const v = parseFloat(val) || 0;
-                    if (unit === "ft") return v * 12;
-                    if (unit === "m") return v * 39.3701;
-                    return v;
-                  };
-                  const displayWidth = customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2);
-                  return {
-                    width: displayWidth, 
-                    length: customLength, 
-                    unit: customUnit,
-                    width_ft: toFeet(customWidth, customUnit).toFixed(1),
-                    length_ft: toFeet(customLength, customUnit).toFixed(1),
-                    width_in: toInches(customWidth, customUnit),
-                    length_in: toInches(customLength, customUnit),
-                    custom_price: customPrice 
-                  };
-                })() : undefined}
+                metadata={{
+                  ...((selectedVariant?.type?.toLowerCase() === "custom" ? (() => {
+                    const toFeet = (val: string, unit: string) => {
+                      const v = parseFloat(val) || 0;
+                      if (unit === "in") return v / 12;
+                      if (unit === "m") return v * 3.28084;
+                      return v;
+                    };
+                    const toInches = (val: string, unit: string) => {
+                      const v = parseFloat(val) || 0;
+                      if (unit === "ft") return v * 12;
+                      if (unit === "m") return v * 39.3701;
+                      return v;
+                    };
+                    const displayWidth = customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2);
+                    return {
+                      width: displayWidth, 
+                      length: customLength, 
+                      unit: customUnit,
+                      width_ft: toFeet(customWidth, customUnit).toFixed(1),
+                      length_ft: toFeet(customLength, customUnit).toFixed(1),
+                      width_in: toInches(customWidth, customUnit),
+                      length_in: toInches(customLength, customUnit),
+                      custom_price: customPrice 
+                    };
+                  })() : {}) as any),
+                  hanging_style: hangingStyle
+                }}
               />
             </PurchaseCard>
 
@@ -601,7 +851,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
             {/* Mobile Only: CTA Block after all details and description */}
             <PurchaseCard ref={bottomTriggerRef} $isSecondary>
-              <BuyNow onClick={handleBuyNow} />
+              <BuyNow onClick={() => handleBuyNow()} />
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
@@ -647,36 +897,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
         <MobileStickyActions $visible={showMobileSticky}>
-          <BuyNow onClick={handleBuyNow} />
+          <BuyNow onClick={() => handleBuyNow()} />
         </MobileStickyActions>
         
 
-        {variants && variants.length > 0 && (
-          <RecommendationsContainer>
-            <h2>You May Also Like: More Curtains</h2>
-            <div className="grid">
-              {variants.filter(v => v.id !== selectedVariant?.id).slice(0, 4).map((v) => (
-                <RecommendationCard key={v.id} onClick={() => router.push(`/products/${v.slug}`)}>
-                  <div className="img-wrapper">
-                    {v.image_url && (
-                      <Image
-                        loader={cloudinaryLoader}
-                        src={v.image_url}
-                        alt={`${v.name} Variant Preview`}
-                        fill
-                        loading="lazy"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        style={{ objectFit: "cover", transition: "transform 0.5s" }}
-                      />
-                    )}
-                  </div>
-                  <h3>{productDetails?.name}</h3>
-                  <p>{v.name} Edition • ₹{v.price}</p>
-                </RecommendationCard>
-              ))}
-            </div>
-          </RecommendationsContainer>
-        )}
+
       </ProductPageWrapper>
     </LoaderWrapper>
   );

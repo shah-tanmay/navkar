@@ -33,7 +33,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   };
 
   return (
-    <QuantityControls widthType={width}>
+    <QuantityControls $widthType={width}>
       <QuantityButton onClick={handleDecrement}>
         <FaMinus size={10} />
       </QuantityButton>

@@ -110,6 +110,7 @@ export interface ProductVariantDetails {
   description: string;
   metadata: Record<string, any>;
   name: string;
+  image_url?: string;
   variants: ProductVariant[];
   tag?: string;
   is_blackout?: boolean;

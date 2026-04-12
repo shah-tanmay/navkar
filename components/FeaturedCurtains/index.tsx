@@ -52,7 +52,7 @@ const FeaturedCurtains = ({ initialProducts }: { initialProducts?: ProductRespon
           <ProductCard
             key={product.product_id}
             id={product.product_id}
-            imageUrl={_.first(product.variants)?.image_url as string}
+            imageUrl={(product.image_url || _.first(product.variants)?.image_url) as string}
             name={product.product_name}
             variants={product.variants}
             tag={product.tag || "bestseller"}

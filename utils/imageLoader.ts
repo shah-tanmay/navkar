@@ -3,14 +3,35 @@
  * Uses a robust replacement strategy to inject transformations.
  */
 export const cloudinaryLoader = ({ src, width }: { src: string; width: number }) => {
-  if (!src || !src.includes('res.cloudinary.com')) {
+  if (!src) return "";
+  
+  if (!src.includes('res.cloudinary.com')) {
     return src;
   }
 
-  // Simple and robust: replace /upload/ with optimized path
-  // c_limit: resize only if larger than width
-  // f_auto: best format
-  // q_auto:best: higher quality automated compression
-  // dpr_auto: serve appropriate resolution for high-density (Retina) screens
-  return src.replace('/upload/', `/upload/f_auto,q_auto:best,w_${width},c_limit,dpr_auto/`);
+  const parts = src.split('/upload/');
+  if (parts.length < 2) return src;
+
+  const baseUrl = parts[0];
+  const rest = parts[1];
+  
+  const restParts = rest.split('/');
+  const publicId = restParts[restParts.length - 1];
+  const folders = restParts.slice(0, restParts.length - 1).join('/');
+
+  const transformations = [
+    'f_auto',
+    'q_auto',
+    `w_${width}`,
+    'c_limit'
+  ].join(',');
+
+  const path = folders ? `${folders}/${publicId}` : publicId;
+  
+  // Cloudinary sometimes misinterprets folder names as transformations if no version is present.
+  // We ensure a version prefix (v1) exists if there are folders.
+  const hasVersion = path.startsWith('v') && /v\d+/.test(path.split('/')[0]);
+  const versionedPath = (folders && !hasVersion) ? `v1/${path}` : path;
+
+  return `${baseUrl}/upload/${transformations}/${versionedPath}`;
 };

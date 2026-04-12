@@ -2,20 +2,20 @@ import styled from "styled-components";
 import COLORS from "../../constants/color";
 import { WidthType } from ".";
 
-export const QuantityControls = styled.div<{ widthType: WidthType }>`
+export const QuantityControls = styled.div<{ $widthType: WidthType }>`
   display: flex;
-  justify-content: ${({ widthType }) => {
-    if (widthType === "full") return "space-between";
-    if (widthType === "default") return "";
+  justify-content: ${({ $widthType }) => {
+    if ($widthType === "full") return "space-between";
+    if ($widthType === "default") return "";
   }};
   gap: 0.5rem;
   background: ${COLORS.primary};
   border-radius: 8px;
   padding: 0.5rem;
-  width: ${({ widthType }) => {
-    if (widthType === "full") return "100%";
-    if (widthType === "default") return "fit-content";
-    return widthType;
+  width: ${({ $widthType }) => {
+    if ($widthType === "full") return "100%";
+    if ($widthType === "default") return "fit-content";
+    return $widthType;
   }};
   font-family: "Outfit";
   color: #542e00;

@@ -1,5 +1,5 @@
 export const FREE_SHIPPING_THRESHOLD = 2000;
-export const logoPath = "/logo.png";
+export const logoPath = "https://res.cloudinary.com/dhxa5zutl/image/upload/v1776011447/static_assets/navkar_logo.png";
 
 export const TitleFontSize = {
   "1024": "40px",

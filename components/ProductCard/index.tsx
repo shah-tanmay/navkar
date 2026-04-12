@@ -53,10 +53,10 @@ const ProductCard = ({
       <BeastBadge>
         <BeastLabel>COLORS</BeastLabel>
         <BeastSwatches>
-          {colors.slice(0, 5).map((color) => (
+          {colors.slice(0, 3).map((color) => (
             <BeastSwatch key={color} $color={color} />
           ))}
-          {colors.length > 5 && <BeastCount>+{colors.length - 5}</BeastCount>}
+          {colors.length > 3 && <BeastCount>+{colors.length - 3}</BeastCount>}
         </BeastSwatches>
       </BeastBadge>
 
@@ -77,7 +77,11 @@ const ProductCard = ({
         <TypePantheon>
           {types.map((type, index) => (
             <React.Fragment key={type}>
-              <TypeOracle>{_.startCase(type)}</TypeOracle>
+              <TypeOracle>
+                {type === "Window" ? "Window (5ft \u00d7 4ft)" : 
+                 type === "Door" ? "Door (7ft \u00d7 4ft)" : 
+                 type === "Custom" ? "Custom Size (Made to Order)" : _.startCase(type)}
+              </TypeOracle>
               {index < types.length - 1 && <TypeDivider />}
             </React.Fragment>
           ))}
