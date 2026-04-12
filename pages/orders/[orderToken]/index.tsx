@@ -41,7 +41,12 @@ const OrderTracking: FC<OrderResponse> = () => {
         order.order_items = (order.order_items || []).map(item => {
           if (typeof item.metadata === 'string') {
             try {
-              item.metadata = JSON.parse(item.metadata);
+              let parsed = JSON.parse(item.metadata);
+              // Handle potential double stringification
+              if (typeof parsed === 'string') {
+                parsed = JSON.parse(parsed);
+              }
+              item.metadata = parsed;
             } catch (e) {
               console.error("Failed to parse item metadata", e);
             }
@@ -240,7 +245,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                               </div>
                             )}
 
-                            <div className="price-tag">₹{item.price}</div>
+                            <div className="price-tag">₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
                           </S.ProductMeta>
                         </S.ProductDetails>
                       </S.ProductCard>
