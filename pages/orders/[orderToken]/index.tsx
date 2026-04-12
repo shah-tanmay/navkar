@@ -1,7 +1,6 @@
-// index.tsx
 import { FC, useEffect, useState } from "react";
 import * as S from "../../../styles/pages/orders/token-styles";
-import { OrderResponse, TrackingStatus } from "../../../types/api";
+import { OrderResponse, TrackingStatus, OrderItem } from "../../../types/api";
 import { getOrderByOrderToken } from "../../../services/orderService";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -9,6 +8,7 @@ import { useSession } from "next-auth/react";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import OrderNotFoundPage from "../../../components/OrderNotFound";
+import { FiClock, FiMail, FiMapPin, FiPhone, FiUser, FiLayers, FiZap } from "react-icons/fi";
 
 const STATUS_FLOW = [
   "received",
@@ -19,7 +19,7 @@ const STATUS_FLOW = [
 ];
 
 const OrderTracking: FC<OrderResponse> = () => {
-  const [orderDetails, setOrderDetails] = useState<OrderResponse>();
+  const [orderDetails, setOrderDetails] = useState<any>();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { orderToken } = router.query as { orderToken: string };
@@ -37,12 +37,20 @@ const OrderTracking: FC<OrderResponse> = () => {
         return;
       }
       if (order) {
-        // Robust Metadata Parsing to handle JSON returned as string
-        order.order_items = (order.order_items || []).map(item => {
+        // Parse Order Metadata
+        if (typeof order.metadata === 'string') {
+          try {
+            order.metadata = JSON.parse(order.metadata);
+          } catch (e) {
+            console.error("Failed to parse order metadata", e);
+          }
+        }
+
+        // Robust Metadata Parsing to handle JSON returned as string for items
+        order.order_items = (order.order_items || []).map((item: any) => {
           if (typeof item.metadata === 'string') {
             try {
               let parsed = JSON.parse(item.metadata);
-              // Handle potential double stringification
               if (typeof parsed === 'string') {
                 parsed = JSON.parse(parsed);
               }
@@ -56,7 +64,7 @@ const OrderTracking: FC<OrderResponse> = () => {
 
         order.order_tracking_statuses = _.orderBy(
           order?.order_tracking_statuses,
-          (order) => STATUS_FLOW.indexOf(order.status)
+          (o) => STATUS_FLOW.indexOf(o.status)
         );
         order.order_tracking_statuses = _.map(
           order?.order_tracking_statuses,
@@ -73,7 +81,7 @@ const OrderTracking: FC<OrderResponse> = () => {
       setLoading(false);
     };
     fetchOrder();
-  }, [router]);
+  }, [orderToken]);
 
   const getDaySuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
@@ -95,12 +103,12 @@ const OrderTracking: FC<OrderResponse> = () => {
     if (isNaN(date.getTime())) return "Pending";
 
     const istOffset = 5.5 * 60 * 60 * 1000;
-    const istDate = new Date(date.getTime() + istOffset);
+    const istDate = new Date(date.getTime()); // Standard date conversion
 
-    // Format options
     const options: Intl.DateTimeFormatOptions = {
       day: "numeric",
       month: "long",
+      year: "numeric",
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
@@ -110,7 +118,7 @@ const OrderTracking: FC<OrderResponse> = () => {
     const formatter = new Intl.DateTimeFormat("en-IN", options);
     const formatted = formatter.format(istDate);
 
-    const day = istDate.getUTCDate();
+    const day = istDate.getDate();
     const suffix = getDaySuffix(day);
 
     return formatted.replace(day.toString(), `${day}${suffix}`);
@@ -119,7 +127,7 @@ const OrderTracking: FC<OrderResponse> = () => {
   const getFullTrackingStatus = () => {
     return STATUS_FLOW.map((statusTitle) => {
       const backendStatus = orderDetails?.order_tracking_statuses.find(
-        (s) => s.status === statusTitle
+        (s: any) => s.status === statusTitle
       );
       return (
         backendStatus || {
@@ -134,6 +142,11 @@ const OrderTracking: FC<OrderResponse> = () => {
 
   const fullStatus = getFullTrackingStatus();
   const currentStatusIndex = fullStatus.findIndex((s) => !s.isCompleted);
+
+  const contactInfo = orderDetails?.metadata?.contact || {};
+  const customerName = contactInfo.firstName ? `${contactInfo.firstName} ${contactInfo.lastName}` : session?.user?.name || "Customer";
+  const customerEmail = contactInfo.email || session?.user?.email || "---";
+  const customerPhone = contactInfo.phoneNumber || "---";
 
   return (
     <LoaderWrapper loading={loading}>
@@ -158,27 +171,59 @@ const OrderTracking: FC<OrderResponse> = () => {
             {orderDetails && (
               <S.OrderCard>
                 <S.OrderHeader>
-                  <S.OrderNumber>
-                    Order #{orderDetails?.order_token}
-                    {orderDetails?.coupon_code && (
-                      <span style={{ fontSize: '0.85rem', color: '#2e7d32', marginLeft: '12px', fontWeight: '500' }}>
-                        (Coupon: {orderDetails.coupon_code})
-                      </span>
-                    )}
-                  </S.OrderNumber>
-                  <S.CustomerName>{session?.user?.name}</S.CustomerName>
-                  <S.DeliveryAddress>
-                    {orderDetails.shipping_address ? (
-                      <>
-                        {orderDetails.shipping_address.street},{" "}
-                        {orderDetails.shipping_address.city},{" "}
-                        {orderDetails.shipping_address.state} -{" "}
-                        {orderDetails.shipping_address.postal_code}
-                      </>
-                    ) : (
-                      "Address Details"
-                    )}
-                  </S.DeliveryAddress>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <S.OrderNumber>
+                        Order #{orderDetails?.order_token}
+                        {orderDetails?.coupon_code && (
+                          <span style={{ fontSize: '0.9rem', background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '20px', marginLeft: '12px', fontWeight: '500' }}>
+                            {orderDetails.coupon_code}
+                          </span>
+                        )}
+                      </S.OrderNumber>
+                      <S.DeliveryAddress>
+                        {orderDetails.shipping_address ? (
+                          <>
+                            <FiMapPin style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                            {orderDetails.shipping_address.street},{" "}
+                            {orderDetails.shipping_address.city},{" "}
+                            {orderDetails.shipping_address.state} -{" "}
+                            {orderDetails.shipping_address.postal_code}
+                          </>
+                        ) : (
+                          "Shipping Address Pending"
+                        )}
+                      </S.DeliveryAddress>
+                    </div>
+
+                    <S.InfoBlock style={{ textAlign: 'right', alignItems: 'flex-end' }}>
+                       <span className="label">Total Amount</span>
+                       <div className="value" style={{ fontSize: '1.8rem', fontWeight: '800' }}>
+                         ₹{parseFloat(orderDetails.total_amount).toLocaleString('en-IN')}
+                       </div>
+                    </S.InfoBlock>
+                  </div>
+
+                  <S.InfoGrid>
+                    <S.InfoBlock>
+                      <span className="label">Customer Details</span>
+                      <div className="value"><FiUser /> {customerName}</div>
+                      <div className="value" style={{ fontSize: '0.9rem', opacity: 0.9 }}><FiMail /> {customerEmail}</div>
+                      <div className="value" style={{ fontSize: '0.9rem', opacity: 0.9 }}><FiPhone /> {customerPhone}</div>
+                    </S.InfoBlock>
+
+                    <S.InfoBlock>
+                      <span className="label">Order Placement Time</span>
+                      <div className="value"><FiClock /> {formatToIST(orderDetails.created_at)}</div>
+                      <div className="value" style={{ fontSize: '0.9rem', opacity: 0.9 }}>Timezone: India (IST)</div>
+                    </S.InfoBlock>
+
+                    <S.InfoBlock>
+                      <span className="label">Shipping Method</span>
+                      <div className="value">Standard Delivery</div>
+                      <div className="value" style={{ fontSize: '0.9rem', opacity: 0.9 }}>Estimated 5-7 business days</div>
+                    </S.InfoBlock>
+                  </S.InfoGrid>
                 </S.OrderHeader>
 
                 <S.OrderSection>
@@ -215,7 +260,7 @@ const OrderTracking: FC<OrderResponse> = () => {
                 <S.OrderSection>
                   <S.SectionTitle>Ordered Products</S.SectionTitle>
                   <S.ItemsGrid>
-                    {orderDetails?.order_items.map((item) => (
+                    {orderDetails?.order_items.map((item: any) => (
                       <S.ProductCard
                         key={item.id}
                         onClick={() => router.push(`/products/${item.slug}`)}
@@ -227,30 +272,70 @@ const OrderTracking: FC<OrderResponse> = () => {
                           </S.ProductName>
                           <S.ProductMeta>
                             <div className="meta-row">
-                              <span>Qty: <b>{item.quantity}</b></span>
+                              <span>Quantity: <b>{item.quantity}</b></span>
                               <span>{_.capitalize(item.type)} Curtain</span>
                             </div>
                             
-                            {item.metadata?.hangingStyle && (
+                            {(item.metadata?.hangingStyle || item.metadata?.hanging_style) && (
                               <div className="meta-row">
-                                <span>Hanging Type:</span>
-                                <b>{item.metadata.hangingStyle}</b>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <FiLayers size={14} /> Hanging Type:
+                                </span>
+                                <b>{item.metadata.hangingStyle || item.metadata.hanging_style}</b>
                               </div>
                             )}
 
                             {(item.metadata?.width_ft || item.metadata?.length_ft) && (
                               <div className="meta-row" style={{ color: '#ba8160' }}>
-                                <span>Dimensions:</span>
+                                <span>Dimensions (W×L):</span>
                                 <b>{item.metadata.width_ft} × {item.metadata.length_ft} ft</b>
                               </div>
                             )}
 
-                            <div className="price-tag">₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
+                            <S.PriceRow>
+                              <div className="unit-price">
+                                <span>Price per panel</span>
+                                <b>₹{parseFloat(item.price).toLocaleString('en-IN')}</b>
+                              </div>
+                              <div className="total-price">
+                                <span>Item Total</span>
+                                <b>₹{(item.price * item.quantity).toLocaleString('en-IN')}</b>
+                              </div>
+                            </S.PriceRow>
                           </S.ProductMeta>
                         </S.ProductDetails>
                       </S.ProductCard>
                     ))}
                   </S.ItemsGrid>
+
+                  <S.SummarySection>
+                    <div className="summary-row">
+                      <span className="label">Subtotal</span>
+                      <span className="value">₹{parseFloat(orderDetails.metadata?.subtotal || orderDetails.total_amount).toLocaleString('en-IN')}</span>
+                    </div>
+
+                    {orderDetails.coupon_code && (
+                      <div className="summary-row discount">
+                        <span className="label">
+                          <FiZap style={{ color: '#16a34a' }} /> 
+                          Coupon Applied ({orderDetails.coupon_code})
+                        </span>
+                        <span className="value">-₹{parseFloat(orderDetails.metadata?.discount || 0).toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
+
+                    <div className="summary-row">
+                      <span className="label">Shipping Fee</span>
+                      <span className={`value ${!orderDetails.metadata?.shipping_fee || parseFloat(orderDetails.metadata.shipping_fee) === 0 ? 'free' : ''}`}>
+                        {!orderDetails.metadata?.shipping_fee || parseFloat(orderDetails.metadata.shipping_fee) === 0 ? 'FREE' : `₹${parseFloat(orderDetails.metadata.shipping_fee).toLocaleString('en-IN')}`}
+                      </span>
+                    </div>
+
+                    <div className="summary-row total">
+                      <span className="label">Grand Total</span>
+                      <span className="value">₹{parseFloat(orderDetails.total_amount).toLocaleString('en-IN')}</span>
+                    </div>
+                  </S.SummarySection>
                 </S.OrderSection>
               </S.OrderCard>
             )}
