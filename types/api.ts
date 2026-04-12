@@ -149,6 +149,7 @@ export interface OrderItem {
   product_id: string;
   slug: string;
   metadata?: any;
+  catalogue_name?: string;
 }
 
 export interface TrackingStatus {
@@ -168,6 +169,7 @@ export interface OrderResponse {
   shipping_address?: Address;
   shipping_address_id?: string;
   metadata?: any;
+  coupon_code?: string;
 }
 
 export type StateOption = { value: string; label: string };

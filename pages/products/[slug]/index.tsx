@@ -4,8 +4,13 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { AddToCart } from "../../../components/AddToCartButton";
 import { getProductVariantDetails } from "../../../services/productService";
+import { 
+  FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, 
+  FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock, 
+  FaRulerCombined, FaShareAlt 
+} from "react-icons/fa";
+import Head from "next/head";
 import Image from "next/image";
-import { FaShareAlt, FaChevronDown, FaTruck } from "react-icons/fa";
 import { cloudinaryLoader } from "../../../utils/imageLoader";
 import {
   CartItems,
