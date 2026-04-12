@@ -143,6 +143,11 @@ const OrderTracking: FC<OrderResponse> = () => {
                 <S.OrderHeader>
                   <S.OrderNumber>
                     Order #{orderDetails?.order_token}
+                    {orderDetails?.coupon_code && (
+                      <span style={{ fontSize: '0.85rem', color: '#2e7d32', marginLeft: '12px', fontWeight: '500' }}>
+                        (Coupon: {orderDetails.coupon_code})
+                      </span>
+                    )}
                   </S.OrderNumber>
                   <S.CustomerName>{session?.user?.name}</S.CustomerName>
                   <S.DeliveryAddress>
@@ -205,8 +210,14 @@ const OrderTracking: FC<OrderResponse> = () => {
                           </S.ProductName>
                           <S.ProductMeta>
                             <span>Qty: {item.quantity}</span>
-                            <span>Type: {_.capitalize(item.type)}</span>
-                            <span>₹{item.price}</span>
+                            <span>{_.capitalize(item.type)} {item.catalogue_name ? `(${item.catalogue_name})` : ''}</span>
+                            {item.metadata?.hangingStyle && <span>Hanging: {item.metadata.hangingStyle}</span>}
+                            {(item.metadata?.width_ft || item.metadata?.length_ft) && (
+                              <span style={{ color: '#ba8160', fontWeight: '600' }}>
+                                Dim: {item.metadata.width_ft}x{item.metadata.length_ft} ft
+                              </span>
+                            )}
+                            <span style={{ fontWeight: '600', color: '#111827' }}>₹{item.price}</span>
                           </S.ProductMeta>
                         </S.ProductDetails>
                       </S.ProductCard>

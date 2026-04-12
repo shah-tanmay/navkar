@@ -43,6 +43,7 @@ const AdminOrdersComprehensive: NextPage = () => {
       toast.success("Order deleted");
       fetchOrders();
     } catch (e) {
+      console.log('Order deletion admin error', e);
       toast.error("Failed to delete order");
     }
   };
