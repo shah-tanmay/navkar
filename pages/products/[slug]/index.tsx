@@ -184,7 +184,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
     if (h && h !== customLength) setCustomLength(h as string);
     if (w && w !== customWidth) setCustomWidth(w as string);
     if (u && u !== customUnit) setCustomUnit(u as string);
-    if (hs && hs !== hangingStyle) setHangingStyle(hs as string);
+    if (hs && hs !== hangingStyle) {
+      setHangingStyle(hs as string);
+    }
 
     // If type is provided but no slug is matched yet, or we want to refine by type
     if (type && !slug) {
@@ -320,10 +322,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
     setQuantity(newQuantity);
   };
 
-  const handleBuyNow = async (overrideQuantity?: number) => {
+  const handleBuyNow = async (overrideQuantity?: number, overrideHangingStyle?: string) => {
     if (!selectedVariant) return;
 
-    if (!hangingStyle) {
+    const currentStyle = overrideHangingStyle || hangingStyle;
+
+    if (!currentStyle) {
       setIsStyleModalOpen(true);
       return;
     }
@@ -368,12 +372,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
         width_in: toInches(customWidth, customUnit),
         length_in: toInches(customLength, customUnit),
         custom_price: customPrice,
-        hanging_style: hangingStyle,
+        hanging_style: currentStyle,
         total_price: getCurrentPrice()
       };
     } else {
       metadata = {
-        hanging_style: hangingStyle,
+        hanging_style: currentStyle,
         total_price: getCurrentPrice()
       };
     }
@@ -1213,7 +1217,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 onClick={() => {
                   setHangingStyle("Eyelets");
                   setIsStyleModalOpen(false);
-                  setTimeout(() => handleBuyNow(), 100);
+                  handleBuyNow(undefined, "Eyelets");
                 }}
               >
                 <div className="img-wrapper">
@@ -1236,7 +1240,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 onClick={() => {
                   setHangingStyle("American Pleats");
                   setIsStyleModalOpen(false);
-                  setTimeout(() => handleBuyNow(), 100);
+                  handleBuyNow(undefined, "American Pleats");
                 }}
               >
                 <div className="img-wrapper">
