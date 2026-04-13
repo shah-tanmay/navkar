@@ -408,6 +408,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`}
                   fill
                   priority
+                  quality={75}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 650px"
                   style={{ objectFit: "cover", borderRadius: "12px" }}
                 />
@@ -457,6 +458,26 @@ const ProductPage: React.FC<ProductPageProps> = ({
               ₹{(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))} 
               <span>₹{Math.floor(Number((selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))) * 1.3)}</span>
             </PriceTag>
+
+            {productDetails?.is_discontinued && (
+              <div style={{ 
+                background: '#fff1f2', 
+                border: '1px solid #fecaca', 
+                color: '#b91c1c', 
+                padding: '12px 16px', 
+                borderRadius: '8px', 
+                marginTop: '1rem',
+                marginBottom: '1rem',
+                fontSize: '0.9rem',
+                lineHeight: '1.5',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                <span style={{ fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.8rem' }}>Status: Discontinued</span>
+                <span>This model is no longer available. <a href="/" style={{ fontWeight: '600', textDecoration: 'underline' }}>Explore our current collection →</a></span>
+              </div>
+            )}
 
             {isMobile && (
               <div 
@@ -530,6 +551,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                       src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776016703/static_assets/hanging_eyelets_final.png" 
                       alt="Eyelets Style" 
                       fill
+                      quality={75}
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
@@ -548,6 +570,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                       src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776020723/static_assets/american_pleats_v2.png" 
                       alt="American Pleats Style" 
                       fill
+                      quality={75}
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
@@ -842,7 +865,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             )}
 
 
-            <PurchaseCard $hideOnMobile>
+            <PurchaseCard $hideOnMobile style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
               <BuyNow onClick={() => handleBuyNow()} />
               <AddToCart
                 cartId={cartItem?.cart_id}
@@ -967,7 +990,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             </AccordionContainer>
 
             {/* Mobile Only: CTA Block after all details and description */}
-            <PurchaseCard ref={bottomTriggerRef} $isSecondary>
+            <PurchaseCard ref={bottomTriggerRef} $isSecondary style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none', background: '#f9fafb' } : {}}>
               <BuyNow onClick={() => handleBuyNow()} />
               <AddToCart
                 cartId={cartItem?.cart_id}
@@ -1013,9 +1036,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
         </HeroSection>
 
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
-        <MobileStickyActions $visible={showMobileSticky}>
-          <BuyNow onClick={() => handleBuyNow()} />
-        </MobileStickyActions>
+        {!productDetails?.is_discontinued && (
+          <MobileStickyActions $visible={showMobileSticky}>
+            <BuyNow onClick={() => handleBuyNow()} />
+          </MobileStickyActions>
+        )}
         
 
 

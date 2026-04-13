@@ -2,7 +2,7 @@
  * Optimized Cloudinary Loader for Next.js Image
  * Uses a robust replacement strategy to inject transformations.
  */
-export const cloudinaryLoader = ({ src, width }: { src: string; width: number }) => {
+export const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
   if (!src) return "";
   
   if (!src.includes('res.cloudinary.com')) {
@@ -19,9 +19,20 @@ export const cloudinaryLoader = ({ src, width }: { src: string; width: number })
   const publicId = restParts[restParts.length - 1];
   const folders = restParts.slice(0, restParts.length - 1).join('/');
 
+  let qualityString = 'q_auto';
+  if (quality) {
+    if (quality <= 50) {
+      qualityString = 'q_auto:low';
+    } else if (quality <= 75) {
+      qualityString = 'q_auto:eco';
+    } else {
+      qualityString = `q_${quality}`;
+    }
+  }
+
   const transformations = [
     'f_auto',
-    'q_auto',
+    qualityString,
     `w_${width}`,
     'c_limit'
   ].join(',');
