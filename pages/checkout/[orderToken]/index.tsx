@@ -216,7 +216,7 @@ const CheckoutPage = () => {
       }
     };
     fetchConfigs();
-  }, []);
+  }, [api]);
 
   const subtotal = orderMetadata.subtotal || calculateTotal();
   const shippingFee = orderMetadata.shipping_fee !== undefined ? orderMetadata.shipping_fee : (subtotal < threshold && subtotal > 0 ? flatFee : 0);

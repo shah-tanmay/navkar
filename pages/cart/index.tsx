@@ -40,7 +40,7 @@ const CartPage = () => {
       }
     };
     fetchConfigs();
-  }, []);
+  }, [api]);
 
   const subtotal = _.reduce(cartItems, (sum, item) => sum + item.price * item.quantity, 0);
   const shippingFee = (subtotal < threshold && subtotal > 0) ? flatFee : 0;
