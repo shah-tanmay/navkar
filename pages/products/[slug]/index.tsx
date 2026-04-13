@@ -95,7 +95,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   initialStitchingFee,
 }) => {
   const router = useRouter();
-  const { cartItems, addToCart, updateQuantity } = useCart();
+  const { cartItems, addToCart, updateQuantity: updateCartQuantity } = useCart();
   const { data: session, status } = useSession();
   const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
@@ -453,7 +453,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
     );
 
     if (existingCartItem && cartItem?.cart_id) {
-      updateQuantity(cartItem.cart_id, existingCartItem.quantity + quantity);
+      updateCartQuantity(cartItem.cart_id, existingCartItem.quantity + quantity);
     } else {
       addToCart(selectedVariant.id, quantity, metadata);
     }
