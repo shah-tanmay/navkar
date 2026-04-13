@@ -28,8 +28,7 @@ const Gallery = () => {
       <GalleryImageDiv>
         {width > 425 && (
           <GalleryStaticImage
-            loader={cloudinaryLoader}
-            src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1775816222/navkar_assets/gallery-4.jpg"
+            src="/images/gallery-4.jpg"
             alt="Styled Interior Space"
             width={404}
             height={582}
