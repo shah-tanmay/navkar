@@ -11,8 +11,9 @@ export function toOgImage(url: string, title?: string): string {
 
   // Remove the version segment (e.g., v1741544256/) if present to keep URL clean
   const cleanPublicId = publicIdWithVersion.replace(/^v\d+\//, "");
-  // We keep the rest as it might contain folders and the public ID (which can both have underscores)
-  const trulyCleanPublicId = cleanPublicId;
+  // We MUST use a version marker (like v1) if the public ID contains folders,
+  // otherwise Cloudinary might misinterpret folders as transformations.
+  const trulyCleanPublicId = `v1/${cleanPublicId}`;
 
   const headline = title
     ? encodeURIComponent(title)
