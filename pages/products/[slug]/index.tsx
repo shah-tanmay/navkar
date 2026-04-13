@@ -1281,6 +1281,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
           isOpen={isStyleModalOpen} 
           onClose={() => setIsStyleModalOpen(false)}
           title="Choose Your Hanging Style"
+          hideFooter={true}
         >
           <div style={{ padding: '0.5rem 0' }}>
             <p style={{ fontSize: '0.95rem', color: '#4b5563', marginBottom: '1.5rem', textAlign: 'center' }}>

@@ -13,6 +13,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
+  hideFooter?: boolean;
 }
 
 export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
@@ -35,11 +36,13 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
 
         <div className="modal-body">{children}</div>
 
-        <ModalFooter>
-          <button className="close-btn" onClick={onClose}>
-            Close
-          </button>
-        </ModalFooter>
+        {!hideFooter && (
+          <ModalFooter>
+            <button className="close-btn" onClick={onClose}>
+              Close
+            </button>
+          </ModalFooter>
+        )}
       </ModalContainer>
     </ReactModal>
   );
