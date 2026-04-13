@@ -235,6 +235,20 @@ const ProductPage: React.FC<ProductPageProps> = ({
     }
   }, [quantity, customLength, customWidth, customUnit, hangingStyle, selectedVariant?.type]);
 
+  // Meta Pixel Tracking (ViewContent)
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).fbq && selectedVariant) {
+      (window as any).fbq("track", "ViewContent", {
+        content_name: selectedVariant.product_name || (productDetails as any)?.product_name,
+        content_category: selectedVariant.type,
+        content_ids: [selectedVariant.id],
+        content_type: 'product',
+        value: getCurrentPrice(),
+        currency: 'INR'
+      });
+    }
+  }, [selectedVariant?.id]);
+
   useEffect(() => {
     const checkVisibility = () => {
       if (!bottomTriggerRef.current) return;
