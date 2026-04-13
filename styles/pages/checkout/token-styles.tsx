@@ -43,8 +43,8 @@ export const MainContainer = styled.div`
   gap: 3rem;
 
   @media (max-width: 1200px) {
-    flex-direction: column;
-    gap: 2rem;
+    flex-direction: column-reverse;
+    gap: 1.5rem;
   }
 `;
 
@@ -69,11 +69,16 @@ export const OrderSummary = styled.div`
 
   @media (max-width: 1200px) {
     max-width: 100%;
-    position: static;
-    margin-top: 1rem;
-    padding: 1.5rem;
-    width: 100%;
-    overflow: hidden; /* Prevent any internal content from pushing the card width */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-top: 0;
+    padding: 1rem 1.5rem;
+    width: calc(100% + 1.5rem);
+    margin-left: -0.75rem;
+    border-radius: 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   }
 `;
 
@@ -547,5 +552,41 @@ export const AppliedCoupon = styled.div`
     &:hover {
       text-decoration: underline;
     }
+  }
+`;
+
+export const SummaryToggle = styled.div`
+  display: none;
+  @media (max-width: 1200px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+    
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: ${accent};
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .right {
+      font-weight: 700;
+      color: ${primary};
+      font-size: 1.1rem;
+    }
+  }
+`;
+
+export const CollapsibleContent = styled.div<{ $expanded: boolean }>`
+  @media (max-width: 1200px) {
+    max-height: ${props => props.$expanded ? "2000px" : "0"};
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: ${props => props.$expanded ? "1" : "0"};
+    margin-top: ${props => props.$expanded ? "1.5rem" : "0"};
   }
 `;

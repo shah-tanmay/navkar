@@ -24,6 +24,7 @@ import { useReservations } from "../../../lib/useReservations";
 import { event as gaEvent } from "nextjs-google-analytics";
 import { validateCoupon } from "../../../services/couponService";
 import { toast } from "react-toastify";
+import { FaChevronDown, FaChevronUp, FaShoppingCart } from "react-icons/fa";
 
 
 const CheckoutPage = () => {
@@ -47,6 +48,7 @@ const CheckoutPage = () => {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [orderMetadata, setOrderMetadata] = useState<any>({});
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
 
 
   const { isActive, releaseReservations } = useReservations({
@@ -330,102 +332,113 @@ const CheckoutPage = () => {
               </FormProvider>
 
               <S.OrderSummary>
-                <S.SummaryHeader>
-                  <h3>Order Summary</h3>
-                  <S.EditCartLink
-                    onClick={() => {
-                      const pathname = itemSlug
-                        ? `/products/${itemSlug}`
-                        : "/cart";
-                      router.push(pathname);
-                    }}
-                  >
-                    {itemSlug ? "Back to Product" : "Edit Cart"}
-                  </S.EditCartLink>
-                </S.SummaryHeader>
+                <S.SummaryToggle onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}>
+                  <div className="left">
+                    <FaShoppingCart />
+                    <span>{isSummaryExpanded ? "Hide Summary" : "Show Summary"}</span>
+                    {isSummaryExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                  </div>
+                  <div className="right">₹{finalTotal}</div>
+                </S.SummaryToggle>
 
-                <S.ProductItem>
-                  {orderItems.map((item) => (
-                    <S.ProductItemsWrapper
-                      key={item.product_variant_id}
-                      onClick={() => router.push(`/products/${item.slug}`)}
+                <S.CollapsibleContent $expanded={isSummaryExpanded}>
+                  <S.SummaryHeader>
+                    <h3>Order Summary</h3>
+                    <S.EditCartLink
+                      onClick={() => {
+                        const pathname = itemSlug
+                          ? `/products/${itemSlug}`
+                          : "/cart";
+                        router.push(pathname);
+                      }}
                     >
-                      <S.ProductImage src={item.image_url} alt={item.name} />
-                      <S.ProductDetails>
-                        <h4>{item.product_name}</h4>
-                        <p>Color: {item.color}</p>
-                        <p>Size: {item.type}</p>
-                        {item.type?.toLowerCase() === "custom" && item.metadata && (
-                          <p style={{ color: '#D4AF37', fontWeight: '500' }}>
-                            {item.metadata.width} {item.metadata.unit} × {item.metadata.length} {item.metadata.unit}
-                          </p>
-                        )}
-                        {item.metadata?.hanging_style && (
-                          <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                             Style: <span style={{ color: '#111827', fontWeight: '500' }}>{item.metadata.hanging_style}</span>
-                          </p>
-                        )}
-                        <p>Quantity: {item.quantity}</p>
-                      </S.ProductDetails>
-                      <S.Price>₹{item.price * item.quantity}</S.Price>
-                    </S.ProductItemsWrapper>
-                  ))}
-                </S.ProductItem>
+                      {itemSlug ? "Back to Product" : "Edit Cart"}
+                    </S.EditCartLink>
+                  </S.SummaryHeader>
 
-              <S.CouponSection>
-                <h4>Have a coupon?</h4>
-                {orderMetadata.coupon_code ? (
-                  <S.AppliedCoupon>
-                    <div>
-                      <span className="code">{orderMetadata.coupon_code}</span>
-                      <span className="label">Coupon Applied</span>
-                    </div>
-                    <button onClick={handleRemoveCoupon} disabled={isApplyingCoupon}>Remove</button>
-                  </S.AppliedCoupon>
-                ) : (
-                  <>
-                    <S.CouponInputWrapper>
-                      <S.CouponInput 
-                        placeholder="ENTER CODE" 
-                        value={couponCode}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value)}
-                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleApplyCoupon()}
-                      />
-                      <S.ApplyButton 
-                        onClick={handleApplyCoupon} 
-                        disabled={isApplyingCoupon || !couponCode}
+                  <S.ProductItem>
+                    {orderItems.map((item) => (
+                      <S.ProductItemsWrapper
+                        key={item.product_variant_id}
+                        onClick={() => router.push(`/products/${item.slug}`)}
                       >
-                        {isApplyingCoupon ? "..." : "APPLY"}
-                      </S.ApplyButton>
-                    </S.CouponInputWrapper>
-                    {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
-                  </>
-                )}
-              </S.CouponSection>
+                        <S.ProductImage src={item.image_url} alt={item.name} />
+                        <S.ProductDetails>
+                          <h4>{item.product_name}</h4>
+                          <p>Color: {item.color}</p>
+                          <p>Size: {item.type}</p>
+                          {item.type?.toLowerCase() === "custom" && item.metadata && (
+                            <p style={{ color: '#D4AF37', fontWeight: '500' }}>
+                              {item.metadata.width} {item.metadata.unit} × {item.metadata.length} {item.metadata.unit}
+                            </p>
+                          )}
+                          {item.metadata?.hanging_style && (
+                            <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                               Style: <span style={{ color: '#111827', fontWeight: '500' }}>{item.metadata.hanging_style}</span>
+                            </p>
+                          )}
+                          <p>Quantity: {item.quantity}</p>
+                        </S.ProductDetails>
+                        <S.Price>₹{item.price * item.quantity}</S.Price>
+                      </S.ProductItemsWrapper>
+                    ))}
+                  </S.ProductItem>
 
-                <S.PriceBreakdown>
-                  <S.PriceRow>
-                    <span>Subtotal</span>
-                    <span>₹{subtotal}</span>
-                  </S.PriceRow>
-                  
-                  {discount > 0 && (
+                  <S.CouponSection>
+                    <h4>Have a coupon?</h4>
+                    {orderMetadata.coupon_code ? (
+                      <S.AppliedCoupon>
+                        <div>
+                          <span className="code">{orderMetadata.coupon_code}</span>
+                          <span className="label">Coupon Applied</span>
+                        </div>
+                        <button onClick={handleRemoveCoupon} disabled={isApplyingCoupon}>Remove</button>
+                      </S.AppliedCoupon>
+                    ) : (
+                      <>
+                        <S.CouponInputWrapper>
+                          <S.CouponInput 
+                            placeholder="ENTER CODE" 
+                            value={couponCode}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value)}
+                            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleApplyCoupon()}
+                          />
+                          <S.ApplyButton 
+                            onClick={handleApplyCoupon} 
+                            disabled={isApplyingCoupon || !couponCode}
+                          >
+                            {isApplyingCoupon ? "..." : "APPLY"}
+                          </S.ApplyButton>
+                        </S.CouponInputWrapper>
+                        {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
+                      </>
+                    )}
+                  </S.CouponSection>
+
+                  <S.PriceBreakdown>
                     <S.PriceRow>
-                      <span style={{ color: "#2e7d32" }}>Discount ({orderMetadata.coupon_code})</span>
-                      <span style={{ color: "#2e7d32" }}>-₹{discount}</span>
+                      <span>Subtotal</span>
+                      <span>₹{subtotal}</span>
                     </S.PriceRow>
-                  )}
+                    
+                    {discount > 0 && (
+                      <S.PriceRow>
+                        <span style={{ color: "#2e7d32" }}>Discount ({orderMetadata.coupon_code})</span>
+                        <span style={{ color: "#2e7d32" }}>-₹{discount}</span>
+                      </S.PriceRow>
+                    )}
 
-                  <S.PriceRow>
-                    <span>Shipping</span>
-                    <span>{shippingFee > 0 ? `₹${shippingFee}` : "FREE"}</span>
-                  </S.PriceRow>
-                  
-                  <S.TotalPrice>
-                    <span>Total</span>
-                    <span>₹{finalTotal}</span>
-                  </S.TotalPrice>
-                </S.PriceBreakdown>
+                    <S.PriceRow>
+                      <span>Shipping</span>
+                      <span>{shippingFee > 0 ? `₹${shippingFee}` : "FREE"}</span>
+                    </S.PriceRow>
+                    
+                    <S.TotalPrice>
+                      <span>Total</span>
+                      <span>₹{finalTotal}</span>
+                    </S.TotalPrice>
+                  </S.PriceBreakdown>
+                </S.CollapsibleContent>
               </S.OrderSummary>
             </S.MainContainer>
           </S.CheckoutContainer>

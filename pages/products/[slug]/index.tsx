@@ -975,6 +975,19 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
             <PurchaseCard $hideOnMobile style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
               <BuyNow onClick={() => handleBuyNow()} />
+              {getCurrentPrice() > 0 ? (
+                <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
+                  Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
+                    ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', margin: '0.5rem 0' }}>
+                   <div style={{ fontSize: '1.0rem', fontWeight: '700', color: '#111827' }}>Starting from ₹{getWindowPrice().toLocaleString('en-IN')}</div>
+                   <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Price depends on height</div>
+                </div>
+              )}
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
@@ -1100,12 +1113,19 @@ const ProductPage: React.FC<ProductPageProps> = ({
             {/* Mobile Only: CTA Block after all details and description */}
             <PurchaseCard ref={bottomTriggerRef} $isSecondary style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none', background: '#f9fafb' } : {}}>
               <BuyNow onClick={() => handleBuyNow()} />
-              <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
-                Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
-                <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
-                  ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
-                </span>
-              </div>
+              {getCurrentPrice() > 0 ? (
+                <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
+                  Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
+                    ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', margin: '0.5rem 0' }}>
+                   <div style={{ fontSize: '1.0rem', fontWeight: '700', color: '#111827' }}>Starting from ₹{getWindowPrice().toLocaleString('en-IN')}</div>
+                   <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>Price depends on height</div>
+                </div>
+              )}
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
