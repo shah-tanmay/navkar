@@ -1214,11 +1214,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             <HangingGrid style={{ marginBottom: '1.5rem' }}>
               <HangingCard 
                 $active={hangingStyle === "Eyelets"} 
-                onClick={() => {
-                  setHangingStyle("Eyelets");
-                  setIsStyleModalOpen(false);
-                  handleBuyNow(undefined, "Eyelets");
-                }}
+                onClick={() => setHangingStyle("Eyelets")}
               >
                 <div className="img-wrapper">
                   <Image 
@@ -1237,11 +1233,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </HangingCard>
               <HangingCard 
                 $active={hangingStyle === "American Pleats"} 
-                onClick={() => {
-                  setHangingStyle("American Pleats");
-                  setIsStyleModalOpen(false);
-                  handleBuyNow(undefined, "American Pleats");
-                }}
+                onClick={() => setHangingStyle("American Pleats")}
               >
                 <div className="img-wrapper">
                   <Image 
@@ -1259,6 +1251,53 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 </div>
               </HangingCard>
             </HangingGrid>
+
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              gap: '12px',
+              marginTop: '1.5rem',
+              borderTop: '1px solid #f3f4f6',
+              paddingTop: '1.5rem'
+            }}>
+              <button 
+                onClick={() => setIsStyleModalOpen(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid #e5e7eb',
+                  background: 'white',
+                  color: '#64748b',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Close
+              </button>
+              <button 
+                disabled={!hangingStyle}
+                onClick={() => {
+                  setIsStyleModalOpen(false);
+                  handleBuyNow();
+                }}
+                style={{
+                  flex: 1.5,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: hangingStyle ? '#111827' : '#9ca3af',
+                  color: 'white',
+                  fontWeight: '600',
+                  cursor: hangingStyle ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s',
+                  boxShadow: hangingStyle ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                }}
+              >
+                Continue to Checkout
+              </button>
+            </div>
           </div>
         </Modal>
 
