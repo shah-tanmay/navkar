@@ -1266,9 +1266,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   flex: 1,
                   padding: '12px',
                   borderRadius: '10px',
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid #fee2e2',
                   background: 'white',
-                  color: '#64748b',
+                  color: '#dc2626',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
