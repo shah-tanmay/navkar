@@ -197,28 +197,29 @@ const OrderTracking: FC<OrderResponse> = () => {
                     </div>
 
                     <S.InfoBlock style={{ textAlign: 'right', alignItems: 'flex-end' }}>
-                       <span className="label">{orderDetails.payment_status === 'paid' ? 'Amount Paid' : 'Total Amount'}</span>
+                       <span className="label">Total Amount</span>
                        <div className="value" style={{ 
-                         fontSize: '2.2rem', 
-                         fontWeight: '900', 
-                         color: orderDetails.payment_status === 'paid' ? '#16a34a' : '#2a3d4f',
+                         fontSize: '2rem', 
+                         fontWeight: '800', 
+                         color: '#2a3d4f',
                          display: 'flex',
                          alignItems: 'center',
                          gap: '8px'
                        }}>
-                         {orderDetails.payment_status === 'paid' && <FiZap size={24} fill="#16a34a" />}
+                         {orderDetails.payment_status === 'paid' && <FiZap size={22} color="#16a34a" fill="#16a34a" />}
                          ₹{parseFloat(orderDetails.total_amount).toLocaleString('en-IN')}
                        </div>
-                       <div style={{ 
-                         fontSize: '0.85rem', 
-                         fontWeight: '600', 
-                         marginTop: '4px',
-                         color: orderDetails.payment_status === 'paid' ? '#16a34a' : '#f59e0b',
-                         textTransform: 'uppercase',
-                         letterSpacing: '1px'
-                       }}>
-                         ● {orderDetails.payment_status === 'paid' ? 'Payment Verified' : 'Outstanding Payment'}
-                       </div>
+                       {orderDetails.payment_status === 'paid' && (
+                         <div style={{ 
+                           fontSize: '0.8rem', 
+                           fontWeight: '700', 
+                           marginTop: '2px',
+                           color: '#16a34a',
+                           textTransform: 'uppercase'
+                         }}>
+                           Payment Successful
+                         </div>
+                       )}
                     </S.InfoBlock>
                   </div>
 
@@ -332,11 +333,11 @@ const OrderTracking: FC<OrderResponse> = () => {
                       <span className="value">₹{parseFloat(orderDetails.metadata?.subtotal || orderDetails.total_amount).toLocaleString('en-IN')}</span>
                     </div>
 
-                    {(orderDetails.coupon_code || parseFloat(orderDetails.metadata?.discount) > 0) && (
+                    {(orderDetails.coupon_code || (orderDetails.metadata?.discount > 0)) && (
                       <div className="summary-row discount">
                         <span className="label">
                           <FiZap style={{ color: '#16a34a' }} /> 
-                          Coupon ({orderDetails.coupon_code || 'Applied'})
+                          {orderDetails.coupon_code ? `Coupon (${orderDetails.coupon_code})` : 'Discount Applied'}
                         </span>
                         <span className="value">-₹{parseFloat(orderDetails.metadata?.discount || 0).toLocaleString('en-IN')}</span>
                       </div>
