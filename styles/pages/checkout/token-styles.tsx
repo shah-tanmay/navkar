@@ -72,13 +72,12 @@ export const OrderSummary = styled.div`
     position: sticky;
     top: 0;
     z-index: 100;
-    margin-top: 0;
-    padding: 1rem 1.5rem;
-    width: calc(100% + 1.5rem);
-    margin-left: -0.75rem;
-    border-radius: 0;
-    border-bottom: 1px solid #eee;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    margin: 0 auto 1.5rem auto;
+    padding: 1.25rem;
+    width: 100%;
+    border-radius: 15px;
+    border: 1px solid #efefef;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
 `;
 
