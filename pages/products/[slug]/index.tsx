@@ -780,8 +780,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                         }
                       }}
                     >
-                      {type === "Window" ? "Window (5ft Length)" : 
-                       type === "Door" ? "Door (7ft Length)" : 
+                      {type === "Window" ? "Window (5ft Length/Height)" : 
+                       type === "Door" ? "Door (7ft Length/Height)" : 
                        type === "Custom" ? "Custom Size (Made to Order)" : type}
                     </SizeButton>
                   ))}
