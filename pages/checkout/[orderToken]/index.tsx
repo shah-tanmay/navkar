@@ -97,7 +97,13 @@ const CheckoutPage = () => {
           setLoading(false);
           return;
         }
-         setOrderItems(orderDetails.order_items);
+        
+        const parsedItems = (orderDetails.order_items || []).map((item: any) => ({
+          ...item,
+          metadata: typeof item.metadata === 'string' ? JSON.parse(item.metadata) : (item.metadata || {})
+        }));
+        setOrderItems(parsedItems);
+
         const metadata = typeof orderDetails.metadata === 'string' 
           ? JSON.parse(orderDetails.metadata) 
           : (orderDetails.metadata || {});
@@ -352,6 +358,11 @@ const CheckoutPage = () => {
                         {item.type?.toLowerCase() === "custom" && item.metadata && (
                           <p style={{ color: '#D4AF37', fontWeight: '500' }}>
                             {item.metadata.width} {item.metadata.unit} × {item.metadata.length} {item.metadata.unit}
+                          </p>
+                        )}
+                        {item.metadata?.hanging_style && (
+                          <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                             Style: <span style={{ color: '#111827', fontWeight: '500' }}>{item.metadata.hanging_style}</span>
                           </p>
                         )}
                         <p>Quantity: {item.quantity}</p>
