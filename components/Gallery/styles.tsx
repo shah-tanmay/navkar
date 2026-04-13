@@ -3,19 +3,24 @@ import { TextFontSize, TitleFontSize } from "../../constants";
 
 export const GalleryWrapper = styled.div`
   display: flex;
-  padding: 50px 0px;
-  gap: 120px;
+  padding: 80px 0px;
+  gap: 60px;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  max-width: 1400px;
+  margin: 0 auto;
 
-  @media screen and (max-width: 768px) {
-    padding: 30px 0px;
-    gap: 50px;
-    flex-direction: column;
-    text-align: center;
+  @media screen and (max-width: 1024px) {
     gap: 40px;
+    padding: 60px 20px;
   }
 
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 768px) {
+    padding: 40px 15px;
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
   }
 `;
 
@@ -30,9 +35,15 @@ export const GalleryInfoDiv = styled.div`
 `;
 
 export const GalleryInfoWrapper = styled.div`
-  display: grid;
-  place-items: center;
-  min-width: 27%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 0 0 350px;
+
+  @media screen and (max-width: 768px) {
+    flex: 1;
+    width: 100%;
+  }
 `;
 
 export const GalleryTitle = styled.div`
@@ -65,21 +76,25 @@ export const GalleryText = styled.div`
 export const GalleryImageDiv = styled.div`
   display: flex;
   gap: 30px;
+  flex: 1;
+  align-items: center;
 
   @media screen and (max-width: 768px) {
-    max-width: 100%;
-    gap: 15px;
+    width: 100%;
+    flex-direction: column;
+    gap: 20px;
   }
 `;
 
 import Image from "next/image";
 
 export const GalleryStaticImage = styled(Image)`
-  @media screen and (max-width: 768px) {
-    max-width: 40%;
-  }
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 
-  @media screen and (max-width: 425px) {
-    min-width: 60%;
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    max-width: 500px;
   }
 `;

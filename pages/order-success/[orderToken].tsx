@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import * as S from "../../../styles/pages/checkout/success-styles";
-import { getOrderByOrderToken } from "../../../services/orderService";
-import { LoaderWrapper } from "../../../components/LoaderWrapper";
+import * as S from "../../styles/pages/checkout/success-styles";
+import { getOrderByOrderToken } from "../../services/orderService";
+import { LoaderWrapper } from "../../components/LoaderWrapper";
 import { FiCheck, FiShoppingBag, FiArrowRight } from "react-icons/fi";
 import confetti from "canvas-confetti";
 
