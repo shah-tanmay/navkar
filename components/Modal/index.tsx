@@ -16,7 +16,7 @@ interface ModalProps {
   hideFooter?: boolean;
 }
 
-export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children, hideFooter }: ModalProps) => {
   return (
     <ReactModal
       isOpen={isOpen}
