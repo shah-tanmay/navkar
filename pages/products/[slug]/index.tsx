@@ -239,8 +239,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).fbq && selectedVariant) {
       (window as any).fbq("track", "ViewContent", {
-        content_name: selectedVariant.product_name || (productDetails as any)?.product_name,
-        content_category: selectedVariant.type,
+        content_name: (productDetails as any)?.product_name || selectedVariant.slug,
+        content_category: (selectedVariant as any).type,
         content_ids: [selectedVariant.id],
         content_type: 'product',
         value: getCurrentPrice(),
