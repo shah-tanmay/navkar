@@ -111,6 +111,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
   const [hangingStyle, setHangingStyle] = useState<string | null>(null);
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
 
