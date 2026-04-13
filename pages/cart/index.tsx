@@ -9,7 +9,8 @@ import COLORS from "../../constants/color";
 import { useCart } from "../../context/CartContext";
 import { createOrder } from "../../services/orderService";
 import { validateCoupon } from "../../services/couponService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../../lib/axios";
 import { toast } from "react-toastify";
 import * as S from "../../styles/pages/cart/styles";
 

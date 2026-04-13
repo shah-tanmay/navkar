@@ -24,6 +24,7 @@ import { useReservations } from "../../../lib/useReservations";
 import { event as gaEvent } from "nextjs-google-analytics";
 import { validateCoupon } from "../../../services/couponService";
 import { toast } from "react-toastify";
+import api from "../../../lib/axios";
 import { FaChevronDown, FaChevronUp, FaShoppingCart } from "react-icons/fa";
 
 
