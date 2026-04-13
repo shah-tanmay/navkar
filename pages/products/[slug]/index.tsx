@@ -1101,7 +1101,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             </PurchaseCard>
 
             <DeliveryTimeline>
-              <FaCheckCircle /> Delivered in 5–7 business days
+              <FaCheckCircle /> Delivered in 5-7 business days
             </DeliveryTimeline>
 
             <TrustBadgesContainer>

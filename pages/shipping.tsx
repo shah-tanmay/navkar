@@ -107,15 +107,15 @@ const ShippingPage = () => {
       <Timelines>
         <TimeCard>
           <p>Shipping Out</p>
-          <span>1-2 Days</span>
+          <span>1-2 Business Days</span>
         </TimeCard>
         <TimeCard>
           <p>Transit Time</p>
-          <span>5-7 Days</span>
+          <span>5-7 Business Days</span>
         </TimeCard>
       </Timelines>
 
-      <p>Your orders are dispatched within <strong>1–2 business days</strong> and are typically delivered in <strong>5–7 business days</strong> across India.</p>
+      <p>Your orders are dispatched within <strong>1-2 business days</strong> and are typically delivered in <strong>5-7 business days</strong> across India.</p>
 
       <SectionTitle><FiTruck /> Shipping Charges</SectionTitle>
       <p>We offer <strong>free shipping on all orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of ₹50 is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
