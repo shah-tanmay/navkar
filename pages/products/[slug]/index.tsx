@@ -63,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const variants = _.get(details, "variants", []);
   const initialVariant = _.find(variants, (v) => v.slug === slug) || variants[0];
 
-  let initialStitchingFee = 100;
+  let initialStitchingFee = 0;
   try {
     const configRes = await api.get("/config/stitching-fee");
     initialStitchingFee = configRes.data.stitching_fee;
