@@ -95,13 +95,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
   initialStitchingFee,
 }) => {
   const router = useRouter();
-  const { cartItems } = useCart();
-  const { data: session } = useSession();
+  const { cartItems, addToCart, updateQuantity } = useCart();
+  const { data: session, status } = useSession();
   const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
   const [quantity, setQuantity] = useState<number>(1);
-  const { cartItems, addToCart, updateQuantity } = useCart();
 
   const fixedWidthValue = (productDetails as any)?.fixed_width || 48;
   const [customWidth, setCustomWidth] = useState<string>(fixedWidthValue.toString());

@@ -33,7 +33,7 @@ const Footer = () => {
         <FooterSocials>
           <FooterSocialIconWrapper>
             <SocialAnchor
-              href="https://www.instagram.com/navkarmattresses/"
+              href="https://www.instagram.com/navkar.shop/"
               target="_blank"
               rel="noopener noreferrer"
             >
