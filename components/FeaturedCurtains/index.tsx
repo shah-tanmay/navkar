@@ -56,6 +56,7 @@ const FeaturedCurtains = ({ initialProducts }: { initialProducts?: ProductRespon
             name={product.product_name}
             variants={product.variants}
             tag={product.tag || "bestseller"}
+            stitchingFee={product.stitching_fee}
           />
         ))}
       </CurtainsGrid>

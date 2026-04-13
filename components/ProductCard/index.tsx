@@ -27,6 +27,7 @@ const ProductCard = ({
   name,
   tag,
   variants,
+  stitchingFee = 0,
 }: {
   id: string;
   imageUrl: string;
@@ -34,6 +35,7 @@ const ProductCard = ({
   tag: string;
   cartId?: string;
   variants: ProductVariant[];
+  stitchingFee?: number;
 }) => {
   const router = useRouter();
   const types = _.uniq(_.map(variants, "type")).sort((a, b) => {
@@ -44,7 +46,7 @@ const ProductCard = ({
   const colors = _.uniq(_.map(variants, "color_hex_code"));
   const firstVariant = _.first(variants);
   const displayVariants = variants.length > 1 ? variants.filter(v => v.type?.toLowerCase() !== 'custom') : variants;
-  const prices = _.map(displayVariants, "price");
+  const prices = _.map(displayVariants, (v) => Number(v.price) + stitchingFee);
 
   return (
     <ProductCardWrapper

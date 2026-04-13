@@ -53,7 +53,8 @@ const ProductPage: React.FC = () => {
         <ProductsWrapper>
           {products &&
             Children.toArray(
-              products.map(({ product_id, product_name, variants, tag, image_url }) => {
+              products.map((product) => {
+                const { product_id, product_name, variants, tag, image_url, stitching_fee } = product;
                 return (
                   <ProductCard
                     id={product_id}
@@ -61,6 +62,7 @@ const ProductPage: React.FC = () => {
                     name={product_name}
                     variants={variants}
                     tag={tag || "new"}
+                    stitchingFee={stitching_fee}
                   />
                 );
               })

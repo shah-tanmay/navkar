@@ -58,6 +58,7 @@ export interface ProductResponse {
   fixed_width?: number;
   catalogue_name?: string;
   serial_number?: string;
+  stitching_fee?: number;
 }
 
 export interface Product {
