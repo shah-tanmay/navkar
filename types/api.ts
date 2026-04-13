@@ -117,6 +117,7 @@ export interface ProductVariantDetails {
   fixed_width?: number;
   catalogue_name?: string;
   serial_number?: string;
+  is_discontinued?: boolean;
 }
 
 export interface CartItems {

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { cloudinaryLoader } from "../../../utils/imageLoader";
 import {
   CartItems,
@@ -475,7 +476,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 gap: '4px'
               }}>
                 <span style={{ fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.8rem' }}>Status: Discontinued</span>
-                <span>This model is no longer available. <a href="/" style={{ fontWeight: '600', textDecoration: 'underline' }}>Explore our current collection →</a></span>
+                <span>This model is no longer available. <Link href="/" style={{ fontWeight: '600', textDecoration: 'underline' }}>Explore our current collection →</Link></span>
               </div>
             )}
 
