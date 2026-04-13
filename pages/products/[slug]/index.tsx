@@ -283,6 +283,16 @@ const ProductPage = (props: ProductPageProps) => {
     };
   }, []);
 
+  // Props → State sync: when getServerSideProps returns fresh data for a new slug
+  // (e.g. user navigates Fern → Weave via "More designs in same color"),
+  // the component does NOT remount, so we must manually reset state from new props.
+  useEffect(() => {
+    setProductDetails(initialProductDetails);
+    setVariants(initialVariants);
+    setSelectedVariant(initialSelectedVariant);
+    setActiveImage(initialSelectedVariant?.image_url || (initialProductDetails as any)?.image_url || "");
+  }, [initialSelectedVariant?.id]);
+
   useEffect(() => {
     const mainImg = selectedVariant?.image_url || (productDetails as any)?.image_url || "";
     setActiveImage(mainImg);
