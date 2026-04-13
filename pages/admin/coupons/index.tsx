@@ -149,32 +149,57 @@ const AdminCoupons: NextPage = () => {
                 </thead>
                 <tbody>
                   {coupons.map((c) => (
-                    <tr key={c.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "1rem", fontWeight: "bold", color: "#111" }}>{c.code}</td>
-                      <td style={{ padding: "1rem" }}>
-                        <div style={{ fontWeight: "600" }}>
+                    <tr key={c.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "all 0.2s" }}>
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        <div style={{ fontWeight: "700", color: "#111", letterSpacing: "0.5px", background: "#fef3c7", padding: "4px 10px", borderRadius: "4px", display: "inline-block", border: "1px dashed #d97706" }}>
+                          {c.code}
+                        </div>
+                      </td>
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        <div style={{ fontWeight: "600", fontSize: "1.1rem" }}>
                           {c.type === "free_shipping" ? "FREE SHIPPING" : (c.type === "percentage" ? `${c.value}% OFF` : `₹${c.value} OFF`)}
                         </div>
-                        {c.is_free_shipping && c.type !== "free_shipping" && <div style={{ fontSize: "0.75rem", color: "#2e7d32", marginTop: "2px" }}>+ Free Shipping Bonus</div>}
-                      </td>
-                      <td style={{ padding: "1rem" }}>
-                        {c.product_id ? (
-                           <div style={{ fontSize: "0.8rem", color: "#6366f1" }}>Specific Product Only</div>
-                        ) : (
-                           <div style={{ fontSize: "0.8rem", color: "#64748b" }}>Sitewide</div>
+                        {c.is_free_shipping && c.type !== "free_shipping" && (
+                          <div style={{ fontSize: "0.75rem", color: "#D4AF37", fontWeight: "600", marginTop: "4px", textTransform: "uppercase" }}>
+                            + Free Shipping Bonus
+                          </div>
                         )}
-                        {parseFloat(c.min_order_amount) > 0 && <div style={{ fontSize: "0.8rem", color: "#f59e0b" }}>Min. Order: ₹{c.min_order_amount}</div>}
                       </td>
-                      <td style={{ padding: "1rem" }}>
-                        <span style={{ padding: "2px 8px", background: "#f1f5f9", borderRadius: "12px", fontSize: "0.8rem" }}>
-                          {c.used_count} / {c.usage_limit || "∞"}
-                        </span>
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        {c.product_id ? (
+                           <div style={{ fontSize: "0.85rem", color: "#6366f1", fontWeight: "500" }}>🎯 Specific Product</div>
+                        ) : (
+                           <div style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: "500" }}>🌍 Sitewide</div>
+                        )}
+                        {parseFloat(c.min_order_amount) > 0 && (
+                          <div style={{ fontSize: "0.8rem", color: "#f59e0b", marginTop: "4px" }}>
+                            Min. spend: ₹{c.min_order_amount}
+                          </div>
+                        )}
                       </td>
-                      <td style={{ padding: "1rem", fontSize: "0.85rem", color: "#64748b" }}>
-                        {c.expiry_date ? new Date(c.expiry_date).toLocaleDateString() : "Never"}
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          <span style={{ fontSize: "0.85rem", fontWeight: "600" }}>{c.used_count} used</span>
+                          <div style={{ width: "60px", height: "4px", background: "#e2e8f0", borderRadius: "2px", overflow: "hidden" }}>
+                            <div style={{ width: c.usage_limit ? `${Math.min(100, (c.used_count / c.usage_limit) * 100)}%` : "0%", height: "100%", background: "#D4AF37" }}></div>
+                          </div>
+                          <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>Limit: {c.usage_limit || "∞"}</span>
+                        </div>
                       </td>
-                      <td style={{ padding: "1rem" }}>
-                        <button onClick={() => handleDelete(c.id)} style={{ color: "#ef4444", background: "none", border: "none", cursor: "pointer", fontSize: "0.85rem", fontWeight: "500" }}>Remove</button>
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        <div style={{ fontSize: "0.85rem", color: c.expiry_date && new Date(c.expiry_date) < new Date() ? "#ef4444" : "#64748b" }}>
+                          {c.expiry_date ? new Date(c.expiry_date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) : "Permanent"}
+                        </div>
+                      </td>
+                      <td style={{ padding: "1.2rem 1rem" }}>
+                        <button 
+                          onClick={() => handleDelete(c.id)} 
+                          style={{ color: "#ef4444", background: "#fee2e2", border: "none", cursor: "pointer", padding: "6px 12px", borderRadius: "4px", fontSize: "0.8rem", fontWeight: "600", transition: "all 0.2s" }}
+                          onMouseOver={(e) => (e.currentTarget.style.background = "#fecaca")}
+                          onMouseOut={(e) => (e.currentTarget.style.background = "#fee2e2")}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
