@@ -822,18 +822,19 @@ const ProductPage = (props: ProductPageProps) => {
                             : ""
                         }
                         onClick={() => {
-                          // Find variant with SAME color AND SAME design name - crucial to keep user on same pattern (Fern/Grid/Weave)
-                          const currentDesignName = productDetails?.name;
-                          let nextV = _.find(variants, (next: any) => 
-                            next.color_hex_code === v.color_hex_code && 
-                            (next.product_name || next.name) === currentDesignName
+                          // Primary: match by product_id from selectedVariant — always accurate even after cross-design navigation
+                          // (productDetails?.name can go stale when navigating between designs client-side)
+                          let nextV = _.find(variants, (next: any) =>
+                            next.color_hex_code === v.color_hex_code &&
+                            next.product_id?.toString() === (selectedVariant as any)?.product_id?.toString()
                           );
-                          
-                          // Fallback to ID matching if name matching fails
+
+                          // Secondary fallback: match by the current design name if product_id is unavailable
                           if (!nextV) {
-                            nextV = _.find(variants, (next: any) => 
-                              next.color_hex_code === v.color_hex_code && 
-                              next.product_id?.toString() === (selectedVariant as any)?.product_id?.toString()
+                            const currentDesignName = selectedVariant?.name?.split(' ')[0] || productDetails?.name;
+                            nextV = _.find(variants, (next: any) =>
+                              next.color_hex_code === v.color_hex_code &&
+                              ((next.product_name || next.name) === currentDesignName)
                             );
                           }
 
