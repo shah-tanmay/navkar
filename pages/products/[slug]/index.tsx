@@ -116,7 +116,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const getCurrentPrice = () => {
     if (selectedVariant?.type?.toLowerCase() === "custom") {
-      return customPrice > 0 ? customPrice : Number(selectedVariant?.price || 0);
+      return customPrice > 0 ? customPrice : 0;
     }
     return Number(selectedVariant?.price || 0) + initialStitchingFee;
   };
@@ -477,8 +477,16 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </button>
             </ProductTitle>
             <PriceTag>
-              ₹{getCurrentPrice().toLocaleString('en-IN')} 
-              <span>₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}</span>
+              {getCurrentPrice() > 0 ? (
+                <>
+                  ₹{getCurrentPrice().toLocaleString('en-IN')} 
+                  <span>₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}</span>
+                </>
+              ) : (
+                <span style={{ fontSize: '1.2rem', color: '#6b7280', textDecoration: 'none' }}>
+                  Price depends on length
+                </span>
+              )}
             </PriceTag>
 
             {productDetails?.is_discontinued && (
@@ -1078,12 +1086,18 @@ const ProductPage: React.FC<ProductPageProps> = ({
         {!productDetails?.is_discontinued && (
           <MobileStickyActions $visible={showMobileSticky} style={{ flexDirection: 'column', gap: '8px', padding: '1rem 1.5rem' }}>
             <BuyNow onClick={() => handleBuyNow()} />
-            <div style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: '700', color: '#111827' }}>
-              Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
-              <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
-                ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
-              </span>
-            </div>
+            {getCurrentPrice() > 0 ? (
+              <div style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: '700', color: '#111827' }}>
+                Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
+                <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
+                  ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                </span>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}>
+                Price depends on height
+              </div>
+            )}
           </MobileStickyActions>
         )}
         
