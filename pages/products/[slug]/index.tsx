@@ -122,6 +122,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
     return Number(selectedVariant?.price || 0) + initialStitchingFee;
   };
 
+  const getWindowPrice = () => {
+    const windowVariant = variants.find(v => v.type === "Window");
+    return windowVariant ? Number(windowVariant.price || 0) + initialStitchingFee : 0;
+  };
+
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
@@ -477,16 +482,19 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 <FaShareAlt />
               </button>
             </ProductTitle>
-            <PriceTag>
+            <PriceTag style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
               {getCurrentPrice() > 0 ? (
-                <>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                   ₹{getCurrentPrice().toLocaleString('en-IN')} 
-                  <span>₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}</span>
-                </>
+                  <span style={{ fontSize: '1.2rem', color: '#999', textDecoration: 'line-through', fontWeight: '400' }}>
+                    ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                  </span>
+                </div>
               ) : (
-                <span style={{ fontSize: '1.2rem', color: '#6b7280', textDecoration: 'none' }}>
-                  Price depends on length
-                </span>
+                <>
+                  <div style={{ fontSize: '1.8rem', fontWeight: '600' }}>Starting from ₹{getWindowPrice().toLocaleString('en-IN')}</div>
+                  <div style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: '400' }}>(Price depends on length)</div>
+                </>
               )}
             </PriceTag>
 
@@ -1095,8 +1103,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 </span>
               </div>
             ) : (
-              <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}>
-                Price depends on height
+              <div style={{ textAlign: 'center' }}>
+                 <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827' }}>Starting from ₹{getWindowPrice().toLocaleString('en-IN')}</div>
+                 <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>Price depends on height</div>
               </div>
             )}
           </MobileStickyActions>

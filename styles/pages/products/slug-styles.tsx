@@ -108,22 +108,23 @@ export const ScarcityLabel = styled.div<{ $tag?: string; $isBlackout?: boolean }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.45rem 1rem;
-  border-radius: 4px; /* Minimal rounding for sleek look */
-  font-size: 0.75rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px; /* Pill shape looks less like a square button */
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   cursor: default;
-  border-left: 3px solid ${COLORS.gold};
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-left: 2.5px solid ${COLORS.gold};
+  box-shadow: none; /* Removed depth to avoid button feel */
 
-  background: ${props => props.$isBlackout ? COLORS.secondary : COLORS.accent};
-  color: ${props => props.$isBlackout ? COLORS.primary : COLORS.secondary};
+  /* Softer backgrounds to distinguish from CTAs */
+  background: ${props => props.$isBlackout ? 'rgba(17, 24, 39, 0.08)' : 'rgba(186, 129, 96, 0.12)'};
+  color: ${props => props.$isBlackout ? '#374151' : COLORS.secondary};
 
   @media (max-width: 768px) {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.7rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.65rem;
     width: fit-content;
   }
 `;
