@@ -31,6 +31,10 @@ export const SuccessCard = styled.div`
   max-width: 500px;
   width: 100%;
   animation: ${fadeIn} 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  @media (max-width: 480px) {
+    padding: 2rem 1.5rem;
+  }
 `;
 
 export const IconWrapper = styled.div`
@@ -73,9 +77,23 @@ export const OrderInfo = styled.div`
     display: flex;
     justify-content: space-between;
     font-size: 0.95rem;
+    gap: 1rem;
     
-    .label { color: #94a3b8; }
-    .value { color: #1e293b; font-weight: 600; }
+    .label { color: #94a3b8; flex-shrink: 0; }
+    .value { 
+      color: #1e293b; 
+      font-weight: 600; 
+      text-align: right; 
+      word-break: break-all;
+    }
+
+    @media (max-width: 400px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      
+      .value { text-align: left; }
+    }
   }
 `;
 
