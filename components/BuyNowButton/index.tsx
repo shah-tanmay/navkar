@@ -43,7 +43,7 @@ export const BuyNow: React.FC<ButtonProps> = ({ onClick, price, ...props }) => {
           <FiPackage />
           <span>Buy Now</span>
         </div>
-        {price !== undefined && (
+        {!!price && price > 0 && (
           <span style={{ 
             background: 'rgba(255,255,255,0.2)', 
             padding: '2px 8px', 

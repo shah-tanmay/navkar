@@ -549,8 +549,8 @@ export const MainImage = styled.div`
   @media (max-width: 768px) {
     height: 320px;
     max-height: none;
-    position: sticky;
-    top: 0px; 
+    position: relative; /* Changed from sticky */
+    top: auto; /* Changed from 0px */
     border-radius: 0; 
     margin: 0; 
     background: ${COLORS.primary}; /* Solid outer background masks scrolling content */

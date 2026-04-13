@@ -9,6 +9,7 @@ import {
   FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock, 
   FaRulerCombined, FaShareAlt 
 } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -114,6 +115,27 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
   const [hangingStyle, setHangingStyle] = useState<string | null>(null);
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
+
+  const galleryImages = _.uniq([
+    selectedVariant?.image_url || (productDetails as any)?.image_url,
+    ...((selectedVariant?.metadata?.gallery_images && selectedVariant.metadata.gallery_images.length > 0)
+      ? selectedVariant.metadata.gallery_images
+      : (productDetails?.metadata?.gallery_images && productDetails.metadata.gallery_images.length > 0)
+        ? productDetails.metadata.gallery_images
+        : [])
+  ].filter(Boolean));
+
+  const handleNextImage = () => {
+    const currentIndex = galleryImages.indexOf(activeImage);
+    const nextIndex = (currentIndex + 1) % galleryImages.length;
+    setActiveImage(galleryImages[nextIndex]);
+  };
+
+  const handlePrevImage = () => {
+    const currentIndex = galleryImages.indexOf(activeImage);
+    const prevIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+    setActiveImage(galleryImages[prevIndex]);
+  };
 
   const getCurrentPrice = () => {
     if (selectedVariant?.type?.toLowerCase() === "custom") {
@@ -429,29 +451,74 @@ const ProductPage: React.FC<ProductPageProps> = ({
         <HeroSection>
           <ImageGallery>
             <MainImage>
-              {activeImage && (
-                <Image
-                  loader={cloudinaryLoader}
-                  src={activeImage}
-                  alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`}
-                  fill
-                  priority
-                  quality={75}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 650px"
-                  style={{ objectFit: "cover", borderRadius: "12px" }}
-                />
-              )}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ width: '100%', height: '100%', position: 'relative' }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(e, { offset, velocity }) => {
+                    const swipe = offset.x;
+                    if (swipe < -50) {
+                      handleNextImage();
+                    } else if (swipe > 50) {
+                      handlePrevImage();
+                    }
+                  }}
+                >
+                  {activeImage && (
+                    <Image
+                      loader={cloudinaryLoader}
+                      src={activeImage}
+                      alt={`${selectedVariant?.name || ""} ${productDetails?.name || ""} - Premium Fabric Detail`}
+                      fill
+                      priority
+                      quality={75}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 650px"
+                      style={{ objectFit: "cover", borderRadius: "12px" }}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
               <WarrantyBadge $isHighlight>Available in Eyelets & American Pleats</WarrantyBadge>
+              
+              {/* Mobile Pagination Dots */}
+              {isMobile && galleryImages.length > 1 && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '25px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  gap: '8px',
+                  zIndex: 10,
+                  background: 'rgba(255,255,255,0.4)',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  backdropFilter: 'blur(4px)'
+                }}>
+                  {galleryImages.map((_, i) => (
+                    <div 
+                      key={i} 
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: galleryImages.indexOf(activeImage) === i ? '#ba8160' : 'rgba(0,0,0,0.2)',
+                        transition: 'all 0.3s ease'
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </MainImage>
             <ThumbnailGrid>
-              {_.uniq([
-                selectedVariant?.image_url || (productDetails as any)?.image_url,
-                ...((selectedVariant?.metadata?.gallery_images && selectedVariant.metadata.gallery_images.length > 0)
-                  ? selectedVariant.metadata.gallery_images
-                  : (productDetails?.metadata?.gallery_images && productDetails.metadata.gallery_images.length > 0)
-                    ? productDetails.metadata.gallery_images
-                    : [])
-              ].filter(Boolean)).slice(0, 4).map((img, index) => (
+              {galleryImages.slice(0, 4).map((img, index) => (
                 <Thumbnail
                   key={index}
                   className={activeImage === img ? "active" : ""}
