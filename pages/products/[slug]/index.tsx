@@ -111,9 +111,16 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
   const [hangingStyle, setHangingStyle] = useState<string | null>(null);
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
+
+  const getCurrentPrice = () => {
+    if (selectedVariant?.type?.toLowerCase() === "custom") {
+      return customPrice > 0 ? customPrice : Number(selectedVariant?.price || 0);
+    }
+    return Number(selectedVariant?.price || 0) + initialStitchingFee;
+  };
+
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
@@ -320,7 +327,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
         return v;
       };
 
-      const displayWidth = customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2);
+      const displayWidth = customUnit === 'in' ? fixedWidthValue : 
+                           customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : 
+                           customUnit === 'cm' ? (fixedWidthValue * 2.54).toFixed(1) :
+                           (fixedWidthValue * 0.0254).toFixed(2);
       metadata = {
         width: displayWidth,
         length: customLength,
@@ -330,11 +340,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
         width_in: toInches(customWidth, customUnit),
         length_in: toInches(customLength, customUnit),
         custom_price: customPrice,
-        hanging_style: hangingStyle
+        hanging_style: hangingStyle,
+        total_price: getCurrentPrice()
       };
     } else {
       metadata = {
-        hanging_style: hangingStyle
+        hanging_style: hangingStyle,
+        total_price: getCurrentPrice()
       };
     }
 
@@ -465,8 +477,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
               </button>
             </ProductTitle>
             <PriceTag>
-              ₹{(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))} 
-              <span>₹{Math.floor(Number((selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (selectedVariant?.type?.toLowerCase() === "custom" ? selectedVariant?.price : (Number(selectedVariant?.price || 0) + initialStitchingFee))) * 1.3)}</span>
+              ₹{getCurrentPrice().toLocaleString('en-IN')} 
+              <span>₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}</span>
             </PriceTag>
 
             {productDetails?.is_discontinued && (
@@ -778,7 +790,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                         <label>Cloth Width (Standard)</label>
                         <input 
                           disabled
-                          value={`${customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2)} ${customUnit}`} 
+                          value={`${customUnit === 'in' ? fixedWidthValue : customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : customUnit === 'cm' ? (fixedWidthValue * 2.54).toFixed(1) : (fixedWidthValue * 0.0254).toFixed(2)} ${customUnit}`} 
                           style={{ background: '#f3f4f6', cursor: 'not-allowed', color: '#999' }}
                         />
                       </div>
@@ -1004,6 +1016,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
             {/* Mobile Only: CTA Block after all details and description */}
             <PurchaseCard ref={bottomTriggerRef} $isSecondary style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none', background: '#f9fafb' } : {}}>
               <BuyNow onClick={() => handleBuyNow()} />
+              <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
+                Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
+                <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
+                  ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                </span>
+              </div>
               <AddToCart
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
@@ -1030,17 +1048,26 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     if (unit === "m") return v * 39.3701;
                     return v;
                   };
+                  const displayWidth = customUnit === 'in' ? fixedWidthValue : 
+                                       customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : 
+                                       customUnit === 'cm' ? (fixedWidthValue * 2.54).toFixed(1) :
+                                       (fixedWidthValue * 0.0254).toFixed(2);
                   return {
-                    width: customWidth, 
-                    length: customLength, 
+                    width: displayWidth,
+                    length: customLength,
                     unit: customUnit,
                     width_ft: toFeet(customWidth, customUnit).toFixed(1),
                     length_ft: toFeet(customLength, customUnit).toFixed(1),
                     width_in: toInches(customWidth, customUnit),
                     length_in: toInches(customLength, customUnit),
-                    custom_price: customPrice 
+                    custom_price: customPrice,
+                    hanging_style: hangingStyle,
+                    total_price: getCurrentPrice()
                   };
-                })() : undefined}
+                })() : { 
+                  hanging_style: hangingStyle,
+                  total_price: getCurrentPrice()
+                }}
               />
             </PurchaseCard>
 
@@ -1049,11 +1076,14 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
         {!productDetails?.is_discontinued && (
-          <MobileStickyActions $visible={showMobileSticky}>
-            <BuyNow 
-              onClick={() => handleBuyNow()} 
-              price={(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (Number(selectedVariant?.price || 0) + initialStitchingFee)} 
-            />
+          <MobileStickyActions $visible={showMobileSticky} style={{ flexDirection: 'column', gap: '8px', padding: '1rem 1.5rem' }}>
+            <BuyNow onClick={() => handleBuyNow()} />
+            <div style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: '700', color: '#111827' }}>
+              Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
+              <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: '400', marginLeft: '6px', textDecoration: 'line-through' }}>
+                ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+              </span>
+            </div>
           </MobileStickyActions>
         )}
         
