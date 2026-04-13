@@ -36,45 +36,45 @@ const SuccessPage = () => {
     fetchOrder();
   }, [orderToken]);
 
-  if (loading) return <LoaderWrapper loading={true} />;
-
   return (
-    <S.SuccessContainer>
-      <S.SuccessCard>
-        <S.IconWrapper>
-          <FiCheck />
-        </S.IconWrapper>
-        
-        <S.Title>Order Confirmed!</S.Title>
-        <S.Subtitle>
-          Thank you for choosing Navkar. We&apos;ve received your order and are preparing it for shipment.
-        </S.Subtitle>
+    <LoaderWrapper loading={loading}>
+      <S.SuccessContainer>
+        <S.SuccessCard>
+          <S.IconWrapper>
+            <FiCheck />
+          </S.IconWrapper>
+          
+          <S.Title>Order Confirmed!</S.Title>
+          <S.Subtitle>
+            Thank you for choosing Navkar. We&apos;ve received your order and are preparing it for shipment.
+          </S.Subtitle>
 
-        <S.OrderInfo>
-          <div className="row">
-            <span className="label">Order ID</span>
-            <span className="value">#{orderToken}</span>
-          </div>
-          <div className="row">
-            <span className="label">Amount Paid</span>
-            <span className="value">₹{parseFloat(order?.total_amount || 0).toLocaleString('en-IN')}</span>
-          </div>
-          <div className="row">
-            <span className="label">Shipping to</span>
-            <span className="value">{order?.shipping_address?.city}, {order?.shipping_address?.state}</span>
-          </div>
-        </S.OrderInfo>
+          <S.OrderInfo>
+            <div className="row">
+              <span className="label">Order ID</span>
+              <span className="value">#{orderToken}</span>
+            </div>
+            <div className="row">
+              <span className="label">Amount Paid</span>
+              <span className="value">₹{parseFloat(order?.total_amount || 0).toLocaleString('en-IN')}</span>
+            </div>
+            <div className="row">
+              <span className="label">Shipping to</span>
+              <span className="value">{order?.shipping_address?.city}, {order?.shipping_address?.state}</span>
+            </div>
+          </S.OrderInfo>
 
-        <S.ActionButtons>
-          <S.PrimaryButton onClick={() => router.push(`/orders/${orderToken}`)}>
-            Track My Order <FiArrowRight />
-          </S.PrimaryButton>
-          <S.SecondaryButton onClick={() => router.push("/products")}>
-            <FiShoppingBag style={{ marginRight: '8px' }} /> Continue Shopping
-          </S.SecondaryButton>
-        </S.ActionButtons>
-      </S.SuccessCard>
-    </S.SuccessContainer>
+          <S.ActionButtons>
+            <S.PrimaryButton onClick={() => router.push(`/orders/${orderToken}`)}>
+              Track My Order <FiArrowRight />
+            </S.PrimaryButton>
+            <S.SecondaryButton onClick={() => router.push("/products")}>
+              <FiShoppingBag style={{ marginRight: '8px' }} /> Continue Shopping
+            </S.SecondaryButton>
+          </S.ActionButtons>
+        </S.SuccessCard>
+      </S.SuccessContainer>
+    </LoaderWrapper>
   );
 };
 
