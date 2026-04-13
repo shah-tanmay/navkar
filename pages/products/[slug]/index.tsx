@@ -101,6 +101,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(initialSelectedVariant);
   const [quantity, setQuantity] = useState<number>(1);
+  const { cartItems, addToCart, updateQuantity } = useCart();
 
   const fixedWidthValue = (productDetails as any)?.fixed_width || 48;
   const [customWidth, setCustomWidth] = useState<string>(fixedWidthValue.toString());
@@ -115,6 +116,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
   const [hangingStyle, setHangingStyle] = useState<string | null>(null);
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState<'buy' | 'cart'>('buy');
 
   const galleryImages = _.uniq([
     selectedVariant?.image_url || (productDetails as any)?.image_url,
@@ -404,6 +406,60 @@ const ProductPage: React.FC<ProductPageProps> = ({
         toast.error("Failed to copy link.");
       });
     }
+  };
+
+  const executeAddToCart = async () => {
+    if (!selectedVariant || !hangingStyle) return;
+
+    if (status === "unauthenticated") {
+      const redirect = encodeURIComponent(router.asPath);
+      toast.warn("Please Login");
+      router.push(`/login?redirect=${redirect}`);
+      return;
+    }
+
+    let metadata = {};
+    if (selectedVariant.type?.toLowerCase() === "custom") {
+      const toInches = (val: string, unit: string) => {
+        const v = parseFloat(val) || 0;
+        if (unit === "ft") return v * 12;
+        if (unit === "m") return v * 39.3701;
+        return v;
+      };
+      
+      const displayWidth = customUnit === 'in' ? fixedWidthValue : 
+                           customUnit === 'ft' ? (fixedWidthValue / 12).toFixed(1) : 
+                           (fixedWidthValue * 0.0254).toFixed(2);
+
+      metadata = {
+        width: displayWidth,
+        length: customLength,
+        unit: customUnit,
+        width_in: toInches(customWidth, customUnit),
+        length_in: toInches(customLength, customUnit),
+        custom_price: customPrice,
+        hanging_style: hangingStyle,
+        total_price: getCurrentPrice()
+      };
+    } else {
+      metadata = {
+        hanging_style: hangingStyle,
+        total_price: getCurrentPrice()
+      };
+    }
+
+    const existingCartItem = _.find(
+      cartItems,
+      (cartItem) => cartItem.variant_id === selectedVariant.id
+    );
+
+    if (existingCartItem && cartItem?.cart_id) {
+      updateQuantity(cartItem.cart_id, existingCartItem.quantity + quantity);
+    } else {
+      addToCart(selectedVariant.id, quantity, metadata);
+    }
+
+    toast.success("Added to cart!");
   };
 
   const handleApplyRecommendation = () => {
@@ -978,7 +1034,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
 
             <PurchaseCard $hideOnMobile style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
-              <BuyNow onClick={() => handleBuyNow()} />
+              <BuyNow onClick={() => {
+                setModalAction('buy');
+                handleBuyNow();
+              }} />
               {getCurrentPrice() > 0 ? (
                 <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
                   Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
@@ -997,6 +1056,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 variantId={selectedVariant?.id as string}
                 quantity={quantity}
                 onBeforeAdd={() => {
+                  if (!hangingStyle) {
+                    setModalAction('cart');
+                    setIsStyleModalOpen(true);
+                    return false;
+                  }
                   if (selectedVariant.type?.toLowerCase() === "custom") {
                     if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
                       toast.error("Please enter valid dimensions (Width and Length) for your custom curtain.");
@@ -1031,7 +1095,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                       custom_price: customPrice 
                     };
                   })() : {}) as any),
-                  hanging_style: hangingStyle
+                  hanging_style: hangingStyle,
+                  total_price: getCurrentPrice()
                 }}
               />
             </PurchaseCard>
@@ -1116,7 +1181,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
             {/* Mobile Only: CTA Block after all details and description */}
             <PurchaseCard ref={bottomTriggerRef} $isSecondary style={productDetails?.is_discontinued ? { opacity: 0.6, pointerEvents: 'none', background: '#f9fafb' } : {}}>
-              <BuyNow onClick={() => handleBuyNow()} />
+              <BuyNow onClick={() => {
+                setModalAction('buy');
+                handleBuyNow();
+              }} />
               {getCurrentPrice() > 0 ? (
                 <div style={{ textAlign: 'center', fontSize: '1rem', fontWeight: '700', color: '#111827', margin: '0.5rem 0' }}>
                   Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
@@ -1135,6 +1203,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 variantId={selectedVariant?.id as string}
                 quantity={quantity}
                 onBeforeAdd={() => {
+                  if (!hangingStyle) {
+                    setModalAction('cart');
+                    setIsStyleModalOpen(true);
+                    return false;
+                  }
                   if (selectedVariant.type?.toLowerCase() === "custom") {
                     if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
                       toast.error("Please enter valid dimensions for your custom curtain.");
@@ -1185,7 +1258,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
         {!productDetails?.is_discontinued && (
           <MobileStickyActions $visible={showMobileSticky} style={{ flexDirection: 'column', gap: '8px', padding: '1rem 1.5rem' }}>
-            <BuyNow onClick={() => handleBuyNow()} />
+            <BuyNow onClick={() => {
+              setModalAction('buy');
+              handleBuyNow();
+            }} />
             {getCurrentPrice() > 0 ? (
               <div style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: '700', color: '#111827' }}>
                 Total: ₹{getCurrentPrice().toLocaleString('en-IN')}
@@ -1280,7 +1356,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 disabled={!hangingStyle}
                 onClick={() => {
                   setIsStyleModalOpen(false);
-                  handleBuyNow();
+                  if (modalAction === 'buy') {
+                    handleBuyNow();
+                  } else {
+                    executeAddToCart();
+                  }
                 }}
                 style={{
                   flex: 1.5,
