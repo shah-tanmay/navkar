@@ -201,8 +201,24 @@ const CheckoutPage = () => {
     }
   };
 
+  const [threshold, setThreshold] = useState(2000);
+  const [flatFee, setFlatFee] = useState(50);
+
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        const res = await api.get("/admin/settings");
+        if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
+        if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
+      } catch (e) {
+        console.error("Failed to fetch shipping configs", e);
+      }
+    };
+    fetchConfigs();
+  }, []);
+
   const subtotal = orderMetadata.subtotal || calculateTotal();
-  const shippingFee = orderMetadata.shipping_fee !== undefined ? orderMetadata.shipping_fee : (subtotal < 2000 && subtotal > 0 ? 50 : 0);
+  const shippingFee = orderMetadata.shipping_fee !== undefined ? orderMetadata.shipping_fee : (subtotal < threshold && subtotal > 0 ? flatFee : 0);
   const discount = orderMetadata.discount || 0;
   const finalTotal = subtotal + shippingFee - discount;
 

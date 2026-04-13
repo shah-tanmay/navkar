@@ -68,6 +68,7 @@ const AdminSettings: NextPage = () => {
   const [stitchingFee, setStitchingFee] = useState<string>("100");
   const [deliveryTimeline, setDeliveryTimeline] = useState<string>("5-7 business days");
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<string>("2000");
+  const [shippingFee, setShippingFee] = useState<string>("50");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -83,6 +84,9 @@ const AdminSettings: NextPage = () => {
         }
         if (res.data.free_shipping_threshold) {
           setFreeShippingThreshold(res.data.free_shipping_threshold.toString());
+        }
+        if (res.data.standard_shipping_fee) {
+          setShippingFee(res.data.standard_shipping_fee.toString());
         }
         setLoading(false);
       } catch (e) {
@@ -107,11 +111,17 @@ const AdminSettings: NextPage = () => {
         key: "delivery_timeline",
         value: deliveryTimeline
       });
-      
+
       // Save Free Shipping Threshold
       await axios.post("/admin/settings", {
         key: "free_shipping_threshold",
         value: freeShippingThreshold
+      });
+
+      // Save Standard Shipping Fee
+      await axios.post("/admin/settings", {
+        key: "standard_shipping_fee",
+        value: shippingFee
       });
 
       toast.success("All settings saved successfully");
@@ -163,6 +173,17 @@ const AdminSettings: NextPage = () => {
                 placeholder="2000"
               />
               <div className="hint">Minimum order value for free shipping.</div>
+            </FormGroup>
+
+            <FormGroup>
+              <label>Standard Shipping Fee (INR)</label>
+              <input 
+                type="number" 
+                value={shippingFee} 
+                onChange={(e) => setShippingFee(e.target.value)}
+                placeholder="50"
+              />
+              <div className="hint">Charged for orders below the threshold.</div>
             </FormGroup>
             
             <SaveButton onClick={handleSave} disabled={saving}>

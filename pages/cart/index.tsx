@@ -23,9 +23,26 @@ const CartPage = () => {
   const [couponError, setCouponError] = useState("");
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState(0);
+  
+  // Dynamic Settings
+  const [threshold, setThreshold] = useState(2000);
+  const [flatFee, setFlatFee] = useState(50);
+
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        const res = await api.get("/admin/settings");
+        if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
+        if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
+      } catch (e) {
+        console.error("Failed to fetch shipping configs", e);
+      }
+    };
+    fetchConfigs();
+  }, []);
 
   const subtotal = _.reduce(cartItems, (sum, item) => sum + item.price * item.quantity, 0);
-  const shippingFee = (subtotal < 2000 && subtotal > 0) ? 50 : 0;
+  const shippingFee = (subtotal < threshold && subtotal > 0) ? flatFee : 0;
   const finalTotal = Math.max(0, subtotal + shippingFee - couponDiscount);
 
   const handleApplyCoupon = async () => {

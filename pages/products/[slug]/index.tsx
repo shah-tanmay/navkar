@@ -64,11 +64,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const initialVariant = _.find(variants, (v) => v.slug === slug) || variants[0];
 
   let initialStitchingFee = 0;
+  let deliveryTimeline = "5-7 business days";
   try {
-    const configRes = await api.get("/config/stitching-fee");
-    initialStitchingFee = configRes.data.stitching_fee;
+    const configRes = await api.get("/admin/settings");
+    initialStitchingFee = configRes.data.stitching_fee || 0;
+    deliveryTimeline = configRes.data.delivery_timeline || "5-7 business days";
   } catch (e) {
-    console.error("Failed to fetch stitching fee", e);
+    console.error("Failed to fetch settings", e);
   }
 
   return {
@@ -77,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       initialVariants: variants,
       initialSelectedVariant: initialVariant,
       initialStitchingFee,
+      deliveryTimeline,
     },
   };
 };
@@ -86,14 +89,17 @@ interface ProductPageProps {
   initialVariants: ProductVariant[];
   initialSelectedVariant: ProductVariant;
   initialStitchingFee: number;
+  deliveryTimeline: string;
 }
 
-const ProductPage: React.FC<ProductPageProps> = ({
-  initialProductDetails,
-  initialVariants,
-  initialSelectedVariant,
-  initialStitchingFee,
-}) => {
+const ProductPage = (props: ProductPageProps) => {
+  const {
+    initialProductDetails,
+    initialVariants,
+    initialSelectedVariant,
+    initialStitchingFee,
+    deliveryTimeline,
+  } = props;
   const router = useRouter();
   const { cartItems, addToCart, updateQuantity: updateCartQuantity } = useCart();
   const { data: session, status } = useSession();
@@ -1115,7 +1121,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             </PurchaseCard>
 
             <DeliveryTimeline>
-              <FaCheckCircle /> Delivered in 5-7 business days
+              <FaCheckCircle /> Delivered in {deliveryTimeline}
             </DeliveryTimeline>
 
             <TrustBadgesContainer>
