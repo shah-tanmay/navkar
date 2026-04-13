@@ -87,7 +87,7 @@ export const Payment = ({
             });
           }
           toast.success("Payment successful!");
-          router.push(`/orders/${orderToken}?success=true`);
+          router.push(`/checkout/success/${orderToken}`);
         } else {
           toast.error("Payment failed. Please try again.");
         }
