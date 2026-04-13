@@ -38,11 +38,16 @@ const ProductCard = ({
   stitchingFee?: number;
 }) => {
   const router = useRouter();
-  const types = _.uniq(_.map(variants, "type")).sort((a, b) => {
-    if (a.toLowerCase() === 'custom') return 1;
-    if (b.toLowerCase() === 'custom') return -1;
-    return 0;
-  });
+  const types = _.chain(variants)
+    .groupBy("type")
+    .map((variants, type) => ({
+      type,
+      minPrice: _.minBy(variants, (v) => Number(v.price))?.price || 0
+    }))
+    .orderBy(["minPrice"], ["asc"])
+    .map("type")
+    .value();
+
   const colors = _.uniq(_.map(variants, "color_hex_code"));
   const firstVariant = _.first(variants);
   const displayVariants = variants.length > 1 ? variants.filter(v => v.type?.toLowerCase() !== 'custom') : variants;
