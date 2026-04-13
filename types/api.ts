@@ -118,6 +118,8 @@ export interface ProductVariantDetails {
   catalogue_name?: string;
   serial_number?: string;
   is_discontinued?: boolean;
+  stitching_fee?: number;
+  delivery_timeline?: string;
 }
 
 export interface CartItems {

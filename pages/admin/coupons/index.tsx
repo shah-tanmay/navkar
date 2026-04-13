@@ -58,14 +58,23 @@ const AdminCoupons: NextPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure?")) return;
+  const handleDelete = async (id: string | number) => {
+    if (!id) {
+      toast.error("Invalid coupon ID");
+      return;
+    }
+    if (!confirm("Are you sure you want to permanently delete this coupon?")) return;
+    
     try {
+      console.log(`Deleting coupon: ${id}`);
       await axios.delete(`/admin/coupons/${id}`);
-      toast.success("Coupon Deleted");
+      toast.success("Coupon removed successfully");
       fetchData();
-    } catch (e) {
-      toast.error("Deletion failed");
+    } catch (e: any) {
+      console.error("Delete failed:", e);
+      const msg = e.response?.data?.message || "Deletion failed";
+      toast.error(msg);
+      fetchData(); // Refresh anyway to sync state
     }
   };
 

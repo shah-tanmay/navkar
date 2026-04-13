@@ -63,15 +63,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const variants = _.get(details, "variants", []);
   const initialVariant = _.find(variants, (v) => v.slug === slug) || variants[0];
 
-  let initialStitchingFee = 0;
-  let deliveryTimeline = "5-7 business days";
-  try {
-    const configRes = await api.get("/admin/settings");
-    initialStitchingFee = configRes.data.stitching_fee || 0;
-    deliveryTimeline = configRes.data.delivery_timeline || "5-7 business days";
-  } catch (e) {
-    console.error("Failed to fetch settings", e);
-  }
+  const initialStitchingFee = details.stitching_fee || 0;
+  const deliveryTimeline = details.delivery_timeline || "5-7 business days";
 
   return {
     props: {

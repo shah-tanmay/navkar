@@ -32,7 +32,7 @@ const CartPage = () => {
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const res = await api.get("/admin/settings");
+        const res = await api.get("/config/shipping");
         if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
         if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
       } catch (e) {
@@ -50,6 +50,8 @@ const CartPage = () => {
     if (!couponCode) return;
     setIsApplyingCoupon(true);
     setCouponError("");
+    setAppliedCoupon(null); // Clear previous successful state before trying new one
+    setCouponDiscount(0);
     try {
       const coupon = await validateCoupon(couponCode.trim().toUpperCase());
       
@@ -60,12 +62,8 @@ const CartPage = () => {
 
       let discount = 0;
       if (coupon.type === "free_shipping") {
-        // Handled in subtotal/total calculation by setting couponDiscount to 0 
-        // but marking shipping as free in UI if needed, or by setting a flag.
-        // For simplicity, we'll let the user see -₹50 if they use a free shipping code.
         discount = shippingFee; 
       } else if (coupon.product_id) {
-        // Product specific
         let targetSubtotal = 0;
         cartItems.forEach(item => {
           if (item.product_id === coupon.product_id) {
@@ -81,7 +79,6 @@ const CartPage = () => {
           discount = Math.min(targetSubtotal, parseFloat(coupon.value));
         }
       } else {
-        // Global
         if (coupon.type === "percentage") {
           discount = (subtotal * parseFloat(coupon.value)) / 100;
         } else {
@@ -89,7 +86,6 @@ const CartPage = () => {
         }
       }
 
-      // Add free shipping bonus if coupon says so
       if (coupon.is_free_shipping && coupon.type !== "free_shipping") {
         discount += shippingFee;
       }
@@ -100,6 +96,8 @@ const CartPage = () => {
       toast.success("Coupon applied!");
     } catch (err: any) {
       setCouponError(err.response?.data?.message || err.message || "Invalid coupon");
+      setAppliedCoupon(null);
+      setCouponDiscount(0);
     } finally {
       setIsApplyingCoupon(false);
     }
@@ -191,7 +189,10 @@ const CartPage = () => {
 
               <S.OrderSummary>
                 <S.SummaryCard>
-                  <h2>Order Summary</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h2>Order Summary</h2>
+                    <span style={{ fontSize: '0.6rem', color: '#94a3b8', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>v2.1.0-STRICT</span>
+                  </div>
 
                    <S.SummaryRow>
                     <span>Subtotal ({cartItems?.length} items)</span>
@@ -247,6 +248,20 @@ const CartPage = () => {
 
                   <S.CheckoutButton
                     onClick={async () => {
+                      // Final Safety Check: Re-validate coupon if one is applied
+                      if (appliedCoupon) {
+                        try {
+                          console.log(`[Checkout] Pre-flight re-validating coupon: ${appliedCoupon.code}`);
+                          const freshCoupon = await validateCoupon(appliedCoupon.code);
+                          if (!freshCoupon) throw new Error("Coupon is no longer valid");
+                        } catch (err: any) {
+                          toast.error("Your applied coupon is no longer valid and has been removed.");
+                          setAppliedCoupon(null);
+                          setCouponDiscount(0);
+                          return; // Stop the checkout
+                        }
+                      }
+
                       const orderResponse = await createOrder(
                         orderToken,
                         _.map(cartItems, (item) => {

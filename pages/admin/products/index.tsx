@@ -102,13 +102,14 @@ const AdminProducts: NextPage = () => {
       const rawProducts = res.data.products || [];
       const mappedProducts = rawProducts.map((p: any) => ({
         ...p,
-        real_id: p.product_id || p.id,
-        id: (p.variants && p.variants[0] ? p.variants[0].slug : p.product_id) || p.product_id || p.id,
+        id: p.product_id || p.id,
+        real_id: p.product_id || p.id, 
         name: p.product_name || p.name,
         price: p.price || (p.variants && p.variants[0] ? p.variants[0].price : 0),
         stock: p.stock || 0,
         image_url: p.image_url || (p.variants && p.variants[0] ? p.variants[0].image_url : null),
         is_discontinued: p.is_discontinued,
+        variant_slug: p.variants && p.variants[0] ? p.variants[0].slug : null
       }));
       setProducts(mappedProducts);
       setLoading(false);
