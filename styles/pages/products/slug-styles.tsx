@@ -251,19 +251,28 @@ export const AccordionContent = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
-export const WarrantyBadge = styled.div`
+export const WarrantyBadge = styled.div<{ $isHighlight?: boolean }>`
   position: absolute;
   top: 20px;
   right: 20px;
-  background: ${COLORS.secondary};
-  color: ${COLORS.gold};
-  padding: 0.8rem 1.5rem;
+  background: ${props => props.$isHighlight ? COLORS.gold : COLORS.secondary};
+  color: ${props => props.$isHighlight ? COLORS.secondary : COLORS.gold};
+  padding: ${props => props.$isHighlight ? '0.6rem 1.25rem' : '0.8rem 1.5rem'};
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: ${props => props.$isHighlight ? '0.8rem' : '0.9rem'};
+  font-weight: 700;
   letter-spacing: 0.5px;
-  z-index: 3;
+  z-index: 100;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-transform: uppercase;
+  border: ${props => props.$isHighlight ? `1.5px solid ${COLORS.secondary}` : 'none'};
+
+  @media (max-width: 768px) {
+    top: 25px;
+    right: 25px;
+    padding: 0.5rem 1rem;
+    font-size: 0.7rem;
+  }
 `;
 
 export const PurchaseCard = styled.div<{ $hideOnMobile?: boolean; $isSecondary?: boolean }>`

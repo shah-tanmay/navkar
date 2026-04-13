@@ -9,7 +9,6 @@ export const BuyNowButton = styled.button`
   height: 44px;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   background: ${COLORS.gold};
   color: ${COLORS.secondary};

@@ -43,6 +43,7 @@ import ProductNotFoundPage from "../../../components/ProductNotFound";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
 import { GetServerSideProps } from "next";
+import { Modal } from "../../../components/Modal";
 
 import { toOgImage } from "../../../utils/seo";
 import { toast } from "react-toastify";
@@ -111,7 +112,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
-  const [hangingStyle, setHangingStyle] = useState<string>("Eyelets");
+  const [hangingStyle, setHangingStyle] = useState<string | null>(null);
+  const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>("desc");
   const [showMobileSticky, setShowMobileSticky] = useState(true);
   const bottomTriggerRef = useRef<HTMLDivElement>(null);
@@ -159,7 +161,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
         setSelectedVariant(matchingVariant);
       }
     }
-  }, [router.isReady, router.query, variants]);
+  }, [router.isReady, router.query, variants, selectedVariant?.color_hex_code]);
 
   // 2. State -> URL Sync (Only for secondary params)
   useEffect(() => {
@@ -170,7 +172,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       ...currentQuery,
       slug: selectedVariant.slug, // Explicitly keep current variant slug
       q: quantity > 1 ? quantity : undefined,
-      hs: hangingStyle !== 'Eyelets' ? hangingStyle : undefined
+      hs: hangingStyle || undefined
     };
 
     if (selectedVariant.type?.toLowerCase() === 'custom') {
@@ -241,6 +243,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
         const v = parseFloat(val) || 0;
         if (unit === "ft") return v * 12;
         if (unit === "m") return v * 39.3701;
+        if (unit === "cm") return v / 2.54;
         return v;
       };
 
@@ -269,6 +272,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
     let widthInInches = val;
     if (windowUnit === "ft") widthInInches = val * 12;
     if (windowUnit === "m") widthInInches = val * 39.3701;
+    if (windowUnit === "cm") widthInInches = val / 2.54;
     
     // Standard effective width after pleating (curtain fullness)
     // American Pleats cover ~20", Eyelets cover ~22"
@@ -283,6 +287,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const handleBuyNow = async (overrideQuantity?: number) => {
     if (!selectedVariant) return;
+
+    if (!hangingStyle) {
+      setIsStyleModalOpen(true);
+      return;
+    }
 
     if (selectedVariant.type?.toLowerCase() === "custom") {
       if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
@@ -414,7 +423,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   style={{ objectFit: "cover", borderRadius: "12px" }}
                 />
               )}
-              <WarrantyBadge>Grade Quality Curtain</WarrantyBadge>
+              <WarrantyBadge $isHighlight>Available in Eyelets & American Pleats</WarrantyBadge>
             </MainImage>
             <ThumbnailGrid>
               {_.uniq([
@@ -540,7 +549,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
             </BadgeContainer>
 
             <HangingOptions style={{ marginTop: '0', marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#111827', marginBottom: '1rem' }}>Select Hanging Style (Pleaters)</h3>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#111827', marginBottom: '1rem' }}>Select Hanging Style (Pleaters) <span style={{ color: '#b91c1c', fontSize: '0.8rem' }}>* Required</span></h3>
               <HangingGrid>
                 <HangingCard 
                   $active={hangingStyle === "Eyelets"} 
@@ -592,9 +601,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 <h3>Perfect Fit Calculator</h3>
               </RecommendationHeader>
               <RecommendationBody>
-                <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #e0f2fe' }}>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#0369a1', lineHeight: '1.4' }}>
-                    <strong>Expert Tip:</strong> For perfect drapes and coverage, we&apos;ll calculate the exact panels required. You stay in control—we just handle the math for your space.
+                <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #e5e5e5' }}>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.4' }}>
+                    <strong>Our Recommendation:</strong> We want to help you achieve the most elegant drapes and coverage for your room. Simply share your space&apos;s width, and we&apos;ll calculate exactly what&apos;s needed to give you the most stunning look.
                   </p>
                 </div>
                 <div className="input-section">
@@ -609,6 +618,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     <select value={windowUnit} onChange={(e) => setWindowUnit(e.target.value)}>
                       <option value="in">Inches</option>
                       <option value="ft">Feet</option>
+                      <option value="cm">CM</option>
                       <option value="m">Meters</option>
                     </select>
                   </div>
@@ -756,7 +766,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   ))}
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                  * Width is fixed per catalogue: {(productDetails as any)?.fixed_width || 48} inches (4ft)
+                  * Width is fixed per catalogue: {(productDetails as any)?.fixed_width || 48} inches ({(((productDetails as any)?.fixed_width || 48) / 12) % 1 === 0 ? ((productDetails as any)?.fixed_width || 48) / 12 : (((productDetails as any)?.fixed_width || 48) / 12).toFixed(1)}ft)
                 </p>
 
                 {selectedVariant?.type?.toLowerCase() === "custom" && (
@@ -794,6 +804,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                           >
                             <option value="in">Inches</option>
                             <option value="ft">Feet</option>
+                            <option value="cm">CM</option>
                             <option value="m">Meters</option>
                           </select>
                       </div>
@@ -1039,11 +1050,72 @@ const ProductPage: React.FC<ProductPageProps> = ({
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
         {!productDetails?.is_discontinued && (
           <MobileStickyActions $visible={showMobileSticky}>
-            <BuyNow onClick={() => handleBuyNow()} />
+            <BuyNow 
+              onClick={() => handleBuyNow()} 
+              price={(selectedVariant?.type?.toLowerCase() === "custom" && customPrice > 0) ? customPrice : (Number(selectedVariant?.price || 0) + initialStitchingFee)} 
+            />
           </MobileStickyActions>
         )}
         
-
+        <Modal 
+          isOpen={isStyleModalOpen} 
+          onClose={() => setIsStyleModalOpen(false)}
+          title="Choose Your Hanging Style"
+        >
+          <div style={{ padding: '0.5rem 0' }}>
+            <p style={{ fontSize: '0.95rem', color: '#4b5563', marginBottom: '1.5rem', textAlign: 'center' }}>
+              Select the perfect style for your curtains before proceeding.
+            </p>
+            <HangingGrid style={{ marginBottom: '1.5rem' }}>
+              <HangingCard 
+                $active={hangingStyle === "Eyelets"} 
+                onClick={() => {
+                  setHangingStyle("Eyelets");
+                  setIsStyleModalOpen(false);
+                  setTimeout(() => handleBuyNow(), 100);
+                }}
+              >
+                <div className="img-wrapper">
+                  <Image 
+                    loader={cloudinaryLoader}
+                    src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776016703/static_assets/hanging_eyelets_final.png" 
+                    alt="Eyelets Style" 
+                    fill
+                    quality={75}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="info">
+                  <span className="name">Eyelets</span>
+                  <span className="desc">Regular rings</span>
+                </div>
+              </HangingCard>
+              <HangingCard 
+                $active={hangingStyle === "American Pleats"} 
+                onClick={() => {
+                  setHangingStyle("American Pleats");
+                  setIsStyleModalOpen(false);
+                  setTimeout(() => handleBuyNow(), 100);
+                }}
+              >
+                <div className="img-wrapper">
+                  <Image 
+                    loader={cloudinaryLoader}
+                    src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776020723/static_assets/american_pleats_v2.png" 
+                    alt="American Pleats Style" 
+                    fill
+                    quality={75}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="info">
+                  <span className="name">American Pleats</span>
+                  <span className="desc">Premium pleats</span>
+                </div>
+              </HangingCard>
+            </HangingGrid>
+          </div>
+        </Modal>
 
       </ProductPageWrapper>
     </LoaderWrapper>

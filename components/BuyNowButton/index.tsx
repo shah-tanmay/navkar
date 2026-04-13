@@ -5,9 +5,11 @@ import { isUserloggedIn } from "../../utils/login";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  price?: number;
+}
 
-export const BuyNow: React.FC<ButtonProps> = ({ onClick, ...props }) => {
+export const BuyNow: React.FC<ButtonProps> = ({ onClick, price, ...props }) => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -29,8 +31,32 @@ export const BuyNow: React.FC<ButtonProps> = ({ onClick, ...props }) => {
   return (
     <div style={{ position: "relative" }}>
       <BuyNowButton {...props} onClick={handleClick}>
-        <FiPackage />
-        Buy Now
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px',
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'max-content'
+        }}>
+          <FiPackage />
+          <span>Buy Now</span>
+        </div>
+        {price !== undefined && (
+          <span style={{ 
+            background: 'rgba(255,255,255,0.2)', 
+            padding: '2px 8px', 
+            borderRadius: '4px', 
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            marginLeft: 'auto',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            ₹{price.toLocaleString('en-IN')}
+          </span>
+        )}
       </BuyNowButton>
     </div>
   );
