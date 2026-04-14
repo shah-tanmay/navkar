@@ -14,10 +14,26 @@ export const FooterWrapper = styled.div`
 `;
 
 export const FooterLogoDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
   @media screen and (max-width: 425px) {
-    display: grid;
-    place-items: center;
-    margin-left: 40px;
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+export const FooterContactDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+
+  @media screen and (max-width: 425px) {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 `;
 

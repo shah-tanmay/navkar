@@ -14,6 +14,7 @@ import {
   SocialAnchor,
   FooterLinksRow,
   FooterLinkItem,
+  FooterContactDetails,
 } from "./styles";
 
 const Footer = () => {
@@ -29,14 +30,14 @@ const Footer = () => {
             height={44.22}
             loading="lazy"
           />
-          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-             <SocialAnchor href={`mailto:${SUPPORT_EMAIL}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '14px', color: '#794328' }}>
+          <FooterContactDetails>
+             <SocialAnchor href={`mailto:${SUPPORT_EMAIL}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '14px', color: '#794328', textDecoration: 'none' }}>
                 <FaEnvelope size={16} /> {SUPPORT_EMAIL}
              </SocialAnchor>
-             <SocialAnchor href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '14px', color: '#794328' }}>
+             <SocialAnchor href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '14px', color: '#794328', textDecoration: 'none' }}>
                 <FaWhatsapp size={16} /> WhatsApp Support
              </SocialAnchor>
-          </div>
+          </FooterContactDetails>
         </FooterLogoDiv>
         <FooterSocials>
           <FooterSocialIconWrapper>
