@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import COLORS from "../constants/color";
 import { FREE_SHIPPING_THRESHOLD } from "../constants";
 import { FiArrowLeft, FiTruck, FiMapPin, FiClock } from "react-icons/fi";
 import { useRouter } from "next/router";
 import SEO from "../components/SEO";
+import api from "../lib/axios";
 
 const Container = styled.div`
   max-width: 900px;
@@ -87,6 +88,21 @@ const TimeCard = styled.div`
 
 const ShippingPage = () => {
   const router = useRouter();
+  const [threshold, setThreshold] = useState(FREE_SHIPPING_THRESHOLD);
+  const [flatFee, setFlatFee] = useState(50);
+
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        const res = await api.get("/config/shipping");
+        if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
+        if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
+      } catch (e) {
+        console.error("Failed to fetch shipping configs", e);
+      }
+    };
+    fetchConfigs();
+  }, []);
 
   return (
     <Container>
@@ -118,7 +134,7 @@ const ShippingPage = () => {
       <p>Your orders are dispatched within <strong>1-2 business days</strong> and are typically delivered in <strong>5-7 business days</strong> across India.</p>
 
       <SectionTitle><FiTruck /> Shipping Charges</SectionTitle>
-      <p>We offer <strong>free shipping on all orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of ₹50 is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
+      <p>We offer <strong>free shipping on all orders above ₹{threshold.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of ₹{flatFee} is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
 
       <div style={{ marginTop: "4rem", padding: "2rem", border: `1px solid ${COLORS.accent}`, borderRadius: "12px" }}>
         <h3>📦 Damaged in Transit?</h3>

@@ -22,6 +22,7 @@ import { AddressModal } from "../../components/AddressModal";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import Link from "next/link";
 import _ from "lodash";
+import { WHATSAPP_NUMBER } from "../../constants";
 
 const AccountPage = () => {
   const { data: session, update: updateSession } = useSession();
@@ -120,7 +121,7 @@ const AccountPage = () => {
 
   const openWhatsApp = (orderToken: string) => {
     const message = `Hi Navkar Team, I have an issue with my order #${orderToken}. Can you please help?`;
-    window.open(`https://wa.me/91916834423?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const mapAddressToData = (address: Address | null): any => {

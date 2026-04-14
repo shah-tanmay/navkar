@@ -5,6 +5,7 @@ import { FiArrowLeft, FiRefreshCw, FiTruck, FiShield } from "react-icons/fi";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import SEO from "../components/SEO";
+import { WHATSAPP_LINK } from "../constants";
 
 const Container = styled.div`
   max-width: 900px;
@@ -137,7 +138,7 @@ const ReturnsPage = () => {
         <ol>
           <li>Go to your <Link href="/account" style={{ color: COLORS.gold, fontWeight: "600" }}>Order History</Link> in the My Account section.</li>
           <li>Click on <strong>Support</strong> next to the order you wish to return.</li>
-          <li>Share the reason for return via <a href="https://wa.me/91916834423" target="_blank" rel="noreferrer" style={{ color: COLORS.gold, fontWeight: "600" }}>WhatsApp</a>.</li>
+          <li>Share the reason for return via <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" style={{ color: COLORS.gold, fontWeight: "600" }}>WhatsApp</a>.</li>
           <li>Once approved, a reverse pickup will be scheduled.</li>
         </ol>
       </Section>
