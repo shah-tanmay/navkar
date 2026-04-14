@@ -19,7 +19,9 @@ const AdminCoupons: NextPage = () => {
     usage_limit: "",
     product_id: "",
     min_order_amount: "0",
-    is_free_shipping: false
+    is_free_shipping: false,
+    is_first_order_only: false,
+    show_in_banner: false
   });
 
   const fetchData = async () => {
@@ -48,10 +50,12 @@ const AdminCoupons: NextPage = () => {
         usage_limit: form.usage_limit ? parseInt(form.usage_limit) : null,
         expiry_date: form.expiry_date || null,
         product_id: form.product_id || null,
-        is_free_shipping: !!form.is_free_shipping
+        is_free_shipping: !!form.is_free_shipping,
+        is_first_order_only: !!form.is_first_order_only,
+        show_in_banner: !!form.show_in_banner
       });
       toast.success("Coupon Created");
-      setForm({ code: "", type: "percentage", value: "0", expiry_date: "", usage_limit: "", product_id: "", min_order_amount: "0", is_free_shipping: false });
+      setForm({ code: "", type: "percentage", value: "0", expiry_date: "", usage_limit: "", product_id: "", min_order_amount: "0", is_free_shipping: false, is_first_order_only: false, show_in_banner: false });
       fetchData();
     } catch (e) {
       toast.error("Creation failed");
@@ -134,6 +138,14 @@ const AdminCoupons: NextPage = () => {
               <label style={{ fontSize: "0.8rem", display: "block", marginBottom: "4px" }}>Usage Limit</label>
               <input type="number" value={form.usage_limit} onChange={(e) => setForm({...form, usage_limit: e.target.value})} style={{ width: "100%", padding: "0.6rem", border: "1px solid #ddd", borderRadius: "4px" }} placeholder="∞" />
             </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingTop: "0.5rem" }}>
+              <input type="checkbox" checked={form.is_first_order_only} onChange={(e) => setForm({...form, is_first_order_only: e.target.checked})} id="first_order" style={{ width: "18px", height: "18px" }} />
+              <label htmlFor="first_order" style={{ fontSize: "0.9rem", fontWeight: "500" }}>First Order Only</label>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingTop: "0.5rem" }}>
+              <input type="checkbox" checked={form.show_in_banner} onChange={(e) => setForm({...form, show_in_banner: e.target.checked})} id="show_banner" style={{ width: "18px", height: "18px" }} />
+              <label htmlFor="show_banner" style={{ fontSize: "0.9rem", fontWeight: "500" }}>Show in Banner</label>
+            </div>
             <button type="submit" style={{ gridColumn: "1 / -1", background: "#111", color: "#D4AF37", border: "none", borderRadius: "4px", padding: "1rem", cursor: "pointer", fontWeight: "bold", fontSize: "1rem", textTransform: "uppercase", letterSpacing: "1px" }}>
               Create Coupon
             </button>
@@ -183,6 +195,16 @@ const AdminCoupons: NextPage = () => {
                         {parseFloat(c.min_order_amount) > 0 && (
                           <div style={{ fontSize: "0.8rem", color: "#f59e0b", marginTop: "4px" }}>
                             Min. spend: ₹{c.min_order_amount}
+                          </div>
+                        )}
+                        {c.is_first_order_only && (
+                          <div style={{ fontSize: "0.75rem", color: "#ec4899", fontWeight: "600", marginTop: "4px", textTransform: "uppercase" }}>
+                            💖 First Order Only
+                          </div>
+                        )}
+                        {c.show_in_banner && (
+                          <div style={{ fontSize: "0.75rem", color: "#0ea5e9", fontWeight: "600", marginTop: "4px", textTransform: "uppercase" }}>
+                            📣 In Banner
                           </div>
                         )}
                       </td>

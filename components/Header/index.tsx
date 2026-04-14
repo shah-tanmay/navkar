@@ -24,6 +24,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import _ from "lodash";
 import { useCart } from "../../context/CartContext";
+import TopBanner from "../TopBanner";
 
 const Header = () => {
   const { cartItems } = useCart();
@@ -40,19 +41,7 @@ const Header = () => {
   return (
     <Fragment>
       <div style={{ position: "sticky", top: 0, zIndex: 1000 }}>
-        <div
-          style={{
-            background: "#111",
-            color: "white",
-            fontSize: "0.75rem",
-            textAlign: "center",
-            padding: "8px",
-            letterSpacing: "1px",
-            fontWeight: "500",
-          }}
-        >
-          FREE SHIPPING ON ALL ORDERS ABOVE ₹2000
-        </div>
+        <TopBanner />
         <HeaderWrapper>
           <LogoImage
             loader={cloudinaryLoader}
