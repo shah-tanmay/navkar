@@ -106,8 +106,7 @@ const FaqPage = () => {
       q: "Can I customize the height of the curtains?",
       a: (
         <>
-          Yes! While our standard sizes cover most windows and doors, we do offer custom tailoring for bulk orders. Please {" "}
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">reach out to our support via WhatsApp</a> for custom height requests.
+          Yes! You can choose the &apos;Custom&apos; size option on any <Link href="/products">product page</Link> to enter your specific height and width requirements. For bulk custom orders or special requests, you can also <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">reach out to us on WhatsApp</a>.
         </>
       )
     },
