@@ -85,9 +85,14 @@ export const Payment = ({
               currency: "INR",
               value: total
             });
+          } else {
+            console.warn("[Meta Pixel] fbq not available — Purchase event not fired.");
           }
           toast.success("Payment successful!");
-          router.push(`/order-success/${orderToken}`);
+          // Small delay so the pixel beacon can be dispatched before page navigation
+          setTimeout(() => {
+            router.push(`/order-success/${orderToken}`);
+          }, 300);
         } else {
           toast.error("Payment failed. Please try again.");
         }
