@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { useRouter } from "next/router";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import { ToastContainer } from "react-toastify";
@@ -53,6 +53,38 @@ function AuthErrorHandler() {
   useAuthErrorHandler();
   return null;
 }
+
+// ── Meta Advanced Matching ──────────────────────────────────────────────────
+// Hashes the logged-in user's email with SHA-256 (Web Crypto API, no library)
+// and passes it to fbq('init') so Meta can match events to Facebook profiles.
+// This lifts the match rate from ~44% (automatic only) toward 85-95%+.
+async function sha256hex(plain: string): Promise<string> {
+  const encoded = new TextEncoder().encode(plain.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function MetaAdvancedMatching({ pixelId }: { pixelId: string }) {
+  const { data: session } = useSession();
+  const email = (session?.user as any)?.email as string | undefined;
+
+  useEffect(() => {
+    if (!pixelId || !email) return;
+    if (typeof window === "undefined" || !(window as any).fbq) return;
+
+    sha256hex(email).then((hashedEmail) => {
+      // Re-calling init with user data is the official Meta pattern for
+      // manual advanced matching — it updates the identity context without
+      // duplicating the pixel or resetting event queues.
+      (window as any).fbq("init", pixelId, { em: hashedEmail });
+    });
+  }, [email, pixelId]);
+
+  return null;
+}
+// ── End Meta Advanced Matching ──────────────────────────────────────────────
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter();
@@ -172,6 +204,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         <CartProvider>
           <SessionProvider session={session}>
             <AuthErrorHandler />
+            <MetaAdvancedMatching pixelId={pixelId} />
             <GlobalStyle />
             <ToastContainer />
             <GoogleAnalytics trackPageViews strategy="lazyOnload" />
