@@ -39,6 +39,24 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     if (isLoading) return;
     setIsLoading(true);
+
+    // ── Tracking: Login page — "Continue with Google" clicked ─────────────
+    // Meta Pixel — Lead is the closest standard event for a sign-in attempt
+    if (typeof window !== "undefined" && (window as any).fbq) {
+      (window as any).fbq("track", "Lead", {
+        content_name: "google_sign_in",
+        content_category: "authentication",
+      });
+    }
+
+    // Google Ads — custom event so you can see it in GA4 / Google Ads events
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "login_attempt", {
+        method: "google",
+      });
+    }
+    // ── End tracking ───────────────────────────────────────────────────────
+
     try {
       await signIn("google", {
         callbackUrl: typeof redirect === "string" ? redirect : "/",
