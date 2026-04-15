@@ -66,7 +66,11 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
     const trackPageView = () => {
       if (typeof window !== "undefined" && (window as any).fbq) {
-        (window as any).fbq("track", "PageView");
+        (window as any).fbq("track", "PageView", {
+          page_title:    document.title,
+          page_location: window.location.href,
+          page_path:     window.location.pathname,
+        });
       }
     };
 
@@ -83,7 +87,10 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     const trackGtagPageView = () => {
       if (typeof window !== "undefined" && (window as any).gtag) {
         (window as any).gtag("event", "page_view", {
-          send_to: googleAdsId,
+          send_to:       googleAdsId,
+          page_title:    document.title,
+          page_location: window.location.href,
+          page_path:     window.location.pathname,
         });
       }
     };
