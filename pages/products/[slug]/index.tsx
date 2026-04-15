@@ -234,16 +234,34 @@ const ProductPage = (props: ProductPageProps) => {
     }
   }, [quantity, customLength, customWidth, customUnit, hangingStyle, selectedVariant?.type]);
 
-  // Meta Pixel Tracking (ViewContent)
+  // Pixel & Google Ads Tracking (ViewContent / view_item)
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).fbq && selectedVariant) {
+    if (typeof window === "undefined" || !selectedVariant) return;
+
+    // Meta Pixel
+    if ((window as any).fbq) {
       (window as any).fbq("track", "ViewContent", {
         content_name: (productDetails as any)?.product_name || selectedVariant.slug,
         content_category: (selectedVariant as any).type,
         content_ids: [selectedVariant.id],
-        content_type: 'product',
+        content_type: "product",
         value: getCurrentPrice(),
-        currency: 'INR'
+        currency: "INR",
+      });
+    }
+
+    // Google Ads
+    if ((window as any).gtag) {
+      (window as any).gtag("event", "view_item", {
+        currency: "INR",
+        value: getCurrentPrice(),
+        items: [{
+          item_id: selectedVariant.id,
+          item_name: (productDetails as any)?.product_name || selectedVariant.slug,
+          item_category: (selectedVariant as any).type,
+          price: getCurrentPrice(),
+          quantity: 1,
+        }],
       });
     }
   }, [selectedVariant?.id]);

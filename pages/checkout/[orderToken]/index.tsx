@@ -130,10 +130,24 @@ const CheckoutPage = () => {
           currency: "INR",
           value: orderTotal
         });
+        // Meta Pixel
         if (typeof window !== "undefined" && (window as any).fbq) {
           (window as any).fbq("track", "InitiateCheckout", {
             currency: "INR",
             value: orderTotal
+          });
+        }
+        // Google Ads
+        if (typeof window !== "undefined" && (window as any).gtag) {
+          (window as any).gtag("event", "begin_checkout", {
+            currency: "INR",
+            value: orderTotal,
+            items: (orderDetails.order_items || []).map((item: any) => ({
+              item_id: item.product_variant_id,
+              item_name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+            })),
           });
         }
 

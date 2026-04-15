@@ -58,7 +58,9 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter();
 
   const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "";
+  const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "";
 
+  // Track Meta PageView on client-side navigation
   useEffect(() => {
     if (!pixelId) return;
 
@@ -73,6 +75,24 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
       router.events.off("routeChangeComplete", trackPageView);
     };
   }, [router.events, pixelId]);
+
+  // Track Google Ads page_view on client-side navigation
+  useEffect(() => {
+    if (!googleAdsId) return;
+
+    const trackGtagPageView = () => {
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "page_view", {
+          send_to: googleAdsId,
+        });
+      }
+    };
+
+    router.events.on("routeChangeComplete", trackGtagPageView);
+    return () => {
+      router.events.off("routeChangeComplete", trackGtagPageView);
+    };
+  }, [router.events, googleAdsId]);
 
   return (
     <main className={`${outfit.variable} ${saira.variable}`}>
@@ -116,6 +136,29 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                 alt=""
               />
             </noscript>
+          </>
+        )}
+
+        {/* Google Ads (gtag.js) — loads after hydration so it never blocks LCP */}
+        {googleAdsId && (
+          <>
+            <Script
+              id="gtag-loader"
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`}
+            />
+            <Script
+              id="gtag-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${googleAdsId}');
+                `,
+              }}
+            />
           </>
         )}
 

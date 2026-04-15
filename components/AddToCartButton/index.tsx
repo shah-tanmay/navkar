@@ -64,11 +64,19 @@ export const AddToCart = ({
         currency: "INR",
         items: [{ item_id: variantId, quantity }],
       });
+      // Meta Pixel
       if (typeof window !== "undefined" && (window as any).fbq) {
         (window as any).fbq("track", "AddToCart", {
           content_ids: [variantId],
           content_type: "product",
           currency: "INR",
+        });
+      }
+      // Google Ads
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "add_to_cart", {
+          currency: "INR",
+          items: [{ item_id: variantId, quantity }],
         });
       }
     } catch (err) {

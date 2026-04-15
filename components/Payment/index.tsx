@@ -88,8 +88,22 @@ export const Payment = ({
           } else {
             console.warn("[Meta Pixel] fbq not available — Purchase event not fired.");
           }
+          // Google Ads conversion event
+          const gadsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+          const gadsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
+          if (typeof window !== "undefined" && (window as any).gtag && gadsId) {
+            const sendTo = gadsLabel ? `${gadsId}/${gadsLabel}` : gadsId;
+            (window as any).gtag("event", "conversion", {
+              send_to: sendTo,
+              currency: "INR",
+              value: total,
+              transaction_id: orderToken,
+            });
+          } else {
+            console.warn("[Google Ads] gtag not available — conversion event not fired.");
+          }
           toast.success("Payment successful!");
-          // Small delay so the pixel beacon can be dispatched before page navigation
+          // Small delay so all tracking beacons can be dispatched before page navigation
           setTimeout(() => {
             router.push(`/order-success/${orderToken}`);
           }, 300);
