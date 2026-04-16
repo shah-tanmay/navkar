@@ -49,6 +49,7 @@ const CheckoutPage = () => {
   const [couponError, setCouponError] = useState("");
   const [orderMetadata, setOrderMetadata] = useState<any>({});
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState<any>(null);
 
 
   const { isActive, releaseReservations } = useReservations({
@@ -110,6 +111,7 @@ const CheckoutPage = () => {
           ? JSON.parse(orderDetails.metadata) 
           : (orderDetails.metadata || {});
         setOrderMetadata(metadata);
+        setShippingAddress(orderDetails.shipping_address);
         
         let initialAddressId = orderDetails.shipping_address_id;
 
@@ -294,10 +296,15 @@ const CheckoutPage = () => {
                       },
                       beforeNextStep: async () => {
                         if (selectedAddress) {
-                          await updateOrder(
+                          const updated = await updateOrder(
                             orderToken,
                             { shipping_address_id: selectedAddress }
                           );
+                          if (updated) {
+                            setShippingAddress(updated.shipping_address);
+                            const meta = typeof updated.metadata === 'string' ? JSON.parse(updated.metadata) : (updated.metadata || {});
+                            setOrderMetadata(meta);
+                          }
                         }
                         if (!isAddressSaved && !selectedAddress) {
                           const values = methods.getValues() as any;
@@ -328,10 +335,15 @@ const CheckoutPage = () => {
                           if (response) {
                             setIsAddressSaved(true);
                             const shippingAddressId = response.id;
-                            await updateOrder(
+                            const updated = await updateOrder(
                               orderToken,
                               { shipping_address_id: shippingAddressId }
                             );
+                            if (updated) {
+                              setShippingAddress(updated.shipping_address);
+                              const meta = typeof updated.metadata === 'string' ? JSON.parse(updated.metadata) : (updated.metadata || {});
+                              setOrderMetadata(meta);
+                            }
                           }
                         }
                       },
@@ -345,7 +357,7 @@ const CheckoutPage = () => {
                           orderToken={orderToken}
                           onBack={() => setStartStep(1)}
                           orderItems={orderItems}
-                          shippingDetails={methods.getValues() as any}
+                          shippingDetails={shippingAddress || methods.getValues() as any}
                         />
                       ),
                       validate: async () => {

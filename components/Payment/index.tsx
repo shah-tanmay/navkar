@@ -39,9 +39,37 @@ export const Payment = ({
   const totalPanels = orderItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const designs = orderItems.map(item => item.product_name).join(", ");
   
-  const addressStr = shippingDetails?.street 
-    ? `${shippingDetails.flatHouseNo}, ${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zip}`
-    : "Provided during checkout";
+  const getAddressString = () => {
+    if (!shippingDetails) return "Provided during checkout";
+    
+    // Handle both form state (zip) and DB state (postal_code)
+    const zip = shippingDetails.zip || shippingDetails.postal_code || "";
+    const city = shippingDetails.city || "";
+    const state = shippingDetails.state || "";
+    
+    // Recovery of house number from the 'street' field if it has the '::' separator
+    let street = shippingDetails.street || "";
+    let houseNo = shippingDetails.flatHouseNo || "";
+    
+    if (street.includes("::")) {
+      const parts = street.split("::");
+      houseNo = parts[0];
+      street = parts[1];
+    }
+
+    const parts = [
+      houseNo,
+      street,
+      shippingDetails.landmark,
+      city,
+      state,
+      zip
+    ].filter(Boolean);
+
+    return parts.join(", ");
+  };
+
+  const addressStr = getAddressString();
 
   const dmMessage = encodeURIComponent(
     `Hello! I want to have COD for this order.\n\n` +
