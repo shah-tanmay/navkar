@@ -345,7 +345,7 @@ const CheckoutPage = () => {
                           orderToken={orderToken}
                           onBack={() => setStartStep(1)}
                           orderItems={orderItems}
-                          shippingDetails={methods.getValues().shipping}
+                          shippingDetails={methods.getValues() as any}
                         />
                       ),
                       validate: async () => {
