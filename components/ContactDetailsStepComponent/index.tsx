@@ -1,5 +1,6 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
+import { useSession } from "next-auth/react";
 import { FormInput } from "../FormInput";
 import { FormData } from "../../types/zodSchema";
 import { NameForm, PhoneForm } from "./styles";
@@ -7,8 +8,17 @@ import { NameForm, PhoneForm } from "./styles";
 export const ContactDetailsStepComponent = () => {
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext<FormData>();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    // Pre-fill email for logged-in users
+    if (session?.user?.email) {
+      setValue("contact.email", session.user.email);
+    }
+  }, [session, setValue]);
 
   return (
     <Fragment>
@@ -34,6 +44,14 @@ export const ContactDetailsStepComponent = () => {
           placeholder="+919999999999"
           {...register("contact.phoneNumber")}
           errorMessage={errors.contact?.phoneNumber?.message}
+          required
+        />
+        <FormInput
+          label="Email Address"
+          placeholder="you@example.com"
+          type="email"
+          {...register("contact.email")}
+          errorMessage={errors.contact?.email?.message}
           required
         />
       </PhoneForm>

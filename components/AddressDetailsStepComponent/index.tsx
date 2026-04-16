@@ -1,4 +1,5 @@
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { getAddresses } from "../../services/addressService";
 import { updateOrder } from "../../services/orderService";
 import { Address } from "../../types/api";
@@ -14,6 +15,7 @@ export const AddressDetailsStepComponent = ({
   orderToken: string;
   phone: string;
 }) => {
+  const { data: session, status } = useSession();
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
 
@@ -30,15 +32,25 @@ export const AddressDetailsStepComponent = ({
 
   useEffect(() => {
     const fetchAddresses = async () => {
-      const addresses = await getAddresses();
-      if (addresses?.length > 0) {
-        setAddresses(addresses);
-      } else {
+      if (status === "unauthenticated") {
+        setShowAddressForm(true);
+        return;
+      }
+      if (status === "loading") return;
+
+      try {
+        const addresses = await getAddresses();
+        if (addresses && addresses.length > 0) {
+          setAddresses(addresses);
+        } else {
+          setShowAddressForm(true);
+        }
+      } catch (err) {
         setShowAddressForm(true);
       }
     };
     fetchAddresses();
-  }, []);
+  }, [status]);
 
   return (
     <Fragment>

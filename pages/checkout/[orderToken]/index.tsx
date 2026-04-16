@@ -9,9 +9,8 @@ import { AddressDetailsStepComponent } from "../../../components/AddressDetailsS
 import { ContactDetailsStepComponent } from "../../../components/ContactDetailsStepComponent";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import { Payment } from "../../../components/Payment";
-import ProtectedRoute from "../../../components/ProtectedRoute";
 import { StepContainer } from "../../../components/StepContainer";
-import { postAddress } from "../../../services/addressService";
+import { postAddress, postGuestAddress } from "../../../services/addressService";
 import {
   getOrderByOrderToken,
   updateOrder,
@@ -30,7 +29,7 @@ import { FaChevronDown, FaChevronUp, FaShoppingCart } from "react-icons/fa";
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { orderToken, itemSlug } = router.query as {
     orderToken: string;
     itemSlug: string;
@@ -248,9 +247,8 @@ const CheckoutPage = () => {
       {invalidOrder ? (
         <InvalidCheckout />
       ) : (
-        <ProtectedRoute>
-          <S.CheckoutContainer>
-            <S.MainContainer>
+        <S.CheckoutContainer>
+          <S.MainContainer>
               <FormProvider {...methods}>
                 <StepContainer
                   initialStep={startStep}
@@ -313,10 +311,20 @@ const CheckoutPage = () => {
                             type: values.type,
                           };
 
-                          const response = await postAddress({
-                            ...shippingData,
-                            phone: values.contact.phoneNumber,
-                          });
+                          let response;
+                          if (status === "unauthenticated") {
+                            response = await postGuestAddress({
+                              ...shippingData,
+                              phone: values.contact.phoneNumber,
+                              orderToken,
+                            });
+                          } else {
+                            response = await postAddress({
+                              ...shippingData,
+                              phone: values.contact.phoneNumber,
+                            });
+                          }
+                          
                           if (response) {
                             setIsAddressSaved(true);
                             const shippingAddressId = response.id;
@@ -473,7 +481,6 @@ const CheckoutPage = () => {
               </S.OrderSummary>
             </S.MainContainer>
           </S.CheckoutContainer>
-        </ProtectedRoute>
       )}
     </LoaderWrapper>
   );

@@ -397,17 +397,12 @@ const ProductPage = (props: ProductPageProps) => {
     // ── End raw click tracking ─────────────────────────────────────────────
 
     const currentStyle = overrideHangingStyle || hangingStyle;
+    const isCustom = selectedVariant.type?.toLowerCase() === "custom";
+    const invalidCustom = isCustom && (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0);
 
-    if (!currentStyle) {
+    if (!currentStyle || invalidCustom) {
       setIsStyleModalOpen(true);
       return;
-    }
-
-    if (selectedVariant.type?.toLowerCase() === "custom") {
-      if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
-        toast.error("Please enter valid dimensions (Width and Length) for your custom curtain.");
-        return;
-      }
     }
 
     const variantId = selectedVariant.id;
@@ -1307,16 +1302,13 @@ const ProductPage = (props: ProductPageProps) => {
                 variantId={selectedVariant?.id as string}
                 quantity={quantity}
                 onBeforeAdd={() => {
-                  if (!hangingStyle) {
+                  const isCustom = selectedVariant.type?.toLowerCase() === "custom";
+                  const invalidCustom = isCustom && (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0);
+                  
+                  if (!hangingStyle || invalidCustom) {
                     setModalAction('cart');
                     setIsStyleModalOpen(true);
                     return false;
-                  }
-                  if (selectedVariant.type?.toLowerCase() === "custom") {
-                    if (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0) {
-                      toast.error("Please enter valid dimensions for your custom curtain.");
-                      return false;
-                    }
                   }
                   return true;
                 }}
@@ -1385,13 +1377,15 @@ const ProductPage = (props: ProductPageProps) => {
         <Modal 
           isOpen={isStyleModalOpen} 
           onClose={() => setIsStyleModalOpen(false)}
-          title="Choose Your Hanging Style"
+          title="Complete Your Selection"
           hideFooter={true}
         >
           <div style={{ padding: '0.5rem 0' }}>
             <p style={{ fontSize: '0.95rem', color: '#4b5563', marginBottom: '1.5rem', textAlign: 'center' }}>
-              Select the perfect style for your curtains before proceeding.
+              Please complete your customization before proceeding.
             </p>
+            
+            <h4 style={{ marginBottom: '0.75rem', fontSize: '1rem', color: '#111827' }}>1. Choose Hanging Style</h4>
             <HangingGrid style={{ marginBottom: '1.5rem' }}>
               <HangingCard 
                 $active={hangingStyle === "Eyelets"} 
@@ -1433,6 +1427,74 @@ const ProductPage = (props: ProductPageProps) => {
               </HangingCard>
             </HangingGrid>
 
+            {selectedVariant?.type?.toLowerCase() === "custom" && (
+              <div style={{ padding: '1.25rem', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', marginBottom: '1.5rem' }}>
+                <h4 style={{ marginBottom: '1rem', fontSize: '1rem', marginTop: 0, color: '#111827' }}>2. Enter Custom Height</h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#6b7280', padding: '0.75rem', background: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#111827', display: 'block' }}>Standard Window</span>
+                      <span>5 ft (60 inches)</span>
+                    </div>
+                    <button 
+                      onClick={() => { setCustomLength("60"); setCustomUnit("in"); }}
+                      style={{ padding: '6px 14px', background: customLength === "60" && customUnit === "in" ? '#111827' : '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600, color: customLength === "60" && customUnit === "in" ? '#ffffff' : '#374151', transition: 'all 0.2s' }}
+                    >
+                      {customLength === "60" && customUnit === "in" ? "Selected" : "Select Window"}
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f3f4f6', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#111827', display: 'block' }}>Standard Door</span>
+                      <span>7 ft (84 inches)</span>
+                    </div>
+                    <button 
+                      onClick={() => { setCustomLength("84"); setCustomUnit("in"); }}
+                      style={{ padding: '6px 14px', background: customLength === "84" && customUnit === "in" ? '#111827' : '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600, color: customLength === "84" && customUnit === "in" ? '#ffffff' : '#374151', transition: 'all 0.2s' }}
+                    >
+                      {customLength === "84" && customUnit === "in" ? "Selected" : "Select Door"}
+                    </button>
+                  </div>
+                  <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
+                    <span style={{ fontWeight: 600 }}>Fixed Width:</span>
+                    <span> {(productDetails as any)?.fixed_width || 48} inches / panel</span>
+                  </div>
+                </div>
+
+                <div className="field" style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 500, color: '#4b5563' }}>Curtain Length / Height ({customUnit})</label>
+                  <input 
+                    type="number" 
+                    placeholder={`Enter Height`}
+                    value={customLength} 
+                    onChange={(e) => setCustomLength(e.target.value)} 
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '1rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: '500' }}>Unit:</span>
+                    <select 
+                      value={customUnit} 
+                      onChange={(e) => setCustomUnit(e.target.value)}
+                      style={{ padding: '0.4rem 0.6rem', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.8rem', outline: 'none', background: 'white' }}
+                    >
+                      <option value="in">Inches</option>
+                      <option value="ft">Feet</option>
+                      <option value="cm">CM</option>
+                      <option value="m">Meters</option>
+                    </select>
+                </div>
+                
+                {customPrice > 0 && customWidth && customLength && (
+                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85rem', color: '#4b5563', fontWeight: '500' }}>Price per panel:</span>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#ba8160' }}>₹{customPrice}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
@@ -1458,7 +1520,7 @@ const ProductPage = (props: ProductPageProps) => {
                 Close
               </button>
               <button 
-                disabled={!hangingStyle}
+                disabled={!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))}
                 onClick={() => {
                   setIsStyleModalOpen(false);
                   if (modalAction === 'buy') {
@@ -1472,15 +1534,15 @@ const ProductPage = (props: ProductPageProps) => {
                   padding: '12px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: hangingStyle ? '#111827' : '#9ca3af',
+                  background: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? '#9ca3af' : '#111827',
                   color: 'white',
                   fontWeight: '600',
-                  cursor: hangingStyle ? 'pointer' : 'not-allowed',
+                  cursor: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s',
-                  boxShadow: hangingStyle ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                  boxShadow: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? 'none' : '0 4px 12px rgba(0,0,0,0.1)'
                 }}
               >
-                Continue to Checkout
+                Continue
               </button>
             </div>
           </div>

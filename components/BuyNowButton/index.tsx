@@ -16,15 +16,7 @@ export const BuyNow: React.FC<ButtonProps> = ({ onClick, price, ...props }) => {
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (status === "unauthenticated") {
-      // send them to login, and come back here after
-      const redirect = encodeURIComponent(router.asPath);
-      toast.warn("Please Login");
-      router.push(`/login?redirect=${redirect}`);
-      return;
-    }
-
-    // already logged in—call the original onClick
+    // No auth check — guests go straight to checkout
     onClick?.(e);
   };
 

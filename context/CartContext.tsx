@@ -58,17 +58,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const authCheck = useCallback(async () => {
     const loggedIn = await isUserloggedIn();
-    if (!loggedIn) {
-      // router.push("/login");
-      return false;
-    }
-    return true;
-  }, [router]);
+    return loggedIn;
+  }, []);
 
   // Initial cart fetch
   useEffect(() => {
     const loadCart = async () => {
-      if (!(await authCheck())) return;
+      const loggedIn = await authCheck();
+      if (!loggedIn) {
+        try {
+          const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
+          setCartItems(guestCart);
+        } catch (e) {
+          setCartItems([]);
+        }
+        setIsLoading(false);
+        return;
+      }
       try {
         const items = await getCartItems();
         setCartItems(items);
@@ -95,15 +101,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateQuantity = useCallback(
-    (cartItemId: string, newQuantity: number) => {
-      if (!authCheck()) return; 
-      setCartItems((prev) =>
-        prev.map((item) =>
+    async (cartItemId: string, newQuantity: number) => {
+      const loggedIn = await authCheck();
+      
+      setCartItems((prev) => {
+        const updated = prev.map((item) =>
           item.cart_id === cartItemId
             ? { ...item, quantity: newQuantity }
             : item
-        )
-      );
+        );
+        if (!loggedIn) {
+          localStorage.setItem("guest_cart", JSON.stringify(updated));
+        }
+        return updated;
+      });
+
+      if (!loggedIn) return;
 
       latestQuantitiesRef.current[cartItemId] = newQuantity;
       debouncedUpdates.current(cartItemId, newQuantity);
@@ -114,24 +127,45 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Add to cart with optimistic UI
   const addToCart = useCallback(
     async (variantId: string, quantity: number, metadata?: any) => {
-      if (!(await authCheck())) return;
+      const loggedIn = await authCheck();
       const previousItems = [...cartItems];
 
-      try {
-        // Optimistic update
-        const tempItem: CartItems = {
-          cart_id: `temp-${Date.now()}`,
-          quantity,
-          color: "...",
-          color_hex_code: "",
-          price: 0,
-          image_url: "",
-          metadata: metadata || {},
-          type: "type",
-          variant_id: variantId,
-          product_id: "", // Placeholder for optimistic update
-        };
+      // Optimistic update wrapper for temp item
+      const tempItem: CartItems = {
+        cart_id: `temp-${Date.now()}`,
+        quantity,
+        color: "...",
+        color_hex_code: "",
+        price: 0, // This should normally be fetched with product info
+        image_url: "",
+        metadata: metadata || {},
+        type: "type",
+        variant_id: variantId,
+        product_id: "",
+      };
 
+      if (!loggedIn) {
+        // GUEST MODE: store in localStorage
+        try {
+          const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
+          const existing = guestCart.find((i: any) => i.variant_id === variantId);
+          if (existing) {
+            existing.quantity += quantity;
+            // merge metadata if needed? for now just update quantity
+          } else {
+            // Need a real cart_id for the guest item.
+            guestCart.push({ ...tempItem, cart_id: `guest-${Date.now()}` });
+          }
+          localStorage.setItem("guest_cart", JSON.stringify(guestCart));
+          setCartItems(guestCart);
+          generateNewToken();
+        } catch (error) {
+          console.error("Failed to add to guest cart", error);
+        }
+        return;
+      }
+
+      try {
         setCartItems((prev) => [...prev, tempItem]);
 
         // Actual API call
@@ -157,18 +191,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Remove from cart with optimistic UI
   const removeFromCart = useCallback(
     async (cartItemId: string) => {
+      const loggedIn = await authCheck();
       const previousItems = [...cartItems];
 
       try {
-        setCartItems((prev) =>
-          prev.filter((item) => item.cart_id !== cartItemId)
-        );
-        const total = _.reduce(
-          _.filter(cartItems, (item) => item.cart_id !== cartItemId),
-          (sum, currentCarItem) =>
-            sum + currentCarItem.price * currentCarItem.quantity,
-          0
-        );
+        const newItems = cartItems.filter((item) => item.cart_id !== cartItemId);
+        setCartItems(newItems);
+        
+        if (!loggedIn) {
+          localStorage.setItem("guest_cart", JSON.stringify(newItems));
+          generateNewToken();
+          return;
+        }
+
         await removeItemFromCart(cartItemId);
 
         // Generate new token after successful remove

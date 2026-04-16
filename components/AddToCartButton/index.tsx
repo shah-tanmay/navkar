@@ -36,10 +36,9 @@ export const AddToCart = ({
     }
 
     if (status === "unauthenticated") {
-      // send them to login, and come back here after
-      const redirect = encodeURIComponent(router.asPath);
-      toast.warn("Please Login");
-      router.push(`/login?redirect=${redirect}`);
+      // Add to guest localStorage cart directly
+      await addToCart(variantId, quantity, metadata); // CartContext handles guest mode
+      toast.success("Added to cart!");
       return;
     }
 

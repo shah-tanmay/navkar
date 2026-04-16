@@ -87,3 +87,41 @@ export const deleteAddress = async (addressId: string): Promise<boolean> => {
   );
   return response?.status === 200 || response?.status === 204;
 };
+
+export const postGuestAddress = async ({
+  street,
+  flatHouseNo,
+  landmark,
+  state,
+  city,
+  zip,
+  type,
+  phone,
+  orderToken,
+}: {
+  street: string;
+  flatHouseNo: string;
+  landmark?: string;
+  state: string;
+  city: string;
+  zip: string;
+  type: string;
+  phone: string;
+  orderToken: string;
+}): Promise<Address> => {
+  const streetAddress = `${flatHouseNo}::${street}`;
+  const address = {
+    street: streetAddress,
+    landmark,
+    state,
+    city,
+    postal_code: zip,
+    type,
+    phone,
+    order_token: orderToken,
+  };
+  // Calling the guest endpoint directly without apiRequest wrapper to avoid auth errors
+  const response = await api.post(`${BASE_ADDRESS_URL}/guest`, address);
+  const addressResponse: Address = response?.data.address as Address;
+  return addressResponse;
+};

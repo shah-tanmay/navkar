@@ -5,7 +5,6 @@ import { getOrderByOrderToken } from "../../../services/orderService";
 import { useRouter } from "next/router";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
-import ProtectedRoute from "../../../components/ProtectedRoute";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import OrderNotFoundPage from "../../../components/OrderNotFound";
 import { FiClock, FiMail, FiMapPin, FiPhone, FiUser, FiLayers, FiZap } from "react-icons/fi";
@@ -153,7 +152,6 @@ const OrderTracking: FC<OrderResponse> = () => {
       {invalidOrder ? (
         <OrderNotFoundPage />
       ) : (
-        <ProtectedRoute>
           <S.Container>
             {router.query.success === 'true' && (
               <S.SuccessBanner>
@@ -359,7 +357,6 @@ const OrderTracking: FC<OrderResponse> = () => {
               </S.OrderCard>
             )}
           </S.Container>
-        </ProtectedRoute>
       )}
     </LoaderWrapper>
   );

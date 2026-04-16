@@ -12,6 +12,7 @@ export const schema = z.object({
         phoneRegex,
         "Invalid phone number. Must start with +91 and be a valid 10-digit Indian mobile number."
       ),
+    email: z.string().email("Please enter a valid email address").optional(),
   }),
 });
 
