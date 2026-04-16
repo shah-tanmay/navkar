@@ -143,6 +143,12 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="manifest" href="/site.webmanifest" />
           <link rel="icon" href="/favicon.ico" />
+          
+          {/* Performance: Early connection to third-party domains */}
+          <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href="https://connect.facebook.net" />
+          <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         </Head>
 
         {/* Facebook Pixel — deferred until browser is idle, no impact on LCP/TBT */}

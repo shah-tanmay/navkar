@@ -97,6 +97,10 @@ const SEO: React.FC<SEOProps> = ({
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="icon" href="/favicon.ico" />
+
+      {/* Performance: Early connection to image/tracking domains */}
+      <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+      <link rel="dns-prefetch" href="https://res.cloudinary.com" />
     </Head>
   );
 };

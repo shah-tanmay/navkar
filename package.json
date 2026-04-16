@@ -51,11 +51,13 @@
     "typescript": "5.1.6"
   },
   "browserslist": [
-    "chrome >= 80",
-    "firefox >= 80",
-    "safari >= 14",
-    "edge >= 80",
+    "> 0.5%",
+    "last 2 versions",
+    "Firefox ESR",
     "not dead",
-    "not op_mini all"
+    "not ie 11",
+    "chrome >= 87",
+    "safari >= 14",
+    "edge >= 88"
   ]
 }
