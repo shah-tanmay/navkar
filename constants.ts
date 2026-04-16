@@ -4,7 +4,7 @@ export const logoPath = "https://res.cloudinary.com/dhxa5zutl/image/upload/v1776
 export const WHATSAPP_NUMBER = "+919021533504";
 export const WHATSAPP_LINK = "https://wa.me/919021533504";
 export const SUPPORT_EMAIL = "support@navkar.shop";
-export const INSTAGRAM_URL = "https://www.instagram.com/navkar.shop/";
+export const INSTAGRAM_URL = "https://www.instagram.com/navkarcurtains/";
 
 export const TitleFontSize = {
   "1024": "40px",

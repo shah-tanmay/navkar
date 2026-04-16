@@ -52,7 +52,7 @@ export const Payment = ({
     `Please let me know how to proceed with Cash on Delivery.`
   );
   
-  const instagramUrl = `https://ig.me/m/navkar.shop?text=${dmMessage}`;
+  const instagramUrl = `https://ig.me/m/navkarcurtains?text=${dmMessage}`;
 
   const handleCODClick = () => {
     // Meta Pixel Lead event

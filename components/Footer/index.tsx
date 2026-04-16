@@ -51,7 +51,7 @@ const Footer = () => {
           </FooterSocialIconWrapper>
           <FooterSocialIconWrapper>
             <SocialAnchor
-              href="https://www.facebook.com/navkarmattresses/"
+              href="https://www.facebook.com/navkarcurtains/"
               target="_blank"
               rel="noopener noreferrer"
             >
