@@ -1352,7 +1352,7 @@ const ProductPage = (props: ProductPageProps) => {
         </HeroSection>
 
         {/* Mobile Sticky CTA: Visible only at the top of the page */}
-        {!productDetails?.is_discontinued && (
+        {!productDetails?.is_discontinued && !isStyleModalOpen && (
           <MobileStickyActions $visible={showMobileSticky} style={{ flexDirection: 'column', gap: '8px', padding: '1rem 1.5rem' }}>
             <BuyNow onClick={() => {
               setModalAction('buy');

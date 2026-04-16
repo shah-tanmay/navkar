@@ -423,36 +423,7 @@ const CheckoutPage = () => {
                     ))}
                   </S.ProductItem>
 
-                  <S.CouponSection>
-                    <h4>Have a coupon?</h4>
-                    {orderMetadata.coupon_code ? (
-                      <S.AppliedCoupon>
-                        <div>
-                          <span className="code">{orderMetadata.coupon_code}</span>
-                          <span className="label">Coupon Applied</span>
-                        </div>
-                        <button onClick={handleRemoveCoupon} disabled={isApplyingCoupon}>Remove</button>
-                      </S.AppliedCoupon>
-                    ) : (
-                      <>
-                        <S.CouponInputWrapper>
-                          <S.CouponInput 
-                            placeholder="ENTER CODE" 
-                            value={couponCode}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value)}
-                            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleApplyCoupon()}
-                          />
-                          <S.ApplyButton 
-                            onClick={handleApplyCoupon} 
-                            disabled={isApplyingCoupon || !couponCode}
-                          >
-                            {isApplyingCoupon ? "..." : "APPLY"}
-                          </S.ApplyButton>
-                        </S.CouponInputWrapper>
-                        {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
-                      </>
-                    )}
-                  </S.CouponSection>
+
 
                   <S.PriceBreakdown>
                     <S.PriceRow>
@@ -478,6 +449,37 @@ const CheckoutPage = () => {
                     </S.TotalPrice>
                   </S.PriceBreakdown>
                 </S.CollapsibleContent>
+
+                <S.CouponSection>
+                  <h4>Have a coupon?</h4>
+                  {orderMetadata.coupon_code ? (
+                    <S.AppliedCoupon>
+                      <div>
+                        <span className="code">{orderMetadata.coupon_code}</span>
+                        <span className="label">Coupon Applied</span>
+                      </div>
+                      <button onClick={handleRemoveCoupon} disabled={isApplyingCoupon}>Remove</button>
+                    </S.AppliedCoupon>
+                  ) : (
+                    <>
+                      <S.CouponInputWrapper>
+                        <S.CouponInput 
+                          placeholder="ENTER CODE" 
+                          value={couponCode}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value)}
+                          onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleApplyCoupon()}
+                        />
+                        <S.ApplyButton 
+                          onClick={handleApplyCoupon} 
+                          disabled={isApplyingCoupon || !couponCode}
+                        >
+                          {isApplyingCoupon ? "..." : "APPLY"}
+                        </S.ApplyButton>
+                      </S.CouponInputWrapper>
+                      {couponError && <S.CouponMessage error>{couponError}</S.CouponMessage>}
+                    </>
+                  )}
+                </S.CouponSection>
               </S.OrderSummary>
             </S.MainContainer>
           </S.CheckoutContainer>
