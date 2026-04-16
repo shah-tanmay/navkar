@@ -7,6 +7,7 @@ import {
   getPaymentSessionId,
   verifyPayment,
 } from "../../services/paymentService";
+import { updateOrder } from "../../services/orderService";
 import { LoaderWrapper } from "../LoaderWrapper";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
@@ -24,12 +25,14 @@ export const Payment = ({
   orderToken,
   onBack,
   orderItems = [],
+  orderMetadata = {},
   shippingDetails = {},
 }: {
   total: number;
   orderToken: string;
   onBack?: () => void;
   orderItems?: any[];
+  orderMetadata?: any;
   shippingDetails?: any;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -82,7 +85,20 @@ export const Payment = ({
   
   const whatsappUrl = `https://wa.me/919021533504?text=${dmMessage}`;
 
-  const handleCODClick = () => {
+  const handleCODClick = async () => {
+    // Record COD Lead in DB
+    try {
+      await updateOrder(orderToken, {
+        metadata: { 
+          ...orderMetadata, 
+          cod_requested: true, 
+          cod_requested_at: new Date().toISOString() 
+        }
+      });
+    } catch (e) {
+      console.error("Failed to record COD lead", e);
+    }
+
     // Meta Pixel Lead event
     if (typeof window !== "undefined" && (window as any).fbq) {
       (window as any).fbq("track", "Lead", {

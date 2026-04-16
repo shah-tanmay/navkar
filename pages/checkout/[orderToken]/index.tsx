@@ -357,6 +357,7 @@ const CheckoutPage = () => {
                           orderToken={orderToken}
                           onBack={() => setStartStep(1)}
                           orderItems={orderItems}
+                          orderMetadata={orderMetadata}
                           shippingDetails={shippingAddress || methods.getValues() as any}
                         />
                       ),

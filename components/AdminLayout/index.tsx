@@ -33,6 +33,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
   const navItems = [
     { label: "Revenue Analytics", path: "/admin/dashboard" },
     { label: "Orders Management", path: "/admin/orders" },
+    { label: "COD Inquiry Leads", path: "/admin/cod-leads" },
     { label: "Products & Catalogue", path: "/admin/products" },
     { label: "Inventory Tracker", path: "/admin/inventory" },
     { label: "Customer Database", path: "/admin/customers" },
