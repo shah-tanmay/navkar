@@ -134,7 +134,15 @@ const ShippingPage = () => {
       <p>Your orders are dispatched within <strong>1-2 business days</strong> and are typically delivered in <strong>5-7 business days</strong> across India.</p>
 
       <SectionTitle><FiTruck /> Shipping Charges</SectionTitle>
-      <p>We offer <strong>free shipping on all orders above ₹{threshold.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of {flatFee === 0 ? "FREE" : `₹${flatFee}`} is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
+      <p>
+        <strong>
+          {threshold === 0 
+            ? "We offer free shipping on all orders." 
+            : `We offer free shipping on all orders above ₹${threshold.toLocaleString("en-IN")}.`}
+        </strong> 
+        {threshold > 0 && ` For orders below this value, a minimal delivery fee of ${flatFee === 0 ? "FREE" : `₹${flatFee}`} is applicable.`} 
+        We work with trusted logistics partners to ensure your package arrives safely.
+      </p>
 
       <div style={{ marginTop: "4rem", padding: "2rem", border: `1px solid ${COLORS.accent}`, borderRadius: "12px" }}>
         <h3>📦 Damaged in Transit?</h3>

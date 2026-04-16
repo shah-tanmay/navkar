@@ -791,7 +791,9 @@ const ProductPage = (props: ProductPageProps) => {
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
               <FaTruck style={{ color: "#ba8160" }} /> 
-              {Number(selectedVariant?.price) >= shippingThreshold ? (
+              {shippingThreshold === 0 ? (
+                <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Your order qualifies for FREE Delivery</span>
+              ) : Number(selectedVariant?.price) >= shippingThreshold ? (
                 <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Your order qualifies for FREE Delivery</span>
               ) : (
                 <span>FREE Delivery on orders above ₹{shippingThreshold.toLocaleString("en-IN")}</span>

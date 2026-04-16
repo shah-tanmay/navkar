@@ -43,7 +43,9 @@ const TopBanner = () => {
   const bannerItems = (
     <>
       <BannerItem>
-        FREE SHIPPING ON ALL ORDERS ABOVE <span>₹{threshold}</span>
+        {threshold === 0 ? "FREE SHIPPING ON ALL ORDERS" : (
+          <>FREE SHIPPING ON ALL ORDERS ABOVE <span>₹{threshold}</span></>
+        )}
       </BannerItem>
       {coupons.map((coupon) => (
         <BannerItem key={coupon.id}>
