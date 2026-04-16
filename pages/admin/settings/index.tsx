@@ -76,16 +76,16 @@ const AdminSettings: NextPage = () => {
     const fetchSettings = async () => {
       try {
         const res = await axios.get("/admin/settings");
-        if (res.data.stitching_fee) {
+        if (res.data.stitching_fee !== undefined && res.data.stitching_fee !== null) {
           setStitchingFee(res.data.stitching_fee.toString());
         }
         if (res.data.delivery_timeline) {
           setDeliveryTimeline(res.data.delivery_timeline);
         }
-        if (res.data.free_shipping_threshold) {
+        if (res.data.free_shipping_threshold !== undefined && res.data.free_shipping_threshold !== null) {
           setFreeShippingThreshold(res.data.free_shipping_threshold.toString());
         }
-        if (res.data.standard_shipping_fee) {
+        if (res.data.standard_shipping_fee !== undefined && res.data.standard_shipping_fee !== null) {
           setShippingFee(res.data.standard_shipping_fee.toString());
         }
         setLoading(false);

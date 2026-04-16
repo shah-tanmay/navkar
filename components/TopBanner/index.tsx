@@ -6,6 +6,8 @@ const TopBanner = () => {
   const [coupons, setCoupons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [threshold, setThreshold] = useState(2000);
+
   useEffect(() => {
     const fetchBannerCoupons = async () => {
       try {
@@ -17,7 +19,20 @@ const TopBanner = () => {
         setLoading(false);
       }
     };
+    
+    const fetchShippingConfig = async () => {
+      try {
+        const res = await axios.get("/config/shipping");
+        if (res.data.free_shipping_threshold !== undefined) {
+          setThreshold(Number(res.data.free_shipping_threshold));
+        }
+      } catch (error) {
+        console.error("Failed to fetch shipping config:", error);
+      }
+    };
+
     fetchBannerCoupons();
+    fetchShippingConfig();
   }, []);
 
   const hasCoupons = coupons.length > 0;
@@ -28,7 +43,7 @@ const TopBanner = () => {
   const bannerItems = (
     <>
       <BannerItem>
-        FREE SHIPPING ON ALL ORDERS ABOVE <span>₹2000</span>
+        FREE SHIPPING ON ALL ORDERS ABOVE <span>₹{threshold}</span>
       </BannerItem>
       {coupons.map((coupon) => (
         <BannerItem key={coupon.id}>

@@ -222,8 +222,8 @@ const CheckoutPage = () => {
     const fetchConfigs = async () => {
       try {
         const res = await api.get("/config/shipping");
-        if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
-        if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
+        if (res.data.free_shipping_threshold !== undefined) setThreshold(Number(res.data.free_shipping_threshold));
+        if (res.data.standard_shipping_fee !== undefined) setFlatFee(Number(res.data.standard_shipping_fee));
       } catch (e) {
         console.error("Failed to fetch shipping configs", e);
       }

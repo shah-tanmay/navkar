@@ -95,8 +95,8 @@ const ShippingPage = () => {
     const fetchConfigs = async () => {
       try {
         const res = await api.get("/config/shipping");
-        if (res.data.free_shipping_threshold) setThreshold(Number(res.data.free_shipping_threshold));
-        if (res.data.standard_shipping_fee) setFlatFee(Number(res.data.standard_shipping_fee));
+        if (res.data.free_shipping_threshold !== undefined) setThreshold(Number(res.data.free_shipping_threshold));
+        if (res.data.standard_shipping_fee !== undefined) setFlatFee(Number(res.data.standard_shipping_fee));
       } catch (e) {
         console.error("Failed to fetch shipping configs", e);
       }
@@ -134,7 +134,7 @@ const ShippingPage = () => {
       <p>Your orders are dispatched within <strong>1-2 business days</strong> and are typically delivered in <strong>5-7 business days</strong> across India.</p>
 
       <SectionTitle><FiTruck /> Shipping Charges</SectionTitle>
-      <p>We offer <strong>free shipping on all orders above ₹{threshold.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of ₹{flatFee} is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
+      <p>We offer <strong>free shipping on all orders above ₹{threshold.toLocaleString("en-IN")}</strong>. For orders below this value, a minimal delivery fee of {flatFee === 0 ? "FREE" : `₹${flatFee}`} is applicable. We work with trusted logistics partners to ensure your package arrives safely.</p>
 
       <div style={{ marginTop: "4rem", padding: "2rem", border: `1px solid ${COLORS.accent}`, borderRadius: "12px" }}>
         <h3>📦 Damaged in Transit?</h3>

@@ -115,6 +115,19 @@ const ProductPage = (props: ProductPageProps) => {
   const [hangingStyle, setHangingStyle] = useState<string | null>(null);
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<'buy' | 'cart'>('buy');
+  const [shippingThreshold, setShippingThreshold] = useState(FREE_SHIPPING_THRESHOLD);
+
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        const res = await api.get("/config/shipping");
+        if (res.data.free_shipping_threshold !== undefined) setShippingThreshold(Number(res.data.free_shipping_threshold));
+      } catch (e) {
+        console.error("Failed to fetch shipping configs", e);
+      }
+    };
+    fetchConfigs();
+  }, []);
 
   const galleryImages = _.uniq([
     selectedVariant?.image_url || (productDetails as any)?.image_url,
@@ -237,6 +250,7 @@ const ProductPage = (props: ProductPageProps) => {
   // Pixel & Google Ads Tracking (ViewContent / view_item)
   useEffect(() => {
     if (typeof window === "undefined" || !selectedVariant) return;
+
 
     // Meta Pixel
     if ((window as any).fbq) {
@@ -777,10 +791,10 @@ const ProductPage = (props: ProductPageProps) => {
             
             <ShippingPromoBadge style={{ marginBottom: "1rem" }}>
               <FaTruck style={{ color: "#ba8160" }} /> 
-              {Number(selectedVariant?.price) >= FREE_SHIPPING_THRESHOLD ? (
+              {Number(selectedVariant?.price) >= shippingThreshold ? (
                 <span style={{ color: "#2e7d32", fontWeight: "600" }}>✓ Your order qualifies for FREE Delivery</span>
               ) : (
-                <span>FREE Delivery on orders above ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")}</span>
+                <span>FREE Delivery on orders above ₹{shippingThreshold.toLocaleString("en-IN")}</span>
               )}
             </ShippingPromoBadge>
             
