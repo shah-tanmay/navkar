@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CODContainer, CODLink, CODRow, PayButton, PaymentContainer, SecurityNotice } from "./styles";
-import { FaLock, FaChevronLeft, FaInstagram } from "react-icons/fa";
+import { FaLock, FaChevronLeft, FaWhatsapp } from "react-icons/fa";
 //@ts-ignore
 import { load } from "@cashfreepayments/cashfree-js";
 import {
@@ -52,13 +52,13 @@ export const Payment = ({
     `Please let me know how to proceed with Cash on Delivery.`
   );
   
-  const instagramUrl = `https://ig.me/m/navkarcurtains?text=${dmMessage}`;
+  const whatsappUrl = `https://wa.me/919021533504?text=${dmMessage}`;
 
   const handleCODClick = () => {
     // Meta Pixel Lead event
     if (typeof window !== "undefined" && (window as any).fbq) {
       (window as any).fbq("track", "Lead", {
-        content_name: "Cash on Delivery Request",
+        content_name: "Cash on Delivery Request (WhatsApp)",
         currency: "INR",
         value: total,
       });
@@ -187,12 +187,12 @@ export const Payment = ({
           <CODRow>
             <p>Prefer Cash on Delivery?</p>
             <CODLink 
-              href={instagramUrl} 
+              href={whatsappUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               onClick={handleCODClick}
             >
-              <FaInstagram /> Contact for C.O.D
+              <FaWhatsapp /> WhatsApp for C.O.D
             </CODLink>
           </CODRow>
         </CODContainer>
