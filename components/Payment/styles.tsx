@@ -54,3 +54,43 @@ const ErrorMessage = styled.div`
   align-items: center;
   gap: 0.5rem;
 `;
+export const CODContainer = styled.div`
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-top: 1px dashed #d1d5db;
+  width: 100%;
+  text-align: center;
+`;
+
+export const CODRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #4b5563;
+    font-weight: 500;
+  }
+`;
+
+export const CODLink = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ba8160;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #ba8160;
+  border-radius: 50px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #ba8160;
+    color: white;
+  }
+`;

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FaLock, FaChevronLeft } from "react-icons/fa";
-import { PayButton, PaymentContainer, SecurityNotice } from "./styles";
+import { CODContainer, CODLink, CODRow, PayButton, PaymentContainer, SecurityNotice } from "./styles";
+import { FaLock, FaChevronLeft, FaInstagram } from "react-icons/fa";
 //@ts-ignore
 import { load } from "@cashfreepayments/cashfree-js";
 import {
@@ -23,14 +23,55 @@ export const Payment = ({
   total,
   orderToken,
   onBack,
+  orderItems = [],
+  shippingDetails = {},
 }: {
   total: number;
   orderToken: string;
   onBack?: () => void;
+  orderItems?: any[];
+  shippingDetails?: any;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const totalPanels = orderItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const designs = orderItems.map(item => item.product_name).join(", ");
+  
+  const addressStr = shippingDetails?.street 
+    ? `${shippingDetails.flatHouseNo}, ${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zip}`
+    : "Provided during checkout";
+
+  const dmMessage = encodeURIComponent(
+    `Hello! I want to have COD for this order.\n\n` +
+    `Order Token: ${orderToken}\n` +
+    `Panels: ${totalPanels}\n` +
+    `Designs: ${designs}\n` +
+    `Address: ${addressStr}\n\n` +
+    `Please let me know how to proceed with Cash on Delivery.`
+  );
+  
+  const instagramUrl = `https://ig.me/m/navkar.shop?text=${dmMessage}`;
+
+  const handleCODClick = () => {
+    // Meta Pixel Lead event
+    if (typeof window !== "undefined" && (window as any).fbq) {
+      (window as any).fbq("track", "Lead", {
+        content_name: "Cash on Delivery Request",
+        currency: "INR",
+        value: total,
+      });
+    }
+
+    // Google Ads Lead event
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "generate_lead", {
+        currency: "INR",
+        value: total,
+      });
+    }
+  };
 
   const handlePayment = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -141,6 +182,20 @@ export const Payment = ({
         </SecurityNotice>
         {errorMessage && <div className="error">{errorMessage}</div>}
         <PayButton onClick={handlePayment}>Pay ₹{total}</PayButton>
+
+        <CODContainer>
+          <CODRow>
+            <p>Prefer Cash on Delivery?</p>
+            <CODLink 
+              href={instagramUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={handleCODClick}
+            >
+              <FaInstagram /> Contact for C.O.D
+            </CODLink>
+          </CODRow>
+        </CODContainer>
       </PaymentContainer>
     </LoaderWrapper>
   );
