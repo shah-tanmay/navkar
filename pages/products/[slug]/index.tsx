@@ -45,6 +45,7 @@ import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
 import { GetServerSideProps } from "next";
 import { Modal } from "../../../components/Modal";
+import { LiveViewers } from "../../../components/LiveViewers";
 
 import { toOgImage } from "../../../utils/seo";
 import { toast } from "react-toastify";
@@ -704,6 +705,8 @@ const ProductPage = (props: ProductPageProps) => {
                 </>
               )}
             </PriceTag>
+
+            <LiveViewers productId={productDetails?.product_id} />
 
             {productDetails?.is_discontinued && (
               <div style={{ 
