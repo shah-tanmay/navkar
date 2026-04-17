@@ -776,7 +776,7 @@ const ProductPage = (props: ProductPageProps) => {
                 <div className="badge">Limited Offer</div>
                 <div className="content">
                   <strong>Login & Save ₹250</strong>
-                  <span>Get ₹100 extra off + use <b>NAV150</b> on your 1st order</span>
+                  <span>Get ₹100 extra off + use <b>NAV150</b> on your 1st purchase</span>
                 </div>
                 <FaChevronRight size={18} />
               </PromotionBanner>
@@ -795,7 +795,7 @@ const ProductPage = (props: ProductPageProps) => {
                 fontWeight: '500'
               }}>
                 <FaCheckCircle />
-                <span>₹100 First-Order credit will be applied at checkout!</span>
+                <span>₹100 First-Purchase credit will be applied at checkout!</span>
               </div>
             )}
 

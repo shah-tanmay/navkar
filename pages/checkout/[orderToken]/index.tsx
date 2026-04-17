@@ -270,6 +270,32 @@ const CheckoutPage = () => {
         <S.CheckoutContainer>
           <S.MainContainer>
             <S.MainContent>
+              {status !== 'authenticated' && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
+                  border: '1px solid #fed7aa',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer'
+                }} onClick={() => router.push('/login')}>
+                  <div style={{
+                    background: '#f97316',
+                    color: 'white',
+                    fontSize: '0.65rem',
+                    fontWeight: '800',
+                    padding: '2px 6px',
+                    borderRadius: '4px'
+                  }}>BONUS</div>
+                  <div style={{ flex: 1, fontSize: '0.85rem', color: '#9a3412', fontWeight: '500' }}>
+                    Login now to unlock <b>₹100 EXTRA</b> discount on this purchase!
+                  </div>
+                  <FaChevronRight size={14} color="#f97316" />
+                </div>
+              )}
               <S.StepIndicator>
                 <S.Step $active={currentStep === 0} $completed={currentStep > 0}>
                   <div className="circle">{currentStep > 0 ? <FaCheckCircle /> : "1"}</div>
@@ -533,7 +559,7 @@ const CheckoutPage = () => {
 
                     {orderMetadata.login_reward > 0 && (
                       <S.PriceRow>
-                        <span style={{ color: "#2e7d32" }}>First-Order Login Reward</span>
+                        <span style={{ color: "#2e7d32" }}>First-Purchase Login Reward</span>
                         <span style={{ color: "#2e7d32" }}>-₹{orderMetadata.login_reward}</span>
                       </S.PriceRow>
                     )}
