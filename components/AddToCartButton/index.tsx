@@ -38,6 +38,26 @@ export const AddToCart = ({
     if (status === "unauthenticated") {
       // Add to guest localStorage cart directly
       await addToCart(variantId, quantity, metadata); // CartContext handles guest mode
+      
+      // Fire tracking for guests
+      gaEvent("add_to_cart", {
+        currency: "INR",
+        items: [{ item_id: variantId, quantity }],
+      });
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "AddToCart", {
+          content_ids: [variantId],
+          content_type: "product",
+          currency: "INR",
+        });
+      }
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "add_to_cart", {
+          currency: "INR",
+          items: [{ item_id: variantId, quantity }],
+        });
+      }
+
       toast.success("Added to cart!");
       return;
     }

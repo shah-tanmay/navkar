@@ -55,7 +55,7 @@ export const StepContainer = ({ steps, initialStep = 0 }: { steps: Step[], initi
     }
 
     if (currentStep.beforeNextStep) {
-      currentStep.beforeNextStep();
+      await currentStep.beforeNextStep();
     }
 
     if (currentIndex === steps.length - 1) {

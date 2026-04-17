@@ -304,6 +304,18 @@ const CheckoutPage = () => {
                             setShippingAddress(updated.shipping_address);
                             const meta = typeof updated.metadata === 'string' ? JSON.parse(updated.metadata) : (updated.metadata || {});
                             setOrderMetadata(meta);
+
+                            // Trigger GA4 add_shipping_info
+                            gaEvent("add_shipping_info", {
+                              currency: "INR",
+                              value: finalTotal,
+                              items: orderItems.map((item: any) => ({
+                                item_id: item.product_variant_id,
+                                item_name: item.product_name,
+                                price: item.price,
+                                quantity: item.quantity,
+                              })),
+                            });
                           }
                         }
                         if (!isAddressSaved && !selectedAddress) {
@@ -343,6 +355,18 @@ const CheckoutPage = () => {
                               setShippingAddress(updated.shipping_address);
                               const meta = typeof updated.metadata === 'string' ? JSON.parse(updated.metadata) : (updated.metadata || {});
                               setOrderMetadata(meta);
+
+                              // Trigger GA4 add_shipping_info
+                              gaEvent("add_shipping_info", {
+                                currency: "INR",
+                                value: finalTotal,
+                                items: orderItems.map((item: any) => ({
+                                  item_id: item.product_variant_id,
+                                  item_name: item.product_name,
+                                  price: item.price,
+                                  quantity: item.quantity,
+                                })),
+                              });
                             }
                           }
                         }

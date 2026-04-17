@@ -46,6 +46,22 @@ const CartPage = () => {
   const shippingFee = (subtotal < threshold && subtotal > 0) ? flatFee : 0;
   const finalTotal = Math.max(0, subtotal + shippingFee - couponDiscount);
 
+  useEffect(() => {
+    if (cartItems && cartItems.length > 0) {
+      const { event: gaEvent } = require("nextjs-google-analytics");
+      gaEvent("view_cart", {
+        currency: "INR",
+        value: finalTotal,
+        items: cartItems.map((item: any) => ({
+          item_id: item.variant_id,
+          item_name: item.color, // Using color as name if product_name not directly available in cart items
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      });
+    }
+  }, [cartItems?.length]);
+
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
     setIsApplyingCoupon(true);

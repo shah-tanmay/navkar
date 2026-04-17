@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CODContainer, CODLink, CODRow, PayButton, PaymentContainer, SecurityNotice } from "./styles";
 import { FaLock, FaChevronLeft, FaWhatsapp } from "react-icons/fa";
 //@ts-ignore
@@ -38,6 +38,19 @@ export const Payment = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    gaEvent("add_payment_info", {
+      currency: "INR",
+      value: total,
+      items: orderItems.map((item: any) => ({
+        item_id: item.product_variant_id,
+        item_name: item.product_name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+    });
+  }, []);
 
   const totalPanels = orderItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const designs = orderItems.map(item => item.product_name).join(", ");
