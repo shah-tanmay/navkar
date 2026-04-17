@@ -772,7 +772,7 @@ const ProductPage = (props: ProductPageProps) => {
             <LiveViewers productId={productDetails?.id} />
 
             {status !== 'authenticated' ? (
-              <PromotionBanner onClick={() => router.push('/login')}>
+              <PromotionBanner onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(router.asPath)}`)}>
                 <div className="badge">Limited Offer</div>
                 <div className="content">
                   <strong>Login & Save ₹250</strong>

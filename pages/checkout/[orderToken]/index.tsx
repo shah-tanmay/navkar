@@ -182,6 +182,16 @@ const CheckoutPage = () => {
             }
           }
           setLoading(false);
+
+          // Restore any pending form data (e.g. from login redirect)
+          const savedData = sessionStorage.getItem('pending_checkout_data');
+          if (savedData) {
+            try {
+              const parsed = JSON.parse(savedData);
+              methods.reset(parsed);
+              sessionStorage.removeItem('pending_checkout_data');
+            } catch (e) {}
+          }
         }, 100);
       } else {
         setLoading(false);
@@ -296,7 +306,12 @@ const CheckoutPage = () => {
                   alignItems: 'center',
                   gap: '12px',
                   cursor: 'pointer'
-                }} onClick={() => router.push('/login')}>
+                }} onClick={() => {
+                  // Save current form state before leaving to Login
+                  const currentData = methods.getValues();
+                  sessionStorage.setItem('pending_checkout_data', JSON.stringify(currentData));
+                  router.push(`/login?callbackUrl=${encodeURIComponent(router.asPath)}`);
+                }}>
                   <div style={{
                     background: '#f97316',
                     color: 'white',
