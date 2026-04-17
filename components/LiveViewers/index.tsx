@@ -75,8 +75,8 @@ export const LiveViewers: React.FC<LiveViewersProps> = ({ productId }) => {
     sendHeartbeat();
     fetchCount();
 
-    // 2. Continuous heartbeat (every 25s) and polling (every 30s)
-    const heartbeatTimer = setInterval(sendHeartbeat, 25000);
+    // 2. Continuous heartbeat (every 45s) and polling (every 30s)
+    const heartbeatTimer = setInterval(sendHeartbeat, 45000);
     const pollTimer = setInterval(fetchCount, 30000);
 
     return () => {
@@ -91,7 +91,7 @@ export const LiveViewers: React.FC<LiveViewersProps> = ({ productId }) => {
   return (
     <Container>
       <Dot />
-      <span>{count} people are viewing this right now</span>
+      <span>{count} people viewed this in the last 10 minutes</span>
     </Container>
   );
 };
