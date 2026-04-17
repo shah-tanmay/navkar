@@ -105,7 +105,7 @@ export const StepContainer = ({ steps, initialStep = 0, onStepChange }: { steps:
             <StylesStepContainer active={currentIndex === index}>
               <SectionContainer>
                 <SectionTitle>{step.title}</SectionTitle>
-                <>{step.Component}</>
+                {currentIndex === index && <>{step.Component}</>}
                 <NavigationButtons>
                   {index > 0 && !step.hideBackButton && (
                     <BackButton
