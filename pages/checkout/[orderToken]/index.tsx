@@ -165,6 +165,17 @@ const CheckoutPage = () => {
           
           if (isContactValid) {
             if (initialAddressId) {
+              // Trigger GA4 add_shipping_info since we are skipping to payment
+              gaEvent("add_shipping_info", {
+                currency: "INR",
+                value: finalTotal,
+                items: orderItems.map((item: any) => ({
+                  item_id: item.product_variant_id,
+                  item_name: item.product_name,
+                  price: item.price,
+                  quantity: item.quantity,
+                })),
+              });
               setStartStep(2); // Skip both to Payment
             } else {
               setStartStep(1); // Skip to Shipping
