@@ -524,10 +524,17 @@ const CheckoutPage = () => {
                       <span>₹{subtotal}</span>
                     </S.PriceRow>
                     
-                    {discount > 0 && (
+                    {orderMetadata.coupon_code && (
                       <S.PriceRow>
-                        <span style={{ color: "#2e7d32" }}>Discount ({orderMetadata.coupon_code})</span>
-                        <span style={{ color: "#2e7d32" }}>-₹{discount}</span>
+                        <span style={{ color: "#2e7d32" }}>Coupon ({orderMetadata.coupon_code})</span>
+                        <span style={{ color: "#2e7d32" }}>-₹{discount - (orderMetadata.login_reward || 0)}</span>
+                      </S.PriceRow>
+                    )}
+
+                    {orderMetadata.login_reward > 0 && (
+                      <S.PriceRow>
+                        <span style={{ color: "#2e7d32" }}>First-Order Login Reward</span>
+                        <span style={{ color: "#2e7d32" }}>-₹{orderMetadata.login_reward}</span>
                       </S.PriceRow>
                     )}
 

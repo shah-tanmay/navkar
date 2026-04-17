@@ -7,8 +7,9 @@ import { getProductVariantDetails } from "../../../services/productService";
 import { 
   FaStar, FaShieldAlt, FaTruck, FaHandSparkles, FaChevronDown, 
   FaChevronUp, FaGift, FaCheckCircle, FaMapMarkerAlt, FaLock, 
-  FaRulerCombined, FaShareAlt 
+  FaRulerCombined, FaShareAlt, FaChevronRight 
 } from "react-icons/fa";
+import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import Image from "next/image";
@@ -46,6 +47,68 @@ import SEO from "../../../components/SEO";
 import { GetServerSideProps } from "next";
 import { Modal } from "../../../components/Modal";
 import { LiveViewers } from "../../../components/LiveViewers";
+
+const PromotionBanner = styled.div`
+  background: linear-gradient(135deg, #fffcf0 0%, #fff7e6 100%);
+  border: 1px solid #ffe58f;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+    border-color: #d4af37;
+  }
+
+  .badge {
+    background: #d4af37;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      color: #111111;
+      font-size: 1rem;
+    }
+
+    span {
+      color: #555;
+      font-size: 0.85rem;
+      
+      b {
+        color: #d4af37;
+      }
+    }
+  }
+
+  svg {
+    color: #d4af37;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
+  }
+`;
 
 import { toOgImage } from "../../../utils/seo";
 import { toast } from "react-toastify";
@@ -707,6 +770,34 @@ const ProductPage = (props: ProductPageProps) => {
             </PriceTag>
 
             <LiveViewers productId={productDetails?.id} />
+
+            {status !== 'authenticated' ? (
+              <PromotionBanner onClick={() => router.push('/login')}>
+                <div className="badge">Limited Offer</div>
+                <div className="content">
+                  <strong>Login & Save ₹250</strong>
+                  <span>Get ₹100 extra off + use <b>NAV150</b> on your 1st order</span>
+                </div>
+                <FaChevronRight size={18} />
+              </PromotionBanner>
+            ) : (
+              <div style={{
+                background: '#f0fdf4',
+                border: '1px solid #dcfce7',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '1.5rem',
+                fontSize: '0.9rem',
+                color: '#166534',
+                fontWeight: '500'
+              }}>
+                <FaCheckCircle />
+                <span>₹100 First-Order credit will be applied at checkout!</span>
+              </div>
+            )}
 
             {productDetails?.is_discontinued && (
               <div style={{ 
