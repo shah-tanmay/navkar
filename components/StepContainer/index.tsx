@@ -27,12 +27,17 @@ export interface Step {
   hideBackButton?: boolean;
 }
 
-export const StepContainer = ({ steps, initialStep = 0 }: { steps: Step[], initialStep?: number }) => {
+export const StepContainer = ({ steps, initialStep = 0, onStepChange }: { steps: Step[], initialStep?: number, onStepChange?: (index: number) => void }) => {
   const [currentIndex, setCurrentIndex] = useState(initialStep);
 
   useEffect(() => {
     setCurrentIndex(initialStep);
-  }, [initialStep]);
+    onStepChange && onStepChange(initialStep);
+  }, [initialStep, onStepChange]);
+
+  useEffect(() => {
+    onStepChange && onStepChange(currentIndex);
+  }, [currentIndex, onStepChange]);
 
   const validatePreviousSteps = async (index: number) => {
     let isValid = true;

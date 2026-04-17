@@ -24,7 +24,11 @@ import { event as gaEvent } from "nextjs-google-analytics";
 import { validateCoupon } from "../../../services/couponService";
 import { toast } from "react-toastify";
 import api from "../../../lib/axios";
-import { FaChevronDown, FaChevronUp, FaShoppingCart } from "react-icons/fa";
+import { 
+  FaShoppingCart, FaChevronDown, FaChevronUp, FaLock, 
+  FaShieldAlt, FaTruck, FaClock, FaCheckCircle, 
+  FaCreditCard
+} from "react-icons/fa";
 
 
 const CheckoutPage = () => {
@@ -48,7 +52,8 @@ const CheckoutPage = () => {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [orderMetadata, setOrderMetadata] = useState<any>({});
-  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0); // 0: Contact, 1: Shipping, 2: Payment
   const [shippingAddress, setShippingAddress] = useState<any>(null);
 
 
@@ -251,8 +256,25 @@ const CheckoutPage = () => {
       ) : (
         <S.CheckoutContainer>
           <S.MainContainer>
+            <S.MainContent>
+              <S.StepIndicator>
+                <S.Step $active={currentStep === 0} $completed={currentStep > 0}>
+                  <div className="circle">{currentStep > 0 ? <FaCheckCircle /> : "1"}</div>
+                  <span className="label">Contact</span>
+                </S.Step>
+                <S.Step $active={currentStep === 1} $completed={currentStep > 1}>
+                  <div className="circle">{currentStep > 1 ? <FaCheckCircle /> : "2"}</div>
+                  <span className="label">Shipping</span>
+                </S.Step>
+                <S.Step $active={currentStep === 2} $completed={false}>
+                  <div className="circle">3</div>
+                  <span className="label">Payment</span>
+                </S.Step>
+              </S.StepIndicator>
+              
               <FormProvider {...methods}>
                 <StepContainer
+                  onStepChange={setCurrentStep}
                   initialStep={startStep}
                   steps={[
                     {
@@ -408,6 +430,25 @@ const CheckoutPage = () => {
                   ]}
                 />
               </FormProvider>
+
+              <S.TrustSection>
+                <S.TrustItem>
+                  <FaShieldAlt />
+                  <span>Secure Checkout</span>
+                  <p>SSL Encrypted Payment</p>
+                </S.TrustItem>
+                <S.TrustItem>
+                  <FaCheckCircle />
+                  <span>Quality Fabric</span>
+                  <p>Premium High-Density</p>
+                </S.TrustItem>
+                <S.TrustItem>
+                  <FaTruck />
+                  <span>Fast Delivery</span>
+                  <p>Ready to ship in 5-7 days</p>
+                </S.TrustItem>
+              </S.TrustSection>
+            </S.MainContent>
 
               <S.OrderSummary>
                 <S.SummaryToggle onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}>

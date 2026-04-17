@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { FaLock, FaArrowLeft, FaChevronLeft } from "react-icons/fa";
 import COLORS from "../../../constants/color";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaLock, FaArrowLeft, FaChevronLeft, FaShieldAlt, FaTruck, FaClock, FaCheckCircle } from "react-icons/fa";
 
 // Color scheme
 const primary = "#111111";
@@ -587,5 +587,100 @@ export const CollapsibleContent = styled.div<{ $expanded: boolean }>`
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: ${props => props.$expanded ? "1" : "0"};
     margin-top: ${props => props.$expanded ? "1.5rem" : "0"};
+  }
+`;
+
+export const StepIndicator = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  position: relative;
+  padding: 0 1rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+`;
+
+export const Step = styled.div<{ $active: boolean; $completed: boolean }>`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: ${background};
+  padding: 0 0.5rem;
+
+  .circle {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: ${props => props.$active ? primary : props.$completed ? accent : 'white'};
+    border: 2px solid ${props => props.$active || props.$completed ? 'transparent' : '#e2e8f0'};
+    color: ${props => props.$active || props.$completed ? 'white' : '#94a3b8'};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: ${props => props.$active ? '0 0 0 4px rgba(17, 17, 17, 0.1)' : 'none'};
+  }
+
+  .label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: ${props => props.$active ? primary : '#64748b'};
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+`;
+
+export const TrustSection = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+export const TrustItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+
+  svg {
+    font-size: 1.5rem;
+    color: ${accent};
+  }
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: ${primary};
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  p {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
   }
 `;
