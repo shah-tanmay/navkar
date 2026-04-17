@@ -645,42 +645,51 @@ export const Step = styled.div<{ $active: boolean; $completed: boolean }>`
 `;
 
 export const TrustSection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
 
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    &::-webkit-scrollbar { display: none; }
   }
 `;
 
 export const TrustItem = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 0.5rem;
+  gap: 8px;
+  color: #64748b;
+  white-space: nowrap;
 
   svg {
-    font-size: 1.5rem;
-    color: ${accent};
+    color: #0f172a;
+    font-size: 1rem;
+    flex-shrink: 0;
   }
 
   span {
     font-size: 0.8rem;
     font-weight: 600;
-    color: ${primary};
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    color: #0f172a;
   }
 
   p {
-    font-size: 0.75rem;
-    color: #64748b;
-    margin: 0;
+    display: none; // Hide sub-text for the compact top bar
+  }
+
+  @media (max-width: 480px) {
+    span {
+      font-size: 0.7rem;
+    }
+    svg {
+      font-size: 0.85rem;
+    }
   }
 `;

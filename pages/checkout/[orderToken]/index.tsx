@@ -270,6 +270,21 @@ const CheckoutPage = () => {
         <S.CheckoutContainer>
           <S.MainContainer>
             <S.MainContent>
+              <S.TrustSection>
+                <S.TrustItem>
+                  <FaShieldAlt />
+                  <span>Secure Checkout</span>
+                </S.TrustItem>
+                <S.TrustItem>
+                  <FaCheckCircle />
+                  <span>Quality Fabric</span>
+                </S.TrustItem>
+                <S.TrustItem>
+                  <FaTruck />
+                  <span>Fast Delivery</span>
+                </S.TrustItem>
+              </S.TrustSection>
+
               {status !== 'authenticated' && (
                 <div style={{
                   background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
@@ -296,20 +311,6 @@ const CheckoutPage = () => {
                   <FaChevronRight size={14} color="#f97316" />
                 </div>
               )}
-              <S.StepIndicator>
-                <S.Step $active={currentStep === 0} $completed={currentStep > 0}>
-                  <div className="circle">{currentStep > 0 ? <FaCheckCircle /> : "1"}</div>
-                  <span className="label">Contact</span>
-                </S.Step>
-                <S.Step $active={currentStep === 1} $completed={currentStep > 1}>
-                  <div className="circle">{currentStep > 1 ? <FaCheckCircle /> : "2"}</div>
-                  <span className="label">Shipping</span>
-                </S.Step>
-                <S.Step $active={currentStep === 2} $completed={false}>
-                  <div className="circle">3</div>
-                  <span className="label">Payment</span>
-                </S.Step>
-              </S.StepIndicator>
               
               <FormProvider {...methods}>
                 <StepContainer
@@ -469,24 +470,6 @@ const CheckoutPage = () => {
                   ]}
                 />
               </FormProvider>
-
-              <S.TrustSection>
-                <S.TrustItem>
-                  <FaShieldAlt />
-                  <span>Secure Checkout</span>
-                  <p>SSL Encrypted Payment</p>
-                </S.TrustItem>
-                <S.TrustItem>
-                  <FaCheckCircle />
-                  <span>Quality Fabric</span>
-                  <p>Premium High-Density</p>
-                </S.TrustItem>
-                <S.TrustItem>
-                  <FaTruck />
-                  <span>Fast Delivery</span>
-                  <p>Ready to ship in {deliveryTimeline}</p>
-                </S.TrustItem>
-              </S.TrustSection>
             </S.MainContent>
 
               <S.OrderSummary>
