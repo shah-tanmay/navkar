@@ -198,7 +198,7 @@ const CheckoutPage = () => {
       }
     };
     fetchOrderDetails();
-  }, [orderToken]);
+  }, [orderToken, status]);
 
   const calculateTotal = () =>
     _.reduce(orderItems, (sum, item) => sum + item.price * item.quantity, 0);

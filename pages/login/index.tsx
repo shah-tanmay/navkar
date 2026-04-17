@@ -21,7 +21,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { status } = useSession();
-  const { error, redirect } = router.query;
+  const { error, redirect, callbackUrl } = router.query;
+  const targetUrl = (callbackUrl || redirect || "/") as string;
 
   useEffect(() => {
     if (error) {
@@ -32,9 +33,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/");
+      router.push(targetUrl);
     }
-  }, [status, router]);
+  }, [status, targetUrl, router]);
 
   const handleGoogleSignIn = async () => {
     if (isLoading) return;
@@ -59,7 +60,7 @@ export default function LoginPage() {
 
     try {
       await signIn("google", {
-        callbackUrl: typeof redirect === "string" ? redirect : "/",
+        callbackUrl: targetUrl,
       });
     } catch (error) {
       console.error("Login error:", error);
