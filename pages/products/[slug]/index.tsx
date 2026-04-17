@@ -462,38 +462,6 @@ const ProductPage = (props: ProductPageProps) => {
       };
     }
 
-    // ── Tracking: Buy Now Clicked ──────────────────────────────────────────
-    // Fires after all validation passes, just before the order is created.
-    // This is a PDP-level signal: user tapped Buy Now and is heading to checkout.
-    const trackingPrice = getCurrentPrice();
-    const trackingName  = (productDetails as any)?.product_name || selectedVariant.slug;
-
-    // Meta Pixel — InitiateCheckout
-    if (typeof window !== "undefined" && (window as any).fbq) {
-      (window as any).fbq("track", "InitiateCheckout", {
-        content_name:     trackingName,
-        content_ids:      [selectedVariant.id],
-        content_type:     "product",
-        value:            trackingPrice * variantQuantity,
-        currency:         "INR",
-        num_items:        variantQuantity,
-      });
-    }
-
-    // Google Ads — begin_checkout
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "begin_checkout", {
-        currency: "INR",
-        value:    trackingPrice * variantQuantity,
-        items: [{
-          item_id:       selectedVariant.id,
-          item_name:     trackingName,
-          item_category: (selectedVariant as any).type,
-          price:         trackingPrice,
-          quantity:      variantQuantity,
-        }],
-      });
-    }
     // ── End Tracking ────────────────────────────────────────────────────────
 
     const orderToken = await getOrCreateOrderToken(variantId, variantQuantity, userId, metadata);
