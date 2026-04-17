@@ -27,7 +27,7 @@ import api from "../../../lib/axios";
 import { 
   FaShoppingCart, FaChevronDown, FaChevronUp, FaLock, 
   FaShieldAlt, FaTruck, FaClock, FaCheckCircle, 
-  FaCreditCard
+  FaCreditCard, FaChevronRight
 } from "react-icons/fa";
 
 
