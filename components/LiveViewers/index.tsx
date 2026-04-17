@@ -91,7 +91,7 @@ export const LiveViewers: React.FC<LiveViewersProps> = ({ productId }) => {
   return (
     <Container>
       <Dot />
-      <span>{count} people viewed this in the last 10 minutes</span>
+      <span>{count} people viewing this now</span>
     </Container>
   );
 };
