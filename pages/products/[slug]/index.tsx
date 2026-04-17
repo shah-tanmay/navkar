@@ -706,7 +706,7 @@ const ProductPage = (props: ProductPageProps) => {
               )}
             </PriceTag>
 
-            <LiveViewers productId={productDetails?.product_id} />
+            <LiveViewers productId={productDetails?.id} />
 
             {productDetails?.is_discontinued && (
               <div style={{ 
