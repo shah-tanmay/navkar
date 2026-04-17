@@ -55,6 +55,7 @@ const CheckoutPage = () => {
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
   const [currentStep, setCurrentStep] = useState(0); // 0: Contact, 1: Shipping, 2: Payment
   const [shippingAddress, setShippingAddress] = useState<any>(null);
+  const [deliveryTimeline, setDeliveryTimeline] = useState("5-7 business days");
 
 
   const { isActive, releaseReservations } = useReservations({
@@ -231,6 +232,7 @@ const CheckoutPage = () => {
         const res = await api.get("/config/shipping");
         if (res.data.free_shipping_threshold !== undefined) setThreshold(Number(res.data.free_shipping_threshold));
         if (res.data.standard_shipping_fee !== undefined) setFlatFee(Number(res.data.standard_shipping_fee));
+        if (res.data.delivery_timeline) setDeliveryTimeline(res.data.delivery_timeline);
       } catch (e) {
         console.error("Failed to fetch shipping configs", e);
       }
@@ -445,7 +447,7 @@ const CheckoutPage = () => {
                 <S.TrustItem>
                   <FaTruck />
                   <span>Fast Delivery</span>
-                  <p>Ready to ship in 5-7 days</p>
+                  <p>Ready to ship in {deliveryTimeline}</p>
                 </S.TrustItem>
               </S.TrustSection>
             </S.MainContent>
