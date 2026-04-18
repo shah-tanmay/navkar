@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
+//@ts-ignore
+import { load } from "@cashfreepayments/cashfree-js";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,7 +42,9 @@ import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import QuantitySelector from "../../../components/QuantitySelector";
 import { BuyNow } from "../../../components/BuyNowButton";
 import { getOrCreateOrderToken } from "../../../utils/orderManager";
-import { createOrder } from "../../../services/orderService";
+import { getPaymentSessionId } from "../../../services/paymentService";
+import { createOrder, getAllUserOrders } from "../../../services/orderService";
+
 import ProductNotFoundPage from "../../../components/ProductNotFound";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import SEO from "../../../components/SEO";
@@ -158,7 +162,7 @@ const ProductPage = (props: ProductPageProps) => {
     deliveryTimeline,
   } = props;
   const router = useRouter();
-  const { cartItems, addToCart, updateQuantity: updateCartQuantity } = useCart();
+  const { cartItems, addToCart, removeFromCart, orderToken, updateQuantity: updateCartQuantity, setOrderToken } = useCart();
   const { data: session, status } = useSession();
   const [productDetails, setProductDetails] = useState<ProductVariantDetails>(initialProductDetails);
   const [variants, setVariants] = useState<ProductVariant[]>(initialVariants);
@@ -176,10 +180,32 @@ const ProductPage = (props: ProductPageProps) => {
   const [cartItem, setCartItem] = useState<CartItems | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [activeImage, setActiveImage] = useState<string>(initialSelectedVariant.image_url || (productDetails as any)?.image_url || "");
-  const [hangingStyle, setHangingStyle] = useState<string | null>(null);
+  const [hangingStyle, setHangingStyle] = useState<string | null>("Eyelets");
   const [isStyleModalOpen, setIsStyleModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<'buy' | 'cart'>('buy');
   const [shippingThreshold, setShippingThreshold] = useState(FREE_SHIPPING_THRESHOLD);
+  const [isFirstOrder, setIsFirstOrder] = useState<boolean>(true);
+
+  useEffect(() => {
+    const checkFirstOrder = async () => {
+      if (status === 'authenticated') {
+        try {
+          const orders = await getAllUserOrders();
+          const hasPurchased = (orders || []).some(o => 
+            o.payment_status === 'paid' || 
+            ['paid', 'confirmed', 'shipped', 'delivered', 'ready_to_ship'].includes(o.status?.toLowerCase())
+          );
+          setIsFirstOrder(!hasPurchased);
+        } catch (e) {
+          console.error("Failed to check first order history", e);
+          setIsFirstOrder(true);
+        }
+      } else {
+        setIsFirstOrder(true);
+      }
+    };
+    checkFirstOrder();
+  }, [status]);
 
   useEffect(() => {
     const fetchConfigs = async () => {
@@ -312,6 +338,10 @@ const ProductPage = (props: ProductPageProps) => {
   }, [quantity, customLength, customWidth, customUnit, hangingStyle, selectedVariant?.type]);
 
   // Pixel & Google Ads Tracking (ViewContent / view_item)
+  // Dependency: initialSelectedVariant?.id \u2014 set by getServerSideProps.
+  // This fires once per product page, NOT on every in-page variant swatch swap.
+  // Swapping color/size updates selectedVariant?.id but NOT initialSelectedVariant?.id,
+  // so we avoid inflating ViewContent counts with variant interactions (BUG-10).
   useEffect(() => {
     if (typeof window === "undefined" || !selectedVariant) return;
 
@@ -342,7 +372,7 @@ const ProductPage = (props: ProductPageProps) => {
         }],
       });
     }
-  }, [selectedVariant?.id]);
+  }, [initialSelectedVariant?.id]);
 
   useEffect(() => {
     const checkVisibility = () => {
@@ -467,18 +497,29 @@ const ProductPage = (props: ProductPageProps) => {
       (window as any).gtag("event", "buy_now_clicked", {
         currency:      "INR",
         value:         _intentPrice,
-        item_id:       selectedVariant.id,
-        item_name:     _intentName,
-        item_category: (selectedVariant as any).type,
+        items: [{
+          item_id:       selectedVariant.id,
+          item_name:     _intentName,
+          item_category: (selectedVariant as any).type,
+          price:         _intentPrice,
+          quantity:      quantity,
+        }]
       });
+      // NOTE: begin_checkout fires later — after paymentSessionId is confirmed.
     }
     // ── End raw click tracking ─────────────────────────────────────────────
 
-    const currentStyle = overrideHangingStyle || hangingStyle;
+    const currentStyle = overrideHangingStyle || hangingStyle || "Eyelets";
     const isCustom = selectedVariant.type?.toLowerCase() === "custom";
     const invalidCustom = isCustom && (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0);
 
-    if (!currentStyle || invalidCustom) {
+    // EXPRESS FLOW: Skip modal for standard sizes, or if customization is already complete.
+    // We only open the modal if it's a custom size that hasn't been filled yet.
+    if (invalidCustom) {
+      if (!isStyleModalOpen && typeof window !== "undefined") {
+        if ((window as any).fbq) (window as any).fbq("trackCustom", "CustomizeIntent", { content_ids: [selectedVariant.id] });
+        if ((window as any).gtag) (window as any).gtag("event", "customize_intent", { item_id: selectedVariant.id });
+      }
       setIsStyleModalOpen(true);
       return;
     }
@@ -487,7 +528,10 @@ const ProductPage = (props: ProductPageProps) => {
     const variantQuantity = overrideQuantity || quantity;
     const userId = (session?.user as any)?.id;
     
-    let metadata = {};
+    // Always default to 'Eyelets' for express checkout; users can refine later on Success Page
+    let metadata: any = {
+      hangingStyle: currentStyle
+    };
     if (selectedVariant.type?.toLowerCase() === "custom") {
       const toFeet = (val: string, unit: string) => {
         const v = parseFloat(val) || 0;
@@ -528,15 +572,91 @@ const ProductPage = (props: ProductPageProps) => {
 
     // ── End Tracking ────────────────────────────────────────────────────────
 
-    const orderToken = await getOrCreateOrderToken(variantId, variantQuantity, userId, metadata);
-    if (!orderToken) return;
+    // ── Funnel Tracking: Initiate Checkout ──────────────────────────────
+    // ALWAYS generate a pristine token for "Buy Now" to avoid any Cashfree state contamination 
+    // from cached orders (like "Order already paid" or expired checkout sessions).
+    const { generateFreshOrderToken } = await import("../../../utils/orderManager");
+    const freshToken = await generateFreshOrderToken(variantId, variantQuantity, userId, metadata);
+    if (!freshToken) {
+      toast.error("Failed to generate order session.");
+      return;
+    }
+    
+    // SYNC: Update global context and local storage so the rest of the app "sees" this new order ID
+    setOrderToken(freshToken);
+    localStorage.setItem("cart_order_token", freshToken);
 
-    router.push({
-      pathname: `/checkout/${orderToken}`,
-      query: {
-        itemSlug: selectedVariant?.slug,
-      },
-    });
+    setLoading(true);
+    try {
+      const orderData = await getPaymentSessionId(freshToken);
+      const paymentData = orderData;
+
+      if (paymentData && paymentData.paymentSessionId) {
+        // ── Funnel Tracking: InitiateCheckout ──────────────────────────────
+        // Fires here (after paymentSessionId confirmed) — not on raw click.
+        // This gives accurate begin_checkout / InitiateCheckout counts.
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq("track", "InitiateCheckout", {
+            content_name: (productDetails as any)?.product_name || selectedVariant.slug,
+            content_ids: [selectedVariant.id],
+            content_type: "product",
+            value: getCurrentPrice() * variantQuantity,
+            currency: "INR",
+          });
+        }
+        if (typeof window !== "undefined" && (window as any).gtag) {
+          (window as any).gtag("event", "begin_checkout", {
+            currency: "INR",
+            value: getCurrentPrice() * variantQuantity,
+            items: [{
+              item_id:   selectedVariant.id,
+              item_name: (productDetails as any)?.product_name || selectedVariant.slug,
+              price:     getCurrentPrice(),
+              quantity:  variantQuantity,
+            }],
+          });
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
+        try {
+          // Initialize Cashfree SDK and redirect via their secure UI — fixes the 404 issue and enables "Magic" flow
+          const { load } = await import("@cashfreepayments/cashfree-js");
+          const cashfree = await load({ 
+            mode: (process.env.NEXT_PUBLIC_CASHFREE_MODE as "sandbox" | "production") || "sandbox" 
+          });
+          
+          const result = await cashfree.checkout({
+            paymentSessionId: paymentData.paymentSessionId,
+            redirectTarget: "_self", // Keeps the user in the same tab for a seamless one-click feel
+          });
+
+          if (result?.error) {
+            toast.error(result.error.message);
+          }
+        } catch (sdkErr: any) {
+          console.error("SDK Error:", sdkErr);
+          toast.error("Cashfree SDK failed: " + (sdkErr.message || "Unknown error"));
+          router.push({
+            pathname: `/checkout/${orderToken}`,
+            query: { itemSlug: selectedVariant?.slug },
+          });
+        }
+      } else {
+        console.error("Fallback due to missing paymentSessionId. Data:", paymentData);
+        toast.error("Cannot launch Cashfree: Payment API returned an error.");
+        // Fallback to internal checkout if payment session fails for some reason
+        router.push({
+          pathname: `/checkout/${orderToken}`,
+          query: { itemSlug: selectedVariant?.slug },
+        });
+      }
+    } catch (err: any) {
+      console.error("Fast Checkout failed:", err);
+      toast.error("Checkout Failed: " + (err.message || ""));
+      router.push(`/checkout/${orderToken}`);
+    } finally {
+      setLoading(false);
+    }
   };
   
   const [showAllColors, setShowAllColors] = useState(false);
@@ -754,14 +874,62 @@ const ProductPage = (props: ProductPageProps) => {
               </button>
             </ProductTitle>
             <PriceTag style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-              {getCurrentPrice() > 0 ? (
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  ₹{getCurrentPrice().toLocaleString('en-IN')} 
-                  <span style={{ fontSize: '1.2rem', color: '#999', textDecoration: 'line-through', fontWeight: '400' }}>
-                    ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
-                  </span>
-                </div>
-              ) : (
+               {getCurrentPrice() > 0 ? (
+                 <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                      ₹{getCurrentPrice().toLocaleString('en-IN')} 
+                      <span style={{ fontSize: '1.2rem', color: '#999', textDecoration: 'line-through', fontWeight: '400' }}>
+                        ₹{Math.floor(getCurrentPrice() * 1.3).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    {isFirstOrder && (
+                      status !== 'authenticated' ? (
+                        <div 
+                          onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(router.asPath)}`)}
+                          style={{ 
+                            display: 'inline-flex', 
+                            marginTop: '8px', 
+                            background: '#fffbeb', 
+                            color: '#b45309', 
+                            padding: '4px 10px', 
+                            borderRadius: '6px', 
+                            fontSize: '0.7rem', 
+                            fontWeight: '800', 
+                            textTransform: 'uppercase', 
+                            letterSpacing: '0.02em', 
+                            border: '1px solid #fef3c7',
+                            cursor: 'pointer',
+                            gap: '6px',
+                            alignItems: 'center',
+                            width: 'fit-content'
+                          }}
+                        >
+                           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                           Save ₹100 for your 1st order
+                        </div>
+                      ) : (
+                        <div style={{ 
+                          display: 'inline-flex', 
+                          marginTop: '8px', 
+                          background: '#f0fdf4', 
+                          color: '#166534', 
+                          padding: '4px 10px', 
+                          borderRadius: '6px', 
+                          fontSize: '0.7rem', 
+                          fontWeight: '700', 
+                          border: '1px solid #dcfce7',
+                          gap: '6px',
+                          alignItems: 'center',
+                          width: 'fit-content'
+                        }}>
+                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                           ₹100 credit applied at checkout
+                        </div>
+                      )
+                    )}
+
+                 </div>
+               ) : (
                 <>
                   <div style={{ fontSize: '1.8rem', fontWeight: '600' }}>Starting from ₹{getWindowPrice().toLocaleString('en-IN')}</div>
                   <div style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: '400' }}>(Price depends on length)</div>
@@ -771,33 +939,6 @@ const ProductPage = (props: ProductPageProps) => {
 
             <LiveViewers productId={productDetails?.id} />
 
-            {status !== 'authenticated' ? (
-              <PromotionBanner onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(router.asPath)}`)}>
-                <div className="badge">Limited Offer</div>
-                <div className="content">
-                  <strong>Login & Save ₹250</strong>
-                  <span>Get ₹100 extra off + use <b>NAV150</b> on your 1st purchase</span>
-                </div>
-                <FaChevronRight size={18} />
-              </PromotionBanner>
-            ) : (
-              <div style={{
-                background: '#f0fdf4',
-                border: '1px solid #dcfce7',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginTop: '1.5rem',
-                fontSize: '0.9rem',
-                color: '#166534',
-                fontWeight: '500'
-              }}>
-                <FaCheckCircle />
-                <span>₹100 First-Purchase credit will be applied at checkout!</span>
-              </div>
-            )}
 
             {productDetails?.is_discontinued && (
               <div style={{ 
@@ -1232,6 +1373,8 @@ const ProductPage = (props: ProductPageProps) => {
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
                 quantity={quantity}
+                price={getCurrentPrice()}
+                productName={(productDetails as any)?.product_name || selectedVariant?.name}
                 onBeforeAdd={() => {
                   if (!hangingStyle) {
                     setModalAction('cart');
@@ -1379,6 +1522,8 @@ const ProductPage = (props: ProductPageProps) => {
                 cartId={cartItem?.cart_id}
                 variantId={selectedVariant?.id as string}
                 quantity={quantity}
+                price={getCurrentPrice()}
+                productName={(productDetails as any)?.product_name || selectedVariant?.name}
                 onBeforeAdd={() => {
                   const isCustom = selectedVariant.type?.toLowerCase() === "custom";
                   const invalidCustom = isCustom && (!customWidth || !customLength || parseFloat(customWidth) <= 0 || parseFloat(customLength) <= 0);
@@ -1463,47 +1608,13 @@ const ProductPage = (props: ProductPageProps) => {
               Please complete your customization before proceeding.
             </p>
             
-            <h4 style={{ marginBottom: '0.75rem', fontSize: '1rem', color: '#111827' }}>1. Choose Hanging Style</h4>
+            {/* 1. Choose Hanging Style — HIDDEN in Express Flow to reduce friction; defaulted to Eyelets */}
+            {/* <h4 style={{ marginBottom: '0.75rem', fontSize: '1rem', color: '#111827' }}>1. Choose Hanging Style</h4>
             <HangingGrid style={{ marginBottom: '1.5rem' }}>
-              <HangingCard 
-                $active={hangingStyle === "Eyelets"} 
-                onClick={() => setHangingStyle("Eyelets")}
-              >
-                <div className="img-wrapper">
-                  <Image 
-                    loader={cloudinaryLoader}
-                    src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776016703/static_assets/hanging_eyelets_final.png" 
-                    alt="Eyelets Style" 
-                    fill
-                    quality={75}
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-                <div className="info">
-                  <span className="name">Eyelets</span>
-                  <span className="desc">Regular rings</span>
-                </div>
-              </HangingCard>
-              <HangingCard 
-                $active={hangingStyle === "American Pleats"} 
-                onClick={() => setHangingStyle("American Pleats")}
-              >
-                <div className="img-wrapper">
-                  <Image 
-                    loader={cloudinaryLoader}
-                    src="https://res.cloudinary.com/dhxa5zutl/image/upload/v1776020723/static_assets/american_pleats_v2.png" 
-                    alt="American Pleats Style" 
-                    fill
-                    quality={75}
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-                <div className="info">
-                  <span className="name">American Pleats</span>
-                  <span className="desc">Premium pleats</span>
-                </div>
-              </HangingCard>
-            </HangingGrid>
+              ...
+            </HangingGrid> */}
+            
+            <input type="hidden" value="Eyelets" /> 
 
             {selectedVariant?.type?.toLowerCase() === "custom" && (
               <div style={{ padding: '1.25rem', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', marginBottom: '1.5rem' }}>
@@ -1612,12 +1723,12 @@ const ProductPage = (props: ProductPageProps) => {
                   padding: '12px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? '#9ca3af' : '#111827',
+                  background: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? '#9ca3af' : '#d4af37',
                   color: 'white',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s',
-                  boxShadow: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? 'none' : '0 4px 12px rgba(0,0,0,0.1)'
+                  boxShadow: (!hangingStyle || (selectedVariant?.type?.toLowerCase() === "custom" && (!customLength || parseFloat(customLength) <= 0))) ? 'none' : '0 4px 15px rgba(212, 175, 55, 0.4)'
                 }}
               >
                 Continue

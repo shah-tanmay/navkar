@@ -42,3 +42,21 @@ export const clearOrderToken = (variantId: string, userId?: string): void => {
     localStorage.removeItem(`${STORAGE_KEY_PREFIX}${userId || "guest"}_${variantId}`);
   }
 };
+
+export const generateFreshOrderToken = async (
+  variantId: string,
+  quantity: number,
+  userId?: string,
+  metadata?: any
+): Promise<string | null> => {
+  const token = nanoid();
+  const orderItems = [
+    {
+      product_variant_id: variantId,
+      quantity,
+      metadata,
+    },
+  ];
+  await createOrder(token, orderItems);
+  return token;
+};

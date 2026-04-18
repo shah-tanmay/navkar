@@ -1078,10 +1078,10 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     "to-fast-properties" "^2.0.0"
 
-"@cashfreepayments/cashfree-js@^1.0.5":
-  "integrity" "sha512-fP9wi9mseXJmESGIkD9vb6RAKdSZw42jXiQY2LUt5A2STyEqMv0mYLgK2zqpMNSbdK9QdN1c4YnEv9mmyxC8mg=="
-  "resolved" "https://registry.npmjs.org/@cashfreepayments/cashfree-js/-/cashfree-js-1.0.5.tgz"
-  "version" "1.0.5"
+"@cashfreepayments/cashfree-js@^1.0.7":
+  "integrity" "sha512-WRhjGdUgkPdWbq0YoMsi6hRqyT4XTIGUMNnATQsfz0GIDFP2sjtVon/kcihDVtO6pzEZrjded62Do9xK2VkjPQ=="
+  "resolved" "https://registry.npmjs.org/@cashfreepayments/cashfree-js/-/cashfree-js-1.0.7.tgz"
+  "version" "1.0.7"
 
 "@emotion/babel-plugin@^11.13.5":
   "integrity" "sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ=="

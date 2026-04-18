@@ -7,7 +7,9 @@ import _ from "lodash";
 import { useSession } from "next-auth/react";
 import { LoaderWrapper } from "../../../components/LoaderWrapper";
 import OrderNotFoundPage from "../../../components/OrderNotFound";
-import { FiClock, FiMail, FiMapPin, FiPhone, FiUser, FiLayers, FiZap } from "react-icons/fi";
+import { FiClock, FiMail, FiMapPin, FiPhone, FiUser, FiLayers, FiZap, FiCheck } from "react-icons/fi";
+import Image from "next/image";
+import { cloudinaryLoader } from "../../../utils/imageLoader";
 
 const STATUS_FLOW = [
   "received",
@@ -24,6 +26,8 @@ const OrderTracking: FC<OrderResponse> = () => {
   const { orderToken } = router.query as { orderToken: string };
   const { data: session } = useSession();
   const [invalidOrder, setInvalidOrder] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -81,6 +85,33 @@ const OrderTracking: FC<OrderResponse> = () => {
     };
     fetchOrder();
   }, [orderToken]);
+
+  useEffect(() => {
+    if (!orderDetails?.created_at) return;
+
+    const calculateTime = () => {
+      const orderTime = new Date(orderDetails.created_at).getTime();
+      const now = new Date().getTime();
+      const diff = (30 * 60 * 1000) - (now - orderTime);
+      
+      if (diff <= 0) {
+        setIsExpired(true);
+        setTimeLeft("");
+        return false;
+      } else {
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        setTimeLeft(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+        return true;
+      }
+    };
+
+    const active = calculateTime();
+    if (active) {
+      const timer = setInterval(calculateTime, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [orderDetails?.created_at]);
 
   const getDaySuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
@@ -143,9 +174,21 @@ const OrderTracking: FC<OrderResponse> = () => {
   const currentStatusIndex = fullStatus.findIndex((s) => !s.isCompleted);
 
   const contactInfo = orderDetails?.metadata?.contact || {};
-  const customerName = contactInfo.firstName ? `${contactInfo.firstName} ${contactInfo.lastName}` : session?.user?.name || "Customer";
-  const customerEmail = contactInfo.email || session?.user?.email || "---";
-  const customerPhone = contactInfo.phoneNumber || "---";
+  const baseMetadata = orderDetails?.metadata || {};
+  
+  const customerName = contactInfo.firstName 
+    ? `${contactInfo.firstName} ${contactInfo.lastName}` 
+    : (baseMetadata.name || baseMetadata.customer_name || session?.user?.name || "Customer");
+    
+  const customerEmail = contactInfo.email || baseMetadata.email || baseMetadata.user_email || session?.user?.email || "---";
+  
+  const customerPhone = orderDetails?.phone || 
+                        contactInfo.phoneNumber || 
+                        baseMetadata.phone || 
+                        baseMetadata.contact?.phoneNumber || 
+                        orderDetails?.shipping_address?.phone || 
+                        orderDetails?.shipping_phone || 
+                        "---";
 
   return (
     <LoaderWrapper loading={loading}>
@@ -183,10 +226,10 @@ const OrderTracking: FC<OrderResponse> = () => {
                         {orderDetails.shipping_address ? (
                           <>
                             <FiMapPin style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-                            {orderDetails.shipping_address.street},{" "}
-                            {orderDetails.shipping_address.city},{" "}
-                            {orderDetails.shipping_address.state} -{" "}
-                            {orderDetails.shipping_address.postal_code}
+                            {orderDetails.shipping_address.street || orderDetails.shipping_address.address || orderDetails.shipping_address.address_line_one || '---'},{" "}
+                            {orderDetails.shipping_address.city || '---'},{" "}
+                            {orderDetails.shipping_address.state || '---'} -{" "}
+                            {orderDetails.shipping_address.postal_code || orderDetails.shipping_address.pincode || '---'}
                           </>
                         ) : (
                           "Shipping Address Pending"
@@ -242,6 +285,8 @@ const OrderTracking: FC<OrderResponse> = () => {
                     </S.InfoBlock>
                   </S.InfoGrid>
                 </S.OrderHeader>
+
+                {/* Personalization Section Removed */}
 
                 <S.OrderSection>
                   <S.SectionTitle>Tracking Status</S.SectionTitle>

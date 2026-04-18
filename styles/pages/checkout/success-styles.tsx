@@ -122,15 +122,20 @@ export const PrimaryButton = styled.button`
     background: ${COLORS.gold};
     transform: translateY(-2px);
   }
+
+  @media (max-width: 480px) {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
 `;
 
 export const SecondaryButton = styled.button`
   background: white;
   color: #64748b;
-  padding: 1rem;
+  padding: 0.85rem;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -139,4 +144,28 @@ export const SecondaryButton = styled.button`
     background: #f8fafc;
     border-color: #cbd5e1;
   }
+
+  @media (max-width: 480px) {
+    padding: 0.65rem;
+    font-size: 0.85rem;
+  }
 `;
+
+export const StatusBadge = styled.div`
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  border: 1px solid #dcfce7;
+  animation: ${fadeIn} 0.5s ease-out;
+`;
+
+
+

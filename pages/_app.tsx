@@ -72,14 +72,40 @@ function MetaAdvancedMatching({ pixelId }: { pixelId: string }) {
 
   useEffect(() => {
     if (!pixelId || !email) return;
-    if (typeof window === "undefined" || !(window as any).fbq) return;
+    if (typeof window === "undefined") return;
 
-    sha256hex(email).then((hashedEmail) => {
-      // Re-calling init with user data is the official Meta pattern for
-      // manual advanced matching — it updates the identity context without
-      // duplicating the pixel or resetting event queues.
-      (window as any).fbq("init", pixelId, { em: hashedEmail });
-    });
+    // Poll until window.fbq is available (afterInteractive script may not have loaded yet).
+    // Without this, advanced matching silently fails when the session resolves before the
+    // Pixel script finishes loading (BUG-15).
+    const tryInit = () => {
+      if (!(window as any).fbq) return;
+      sha256hex(email).then((hashedEmail) => {
+        // Re-calling init with user data is the official Meta pattern for
+        // manual advanced matching — it updates the identity context without
+        // duplicating the pixel or resetting event queues.
+        (window as any).fbq("init", pixelId, { em: hashedEmail });
+      });
+    };
+
+    // If fbq is already present, run immediately
+    if ((window as any).fbq) {
+      tryInit();
+      return;
+    }
+
+    // Otherwise poll until ready (max 5 s)
+    const interval = setInterval(() => {
+      if ((window as any).fbq) {
+        tryInit();
+        clearInterval(interval);
+      }
+    }, 200);
+    const timeout = setTimeout(() => clearInterval(interval), 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [email, pixelId]);
 
   return null;
@@ -207,18 +233,18 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           </>
         )}
 
-        <CartProvider>
-          <SessionProvider session={session}>
+        <SessionProvider session={session}>
+          <CartProvider>
             <AuthErrorHandler />
             <MetaAdvancedMatching pixelId={pixelId} />
             <GlobalStyle />
             <ToastContainer />
-            <GoogleAnalytics trackPageViews strategy="lazyOnload" />
+            <GoogleAnalytics gaMeasurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} trackPageViews strategy="lazyOnload" />
             <Layout>
               <Component {...pageProps} />
             </Layout>
-          </SessionProvider>
-        </CartProvider>
+          </CartProvider>
+        </SessionProvider>
       </LoaderProvider>
     </main>
   );

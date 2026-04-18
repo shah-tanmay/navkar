@@ -6,7 +6,7 @@ export const LoaderWrapper = ({
   children,
 }: {
   loading: boolean;
-  children: ReactNode;
+  children?: ReactNode;
 }) => {
   if (loading) {
     return <Loader />;

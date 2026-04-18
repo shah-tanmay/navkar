@@ -18,7 +18,7 @@ const Container = styled.div`
   padding: 8px 16px;
   border-radius: 50px;
   width: fit-content;
-  margin: 10px 0;
+  margin: 8px 0 16px 0;
   font-size: 0.9rem;
   color: #166534;
   font-weight: 500;

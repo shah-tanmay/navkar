@@ -17,14 +17,13 @@ export const getPaymentSessionId = async (
   return paymentDetails;
 };
 
-export const verifyPayment = async (orderToken: string): Promise<boolean> => {
+export const verifyPayment = async (orderToken: string): Promise<any> => {
   if (!orderToken) {
     toast.error("Failed to verify payment");
-    return false;
+    return { verified: false, status: "MISSING_TOKEN" };
   }
   const response = await apiRequest(() =>
     api.post(`${PAYMENT_URL}/verify`, { order_token: orderToken })
   );
-  const verified = response?.data?.verified;
-  return verified;
+  return response?.data;
 };

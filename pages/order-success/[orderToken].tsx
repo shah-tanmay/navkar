@@ -19,6 +19,7 @@ const SuccessPage = () => {
       try {
         const orderData = await getOrderByOrderToken(orderToken);
         setOrder(orderData);
+        
         // Trigger celebration
         confetti({
           particleCount: 150,

@@ -173,37 +173,12 @@ export const Payment = ({
         const isPaymentVerified = await verifyPayment(orderToken);
         setIsLoading(false);
         if (isPaymentVerified) {
-          gaEvent("purchase", {
-            currency: "INR",
-            value: total,
-            transaction_id: orderToken
-          });
-          if (typeof window !== "undefined" && (window as any).fbq) {
-            (window as any).fbq("track", "Purchase", {
-              currency: "INR",
-              value: total
-            });
-          } else {
-            console.warn("[Meta Pixel] fbq not available — Purchase event not fired.");
-          }
-          // Google Ads conversion event
-          const gadsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-          const gadsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
-          if (typeof window !== "undefined" && (window as any).gtag && gadsId) {
-            const sendTo = gadsLabel ? `${gadsId}/${gadsLabel}` : gadsId;
-            (window as any).gtag("event", "conversion", {
-              send_to: sendTo,
-              currency: "INR",
-              value: total,
-              transaction_id: orderToken,
-            });
-          } else {
-            console.warn("[Google Ads] gtag not available — conversion event not fired.");
-          }
           toast.success("Payment successful!");
-          // Small delay so all tracking beacons can be dispatched before page navigation
+          // Route through the process page — it verifies payment server-side and
+          // fires the canonical Purchase events (fbq + gtag) on the success page.
+          // Tracking is NOT fired here to avoid duplicate Purchase events.
           setTimeout(() => {
-            router.push(`/order-success/${orderToken}`);
+            router.push(`/checkout/process/${orderToken}`);
           }, 300);
         } else {
           toast.error("Payment failed. Please try again.");

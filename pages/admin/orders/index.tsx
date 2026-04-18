@@ -134,10 +134,10 @@ const AdminOrdersComprehensive: NextPage = () => {
                           <strong style={{ color: "#1e293b" }}>{o.metadata_name || o.customer_name}</strong><br />
                           <span style={{ fontSize: "0.85rem", color: "#64748b" }}>{o.email}</span>
                         </div>
-                        <div style={{ fontSize: "0.8rem", color: "#64748b", padding: "0.4rem", background: "#f8fafc", borderRadius: "6px" }}>
-                          <i style={{ color: "#94a3b8" }}>Shipping:</i><br />
-                          {o.street || o.shipping_address?.street || '---'}, {o.city || o.shipping_address?.city || '---'}<br />
-                          {o.state || o.shipping_address?.state || '---'} {o.postal_code || o.shipping_address?.postal_code || '---'}
+                        <div style={{ fontSize: "0.8rem", color: "#64748b", padding: "0.6rem", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", marginTop: "0.5rem" }}>
+                          <strong style={{ color: "#475569", fontSize: "0.7rem", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Shipping To:</strong>
+                          {o.street || o.shipping_address?.street || '---'}<br />
+                          {o.city || o.shipping_address?.city || '---'}, {o.state || o.shipping_address?.state || '---'} {o.postal_code || o.shipping_address?.postal_code || '---'}
                         </div>
                       </td>
                       <td style={{ padding: "1.2rem 1rem", borderTop: "1px solid #f1f5f9", borderBottom: "1px solid #f1f5f9" }}>

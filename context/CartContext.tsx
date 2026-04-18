@@ -16,6 +16,7 @@ import {
 } from "../services/cartService";
 import { CartItems } from "../types/api";
 import { isUserloggedIn } from "../utils/login";
+import { useSession } from "next-auth/react";
 import { nanoid } from "nanoid";
 
 const STORAGE_TOKEN_KEY = "cart_order_token";
@@ -27,6 +28,8 @@ type CartContextType = {
   addToCart: (variantId: string, quantity: number, metadata?: any) => Promise<void>;
   removeFromCart: (cartItemId: string) => Promise<void>;
   updateQuantity: (cartItemId: string, newQuantity: number) => void;
+  clearCartToken: () => void;
+  setOrderToken: (token: string) => void; 
 };
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
@@ -35,6 +38,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [orderToken, setOrderToken] = useState<string>("");
+  const { data: session, status } = useSession();
+  const userId = (session?.user as any)?.id;
 
   const router = useRouter();
   const latestQuantitiesRef = useRef<{ [key: string]: number }>({});
@@ -56,15 +61,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setOrderToken(newToken);
   }, []);
 
-  const authCheck = useCallback(async () => {
-    const loggedIn = await isUserloggedIn();
-    return loggedIn;
+  const clearCartToken = useCallback(() => {
+    localStorage.removeItem(STORAGE_TOKEN_KEY);
+    setOrderToken("");
   }, []);
+
+  const authCheck = useCallback(async () => {
+    return status === "authenticated";
+  }, [status]);
 
   // Initial cart fetch
   useEffect(() => {
     const loadCart = async () => {
-      const loggedIn = await authCheck();
+      setIsLoading(true);
+      const loggedIn = status === "authenticated";
+      
       if (!loggedIn) {
         try {
           const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
@@ -75,15 +86,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
         return;
       }
+      
       try {
         const items = await getCartItems();
         setCartItems(items);
+        // Force a token check when we log in to ensure we claim any guest orders
+        let token = localStorage.getItem(STORAGE_TOKEN_KEY);
+        if (token) setOrderToken(token);
       } finally {
         setIsLoading(false);
       }
     };
     loadCart();
-  }, [authCheck]);
+  }, [status, userId]);
 
   // Debounced quantity updates
   const debouncedUpdates = useRef(
@@ -232,6 +247,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCartToken,
+        setOrderToken,
       }}
     >
       {children}

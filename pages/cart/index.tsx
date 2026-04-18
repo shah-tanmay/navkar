@@ -7,17 +7,47 @@ import ProtectedRoute from "../../components/ProtectedRoute";
 import QuantitySelector from "../../components/QuantitySelector";
 import COLORS from "../../constants/color";
 import { useCart } from "../../context/CartContext";
-import { createOrder } from "../../services/orderService";
+import { createOrder, getAllUserOrders } from "../../services/orderService";
+
 import { validateCoupon } from "../../services/couponService";
 import { useState, useEffect } from "react";
 import api from "../../lib/axios";
 import { toast } from "react-toastify";
 import * as S from "../../styles/pages/cart/styles";
+import { getPaymentSessionId } from "../../services/paymentService";
+//@ts-ignore
+import { load } from "@cashfreepayments/cashfree-js";
+import { useSession } from "next-auth/react";
 
 const CartPage = () => {
   const router = useRouter();
   const { cartItems, updateQuantity, removeFromCart, isLoading, orderToken } =
     useCart();
+  const { data: session, status } = useSession();
+  const userId = (session?.user as any)?.id;
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [isFirstOrder, setIsFirstOrder] = useState<boolean>(true);
+
+  useEffect(() => {
+    const checkFirstOrder = async () => {
+      if (status === 'authenticated') {
+        try {
+          const orders = await getAllUserOrders();
+          const hasPurchased = (orders || []).some(o => 
+            o.payment_status === 'paid' || 
+            ['paid', 'confirmed', 'shipped', 'delivered', 'ready_to_ship'].includes(o.status?.toLowerCase())
+          );
+          setIsFirstOrder(!hasPurchased);
+        } catch (e) {
+          console.error("Failed to check first order history", e);
+        }
+      } else {
+        setIsFirstOrder(true);
+      }
+    };
+    checkFirstOrder();
+  }, [status]);
+
 
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -44,7 +74,12 @@ const CartPage = () => {
 
   const subtotal = _.reduce(cartItems, (sum, item) => sum + item.price * item.quantity, 0);
   const shippingFee = (subtotal < threshold && subtotal > 0) ? flatFee : 0;
-  const finalTotal = Math.max(0, subtotal + shippingFee - couponDiscount);
+  
+  // Apply ₹100 Login/First-Order Reward if authenticated and first order
+  const loyaltyReward = (status === "authenticated" && subtotal > 0 && isFirstOrder) ? 100 : 0;
+
+  
+  const finalTotal = Math.max(0, subtotal + shippingFee - couponDiscount - loyaltyReward);
 
   useEffect(() => {
     if (cartItems && cartItems.length > 0) {
@@ -54,7 +89,7 @@ const CartPage = () => {
         value: finalTotal,
         items: cartItems.map((item: any) => ({
           item_id: item.variant_id,
-          item_name: item.color, // Using color as name if product_name not directly available in cart items
+          item_name: item.product_name || item.color, // prefer product_name; fallback to color
           price: item.price,
           quantity: item.quantity,
         })),
@@ -222,6 +257,13 @@ const CartPage = () => {
                     </S.SummaryRow>
                   )}
 
+                  {loyaltyReward > 0 && (
+                    <S.SummaryRow style={{ color: "#BA8160", fontWeight: "600" }}>
+                      <span>First Order reward</span>
+                      <span>-₹{loyaltyReward}</span>
+                    </S.SummaryRow>
+                  )}
+
                   <S.SummaryRow>
                     <span>Delivery</span>
                     <span style={{ color: shippingFee === 0 ? "#2e7d32" : "inherit", fontWeight: shippingFee === 0 ? "600" : "inherit" }}>
@@ -263,38 +305,86 @@ const CartPage = () => {
                   )}
 
                   <S.CheckoutButton
+                    disabled={checkingOut}
                     onClick={async () => {
-                      // Final Safety Check: Re-validate coupon if one is applied
-                      if (appliedCoupon) {
-                        try {
-                          console.log(`[Checkout] Pre-flight re-validating coupon: ${appliedCoupon.code}`);
-                          const freshCoupon = await validateCoupon(appliedCoupon.code);
-                          if (!freshCoupon) throw new Error("Coupon is no longer valid");
-                        } catch (err: any) {
-                          toast.error("Your applied coupon is no longer valid and has been removed.");
-                          setAppliedCoupon(null);
-                          setCouponDiscount(0);
-                          return; // Stop the checkout
+                      setCheckingOut(true);
+                      try {
+                        // Final Safety Check: Re-validate coupon if one is applied
+                        if (appliedCoupon) {
+                          try {
+                            console.log(`[Checkout] Pre-flight re-validating coupon: ${appliedCoupon.code}`);
+                            const freshCoupon = await validateCoupon(appliedCoupon.code);
+                            if (!freshCoupon) throw new Error("Coupon is no longer valid");
+                          } catch (err: any) {
+                            toast.error("Your applied coupon is no longer valid and has been removed.");
+                            setAppliedCoupon(null);
+                            setCouponDiscount(0);
+                            setCheckingOut(false);
+                            return; // Stop the checkout
+                          }
                         }
-                      }
 
-                      const orderResponse = await createOrder(
-                        orderToken,
-                        _.map(cartItems, (item) => {
-                          return {
-                            product_variant_id: item.variant_id,
-                            quantity: item.quantity,
-                            metadata: item.metadata,
-                          };
-                        }),
-                        appliedCoupon?.code
-                      );
-                      if (orderResponse) {
-                        router.push(`/checkout/${orderToken}`);
+                        const orderResponse = await createOrder(
+                          orderToken,
+                          _.map(cartItems, (item) => {
+                            return {
+                              product_variant_id: item.variant_id,
+                              quantity: item.quantity,
+                              metadata: item.metadata,
+                            };
+                          }),
+                          appliedCoupon?.code
+                        );
+
+                        if (orderResponse) {
+                          // ── Trigger One-Click Checkout (Exclusively) ──
+                          const orderData = await getPaymentSessionId(orderToken);
+                          
+                          if (orderData && orderData.paymentSessionId) {
+                            // Standard Funnel Tracking: InitiateCheckout
+                            if (typeof window !== "undefined" && (window as any).fbq) {
+                              (window as any).fbq("track", "InitiateCheckout", {
+                                content_ids: _.map(cartItems, i => i.variant_id),
+                                content_type: "product",
+                                value: finalTotal,
+                                currency: "INR",
+                              });
+                            }
+                            // Google Ads begin_checkout — mirrors fbq InitiateCheckout (BUG-14)
+                            if (typeof window !== "undefined" && (window as any).gtag) {
+                              (window as any).gtag("event", "begin_checkout", {
+                                currency: "INR",
+                                value: finalTotal,
+                                items: cartItems.map((i: any) => ({
+                                  item_id: i.variant_id,
+                                  item_name: i.product_name || i.color,
+                                  price: i.price,
+                                  quantity: i.quantity,
+                                })),
+                              });
+                            }
+
+                            const cashfree = await load({ 
+                              mode: (process.env.NEXT_PUBLIC_CASHFREE_MODE as "sandbox" | "production") || "sandbox" 
+                            });
+                            
+                            await cashfree.checkout({
+                              paymentSessionId: orderData.paymentSessionId,
+                              redirectTarget: "_self",
+                            });
+                          } else {
+                            throw new Error("Failed to initialize payment session");
+                          }
+                        }
+                      } catch (err: any) {
+                        console.error("Checkout Error:", err);
+                        toast.error(err.message || "An unexpected error occurred during checkout.");
+                      } finally {
+                        setCheckingOut(false);
                       }
                     }}
                   >
-                    <FiLock /> Secure Checkout
+                    <FiLock /> {checkingOut ? "Processing..." : "Secure Checkout"}
                   </S.CheckoutButton>
 
                   <S.TrustBadges>

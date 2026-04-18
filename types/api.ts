@@ -166,14 +166,17 @@ export interface TrackingStatus {
 export interface OrderResponse {
   id: string;
   status: string;
-  total_amount: number;
+  total_amount: string | number;
   order_token: string;
   order_items: OrderItem[];
   order_tracking_statuses: TrackingStatus[];
-  shipping_address?: Address;
+  shipping_address?: any;
   shipping_address_id?: string;
   metadata?: any;
   coupon_code?: string;
+  payment_status?: string;
+  created_at: string;
+  phone?: string;
 }
 
 export type StateOption = { value: string; label: string };

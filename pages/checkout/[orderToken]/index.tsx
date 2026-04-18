@@ -38,6 +38,17 @@ const CheckoutPage = () => {
     orderToken: string;
     itemSlug: string;
   };
+
+  // ── DISABLE STANDARD CHECKOUT ──
+  // We are moving exclusively to One-Click Checkout for higher conversion.
+  // This manual step is no longer supported.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      router.replace("/");
+    }
+  }, [router]);
+
+  if (true) return <LoaderWrapper loading={true} />; // Prevent flash of old UI
   const name = _.split(session?.user?.name, " ");
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);

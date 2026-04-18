@@ -15,12 +15,16 @@ export const AddToCart = ({
   quantity,
   metadata,
   onBeforeAdd,
+  price,
+  productName,
 }: {
   cartId?: string;
   variantId: string;
   quantity: number;
   metadata?: any;
   onBeforeAdd?: () => boolean | Promise<boolean>;
+  price?: number;
+  productName?: string;
 }) => {
   const { addToCart, cartItems, updateQuantity } = useCart();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,36 +40,22 @@ export const AddToCart = ({
     }
 
     if (status === "unauthenticated") {
-      // Add to guest localStorage cart directly
-      await addToCart(variantId, quantity, metadata); // CartContext handles guest mode
-      
-      // Fire tracking for guests
-      gaEvent("add_to_cart", {
-        currency: "INR",
-        items: [{ item_id: variantId, quantity }],
+      toast.info("Please login to add items to your cart", {
+        position: "bottom-center",
+        autoClose: 3000
       });
-      if (typeof window !== "undefined" && (window as any).fbq) {
-        (window as any).fbq("track", "AddToCart", {
-          content_ids: [variantId],
-          content_type: "product",
-          currency: "INR",
-        });
-      }
-      if (typeof window !== "undefined" && (window as any).gtag) {
-        (window as any).gtag("event", "add_to_cart", {
-          currency: "INR",
-          items: [{ item_id: variantId, quantity }],
-        });
-      }
-
-      toast.success("Added to cart!");
+      router.push("/auth/signin");
       return;
     }
 
     setIsLoading(true);
     try {
       const userLoggedIn = await isUserloggedIn();
-      if (!userLoggedIn) return;
+      if (!userLoggedIn) {
+        toast.info("Please login to manage your cart");
+        router.push("/auth/signin");
+        return;
+      }
 
       const existingCartItem = _.find(
         cartItems,
@@ -81,23 +71,21 @@ export const AddToCart = ({
 
       gaEvent("add_to_cart", {
         currency: "INR",
-        items: [{ item_id: variantId, quantity }],
+        value: (price || 0) * quantity,
+        items: [{ item_id: variantId, item_name: productName, quantity, price }],
       });
-      // Meta Pixel
+      // Meta Pixel — value is required for catalog attribution
       if (typeof window !== "undefined" && (window as any).fbq) {
         (window as any).fbq("track", "AddToCart", {
           content_ids: [variantId],
+          content_name: productName,
           content_type: "product",
+          value: (price || 0) * quantity,
           currency: "INR",
         });
       }
-      // Google Ads
-      if (typeof window !== "undefined" && (window as any).gtag) {
-        (window as any).gtag("event", "add_to_cart", {
-          currency: "INR",
-          items: [{ item_id: variantId, quantity }],
-        });
-      }
+      // NOTE: raw gtag call removed — gaEvent() above already covers GA4.
+      // A second gtag() here caused duplicate add_to_cart events in GA4 (BUG-08).
     } catch (err) {
       // setError("Failed to update cart");
     } finally {
